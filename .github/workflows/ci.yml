@@ -56,6 +56,9 @@ jobs:
     name: unit (${{ matrix.group }})
     runs-on: ubuntu-latest
     needs: [discover]
+    # The slowest unit group takes ~25s. A job still going at 10 minutes is
+    # stuck, not slow, and the default is six hours of a runner doing nothing.
+    timeout-minutes: 10
     strategy:
       fail-fast: false
       matrix:
@@ -73,6 +76,7 @@ jobs:
     name: browser (${{ matrix.group }})
     runs-on: ubuntu-latest
     needs: [discover, unit]
+    timeout-minutes: 20
     strategy:
       fail-fast: false
       matrix:
@@ -86,7 +90,13 @@ jobs:
           cache-dependency-path: '**/package-lock.json'
       # Chromium only. Firefox and WebKit are not exercised by these suites and
       # downloading them triples the setup for nothing.
+      #
+      # `--with-deps` shells out to apt, which stalled indefinitely on one runner
+      # while the same step finished in under a minute on six others. A step
+      # timeout turns that into a fast, legible failure instead of a job that
+      # occupies a runner until GitHub's six-hour default cuts it off.
       - run: npx playwright install --with-deps chromium
+        timeout-minutes: 6
       - run: node scripts/verify-all.mjs ${{ matrix.group }}
       # The screenshots are not committed — they are rewritten by every verify
       # run, so a green suite would produce a diff. They are kept here for a week
