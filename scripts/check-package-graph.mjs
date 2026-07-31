@@ -50,8 +50,14 @@ if (declared.size < 15) fail(`only parsed ${declared.size} groups out of verify-
 const g = edges();
 const known = new Set(packages());
 
+// Each group's own step list, so we can tell whether it installs itself.
+const STEPS = /\{\s*name:\s*'([a-z0-9-]+)',[\s\S]*?steps:\s*\[([\s\S]*?)\n\s*\]\}/g;
+const steps = new Map([...src.matchAll(STEPS)].map((m) => [m[1], m[2]]));
+
 for (const [name, { dir, needs }] of declared) {
   if (dir === '.' || !known.has(dir)) continue;    // repo-level group, no package of its own
+
+  // 1 — every package whose sources this group compiles must be installed.
   const required = closure(dir, g);
   const missing = required.filter((r) => !needs.includes(r));
   if (missing.length) {
@@ -59,6 +65,17 @@ for (const [name, { dir, needs }] of declared) {
       `group \`${name}\` compiles sources from ${missing.map((x) => `\`${x}\``).join(', ')} ` +
       `but does not declare ${missing.length > 1 ? 'them' : 'it'} in \`needs\` — ` +
       `this passes locally and fails on a clean checkout`,
+    );
+  }
+
+  // 2 — and the group must install the package it RUNS IN. The browser groups
+  // share a directory with a unit group and quietly inherited its node_modules;
+  // that works in one process and never in CI, where they are separate runners.
+  const installsItself = /npm['"\s,]+\[?['"]ci['"]/.test(steps.get(name) ?? '') || needs.includes(dir);
+  if (!installsItself) {
+    fail(
+      `group \`${name}\` runs in \`${dir}\` but neither runs \`npm ci\` nor declares ` +
+      `\`${dir}\` in \`needs\` — it is borrowing an install from another group`,
     );
   }
 }

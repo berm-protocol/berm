@@ -60,10 +60,10 @@ const GROUPS = [
   { name: 'docs', dir: 'docs', why: 'frontmatter, dead links, X Article rules', steps: [
     ['node', ['check.mjs']],
   ]},
-  { name: 'sdk-browser', dir: 'sdk', browser: true, why: 'hello example, end to end, two local relays', steps: [
+  { name: 'sdk-browser', dir: 'sdk', browser: true, needs: ['sdk'], why: 'hello example, end to end, two local relays', steps: [
     ['npm', ['run', 'example:verify']],
   ]},
-  { name: 'graph-browser', dir: 'graph', browser: true, why: 'CSP enforcement and byte-identical pages', steps: [
+  { name: 'graph-browser', dir: 'graph', browser: true, needs: ['graph'], why: 'CSP enforcement and byte-identical pages', steps: [
     ['npm', ['run', 'build']],
     ['npm', ['run', 'verify']],
   ]},
@@ -77,7 +77,7 @@ const GROUPS = [
     ['npm', ['run', 'typecheck']],
     ['npm', ['test']],
   ]},
-  { name: 'post-browser', dir: 'post', browser: true, needs: ['editor', 'landing', 'link', 'sdk'], why: 'card rasterises, decline publishes nothing, intent opens', steps: [
+  { name: 'post-browser', dir: 'post', browser: true, needs: ['post', 'editor', 'landing', 'link', 'sdk'], why: 'card rasterises, decline publishes nothing, intent opens', steps: [
     ['npm', ['run', 'build']],
     ['npm', ['run', 'verify']],
   ]},
@@ -86,7 +86,7 @@ const GROUPS = [
     ['npm', ['run', 'typecheck']],
     ['npm', ['test']],
   ]},
-  { name: 'landing-browser', dir: 'landing', browser: true, why: 'verified / unverified / mismatch, produced against real relays', steps: [
+  { name: 'landing-browser', dir: 'landing', browser: true, needs: ['landing'], why: 'verified / unverified / mismatch, produced against real relays', steps: [
     ['npm', ['run', 'build']],
     ['npm', ['run', 'verify']],
   ]},
