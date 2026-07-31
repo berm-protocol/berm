@@ -61,6 +61,10 @@ const GROUPS = [
     ['node', ['check.mjs']],
   ]},
   { name: 'sdk-browser', dir: 'sdk', browser: true, needs: ['sdk'], why: 'hello example, end to end, two local relays', steps: [
+    // The example page loads dist/berm-sdk.global.js. This group used to run
+    // only the verify and inherit the bundle from the `sdk` group — fine in one
+    // local process, absent on a CI runner that never ran that group.
+    ['npm', ['run', 'bundle']],
     ['npm', ['run', 'example:verify']],
   ]},
   { name: 'graph-browser', dir: 'graph', browser: true, needs: ['graph'], why: 'CSP enforcement and byte-identical pages', steps: [

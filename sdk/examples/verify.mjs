@@ -28,6 +28,15 @@ const check = (name, ok, detail = '') => {
 
 await Promise.all([ready(A), ready(B)]);
 
+// The page loads dist/berm-sdk.global.js. Without it every assertion below
+// fails for the same uninformative reason — "the warning is not shown" — and
+// the reader goes looking in the SDK instead of at a missing build. Say it once,
+// plainly, instead of eighteen times misleadingly.
+if (!existsSync('dist/berm-sdk.global.js')) {
+  console.error('\n  dist/berm-sdk.global.js is missing. Run `npm run bundle` first.\n');
+  process.exit(1);
+}
+
 const server = spawn(process.execPath, ['examples/serve.mjs'], {
   env: { ...process.env, PORT: String(PORT) },
   stdio: 'ignore',
