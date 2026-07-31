@@ -1,0 +1,123 @@
+# CI runs exactly what a developer runs: scripts/verify-all.mjs.
+#
+# A pipeline with its own command list goes green while the repo is broken, and
+# red for reasons nobody can reproduce locally. One entry point, one behaviour.
+#
+# THE MATRIX IS NOT WRITTEN HERE. This file used to hand-list group names and it
+# had already drifted — four packages with full suites existed that CI never ran.
+# `discover` asks verify-all.mjs what the groups are, so adding one to GROUPS is
+# the only step and forgetting to update this file is not a thing that can happen.
+
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # Fast feedback: the invariants that need no browser and no install.
+  invariants:
+    name: supply chain
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node scripts/check-supply-chain.mjs
+      - run: node docs/check.mjs
+
+  discover:
+    name: enumerate groups
+    runs-on: ubuntu-latest
+    outputs:
+      unit: ${{ steps.g.outputs.unit }}
+      browser: ${{ steps.g.outputs.browser }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - id: g
+        run: |
+          echo "unit=$(node scripts/verify-all.mjs --groups unit)" >> "$GITHUB_OUTPUT"
+          echo "browser=$(node scripts/verify-all.mjs --groups browser)" >> "$GITHUB_OUTPUT"
+
+  unit:
+    name: unit (${{ matrix.group }})
+    runs-on: ubuntu-latest
+    needs: [discover]
+    strategy:
+      fail-fast: false
+      matrix:
+        group: ${{ fromJSON(needs.discover.outputs.unit) }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: '**/package-lock.json'
+      - run: node scripts/verify-all.mjs ${{ matrix.group }}
+
+  browser:
+    name: browser (${{ matrix.group }})
+    runs-on: ubuntu-latest
+    needs: [discover, unit]
+    strategy:
+      fail-fast: false
+      matrix:
+        group: ${{ fromJSON(needs.discover.outputs.browser) }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: '**/package-lock.json'
+      # Chromium only. Firefox and WebKit are not exercised by these suites and
+      # downloading them triples the setup for nothing.
+      - run: npx playwright install --with-deps chromium
+      - run: node scripts/verify-all.mjs ${{ matrix.group }}
+      # The screenshots are not committed — they are rewritten by every verify
+      # run, so a green suite would produce a diff. They are kept here for a week
+      # instead, where they are useful for reading a failure and nothing else.
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: screenshots-${{ matrix.group }}
+          path: |
+            **/*.png
+            !**/node_modules/**
+          if-no-files-found: ignore
+          retention-days: 7
+
+  node-php:
+    name: node (PHP, no extensions)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      # No GMP, no BCMath — deliberately. The claim is that any shared host can
+      # verify a signature, and a runner with extensions installed would not
+      # test that claim.
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: none, json, mbstring
+          coverage: none
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      # Through verify-all like every other group, not by calling the PHP
+      # runner directly. The only thing special about this job is how the
+      # runner is configured; the command must stay the one a developer runs.
+      - run: node scripts/verify-all.mjs node-php

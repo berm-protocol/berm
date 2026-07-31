@@ -1,0 +1,73 @@
+# Publishing with provenance.
+#
+# npm provenance attaches a sigstore attestation binding each published package
+# to the exact commit and workflow that built it. Without it, "open source" only
+# proves the code you audited is the code you READ — not that the tarball you
+# installed came from it. That gap is the whole of threat T7.
+
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write        # required for provenance
+
+jobs:
+  verify:
+    name: full verification
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npx playwright install --with-deps chromium
+      # Nothing ships unless every claim still holds.
+      - run: node scripts/verify-all.mjs
+
+  publish:
+    name: publish ${{ matrix.pkg }}
+    needs: [verify]
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        pkg: [crypto, sdk]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          registry-url: 'https://registry.npmjs.org'
+      - run: npm ci --no-audit --no-fund
+        working-directory: ${{ matrix.pkg }}
+      - run: npm run build
+        working-directory: ${{ matrix.pkg }}
+      - run: npm publish --provenance --access public
+        working-directory: ${{ matrix.pkg }}
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  hashes:
+    name: publish build hashes
+    needs: [verify]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '22' }
+      - run: npm ci --no-audit --no-fund
+        working-directory: sdk
+      - run: npm run bundle
+        working-directory: sdk
+      # The SRI hashes documented in the SDK README must match what shipped.
+      # Attaching them to the release is what makes that checkable by a stranger.
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sdk-bundles
+          path: |
+            sdk/dist/*.js
+            sdk/dist/*.sha256

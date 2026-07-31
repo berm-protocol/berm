@@ -1,0 +1,24 @@
+{
+  "name": "@berm/post",
+  "version": "0.1.0",
+  "private": true,
+  "description": "XOnly composer — post tables, code and diagrams to X without them turning to mush, and keep the original signed on Nostr.",
+  "type": "module",
+  "scripts": {
+    "build": "node build.mjs",
+    "test": "vitest run",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "verify": "node verify.mjs",
+    "serve": "node serve.mjs"
+  },
+  "devDependencies": {
+    "@noble/curves": "^2.2.0",
+    "@noble/hashes": "^2.2.0",
+    "esbuild": "^0.28.1",
+    "nostr-tools": "^2.24.0",
+    "playwright": "^1.49.0",
+    "typescript": "^5.7.0",
+    "vitest": "^3.0.0",
+    "ws": "^8.18.0"
+  }
+}

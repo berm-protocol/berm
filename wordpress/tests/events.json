@@ -1,0 +1,169 @@
+[
+  {
+    "label": "plain kind 1",
+    "expect": true,
+    "event": {
+      "kind": 1,
+      "created_at": 1785000000,
+      "tags": [],
+      "content": "hello",
+      "pubkey": "92af29cde8b4c41e89223524f6bc3f23c096cefb9daabc9ad39719d4f8cd424d",
+      "id": "f9c514777973cbbb7c0d27e4b218238efd0b9a346309ec05cb4524c3f6c57a06",
+      "sig": "7f376ffe6debfbab851503773dfb3f9b9f0109614e9719d53d97306012def54f70e8dba5bf3c66f588a3440fe881b96749ef9028d0d06cb77a8366d22262b9d2"
+    }
+  },
+  {
+    "label": "NIP-23 article",
+    "expect": true,
+    "event": {
+      "kind": 30023,
+      "created_at": 1785000100,
+      "tags": [
+        [
+          "d",
+          "your-identity-should-outlive-the-platform"
+        ],
+        [
+          "title",
+          "Your identity should outlive the platform"
+        ],
+        [
+          "summary",
+          "A short argument for writing things you actually own."
+        ],
+        [
+          "published_at",
+          "1785000100"
+        ],
+        [
+          "r",
+          "https://xonly.ai/@dorian/your-identity-should-outlive-the-platform"
+        ]
+      ],
+      "content": "# Heading\n\nEvery platform made you the same offer: *we host it, you make it*.\n\n- one\n- two\n",
+      "pubkey": "f567d71a41b86fc32ad9853cd50b02dd0b9c450bd066ffbd73f5c6f67f883274",
+      "id": "c8128a5ae651503cb59d2ffd98f86a39f3fc852bdd873d4c34fae8f7939a50bc",
+      "sig": "be944cf1f9ccaa35bcdc429fd75f0eb229d4aaf3adc880cefb9380683c2fd90b4c352a391c0e13ea479d1b6179f24c2cee781386caff8e4c8ceff11a22e89f27"
+    }
+  },
+  {
+    "label": "slashes + unicode + emoji",
+    "expect": true,
+    "event": {
+      "kind": 1,
+      "created_at": 1785000200,
+      "tags": [
+        [
+          "r",
+          "https://example.com/a/b?c=d&e=f"
+        ]
+      ],
+      "content": "URL https://xonly.ai/@you — café, naïve, 日本語, emoji 🚀, quote \"x\", backslash \\ done",
+      "pubkey": "f4d82a4417ca5450322937611f97749f0e53ac70196e95405007e6df7c2178c3",
+      "id": "cde9a23bd4f856b5b893cd7d24fdb736d7f8e40995042eb316240cd31f7955b5",
+      "sig": "7ca3c0f0e6920dda1f3d74a689fe1729ebecefa285397787755abd7283cba88a6b3b0e6c09f3e464ed8e8da4eac5d24f36ddcab4910c20c4e927a74f0ffda228"
+    }
+  },
+  {
+    "label": "tampered content",
+    "expect": false,
+    "event": {
+      "kind": 30023,
+      "created_at": 1785000100,
+      "tags": [
+        [
+          "d",
+          "your-identity-should-outlive-the-platform"
+        ],
+        [
+          "title",
+          "Your identity should outlive the platform"
+        ],
+        [
+          "summary",
+          "A short argument for writing things you actually own."
+        ],
+        [
+          "published_at",
+          "1785000100"
+        ],
+        [
+          "r",
+          "https://xonly.ai/@dorian/your-identity-should-outlive-the-platform"
+        ]
+      ],
+      "content": "# Heading\n\nEvery platform made you the same offer: *we host it, you make it*.\n\n- one\n- two\n (tampered)",
+      "pubkey": "f567d71a41b86fc32ad9853cd50b02dd0b9c450bd066ffbd73f5c6f67f883274",
+      "id": "c8128a5ae651503cb59d2ffd98f86a39f3fc852bdd873d4c34fae8f7939a50bc",
+      "sig": "be944cf1f9ccaa35bcdc429fd75f0eb229d4aaf3adc880cefb9380683c2fd90b4c352a391c0e13ea479d1b6179f24c2cee781386caff8e4c8ceff11a22e89f27"
+    }
+  },
+  {
+    "label": "tampered sig",
+    "expect": false,
+    "event": {
+      "kind": 30023,
+      "created_at": 1785000100,
+      "tags": [
+        [
+          "d",
+          "your-identity-should-outlive-the-platform"
+        ],
+        [
+          "title",
+          "Your identity should outlive the platform"
+        ],
+        [
+          "summary",
+          "A short argument for writing things you actually own."
+        ],
+        [
+          "published_at",
+          "1785000100"
+        ],
+        [
+          "r",
+          "https://xonly.ai/@dorian/your-identity-should-outlive-the-platform"
+        ]
+      ],
+      "content": "# Heading\n\nEvery platform made you the same offer: *we host it, you make it*.\n\n- one\n- two\n",
+      "pubkey": "f567d71a41b86fc32ad9853cd50b02dd0b9c450bd066ffbd73f5c6f67f883274",
+      "id": "c8128a5ae651503cb59d2ffd98f86a39f3fc852bdd873d4c34fae8f7939a50bc",
+      "sig": "be944cf1f9ccaa35bcdc429fd75f0eb229d4aaf3adc880cefb9380683c2fd90b4c352a391c0e13ea479d1b6179f24c2cee781386caff8e4c8ceff11a22e89f00"
+    }
+  },
+  {
+    "label": "swapped pubkey",
+    "expect": false,
+    "event": {
+      "kind": 30023,
+      "created_at": 1785000100,
+      "tags": [
+        [
+          "d",
+          "your-identity-should-outlive-the-platform"
+        ],
+        [
+          "title",
+          "Your identity should outlive the platform"
+        ],
+        [
+          "summary",
+          "A short argument for writing things you actually own."
+        ],
+        [
+          "published_at",
+          "1785000100"
+        ],
+        [
+          "r",
+          "https://xonly.ai/@dorian/your-identity-should-outlive-the-platform"
+        ]
+      ],
+      "content": "# Heading\n\nEvery platform made you the same offer: *we host it, you make it*.\n\n- one\n- two\n",
+      "pubkey": "a86c02d9c9853a70a9198520870321522209fa0da985fe77e976a08933a882eb",
+      "id": "c8128a5ae651503cb59d2ffd98f86a39f3fc852bdd873d4c34fae8f7939a50bc",
+      "sig": "be944cf1f9ccaa35bcdc429fd75f0eb229d4aaf3adc880cefb9380683c2fd90b4c352a391c0e13ea479d1b6179f24c2cee781386caff8e4c8ceff11a22e89f27"
+    }
+  }
+]

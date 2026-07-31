@@ -1,0 +1,39 @@
+{
+  "name": "@berm/crypto",
+  "version": "2.0.0",
+  "description": "Berm v2 identity primitives — WebAuthn PRF key derivation, NIP-01 event IDs, NIP-39 binding. No key material ever leaves the signer origin.",
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": "./dist/index.js"
+  },
+  "files": [
+    "dist",
+    "vectors"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "vectors:generate": "tsx scripts/generate-vectors.ts",
+    "vectors:verify": "vitest run test/vectors.test.ts",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@noble/curves": "^2.2.0",
+    "@noble/hashes": "^2.2.0",
+    "nostr-tools": "^2.24.0"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.1",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0",
+    "vitest": "^2.1.0",
+    "ws": "^8.21.1"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

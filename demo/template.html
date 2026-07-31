@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Berm v2 — live proof</title>
+<style>
+  :root {
+    --bg:#0a0b0d; --panel:#111318; --panel2:#15181f; --line:#22262f;
+    --ink:#e8eaed; --dim:#8b919c; --faint:#5a606b;
+    --ok:#3ecf8e; --bad:#ff6b6b; --warn:#f0b849; --accent:#7c9cff;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  }
+  * { box-sizing:border-box; }
+  body {
+    margin:0; background:var(--bg); color:var(--ink);
+    font:15px/1.65 ui-sans-serif,system-ui,-apple-system,"Segoe UI",Inter,sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap { max-width:880px; margin:0 auto; padding:0 24px 120px; }
+  header { padding:80px 0 56px; border-bottom:1px solid var(--line); }
+  h1 { font-size:44px; line-height:1.1; letter-spacing:-.025em; margin:0 0 18px; font-weight:600; }
+  h1 .g { background:linear-gradient(100deg,#7c9cff,#3ecf8e); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .sub { color:var(--dim); font-size:18px; max-width:620px; margin:0; }
+  .meta { margin-top:28px; font:12px/1.6 var(--mono); color:var(--faint); }
+  .meta span { color:var(--dim); }
+
+  section { padding:56px 0; border-bottom:1px solid var(--line); }
+  .act { font:11px/1 var(--mono); letter-spacing:.16em; color:var(--accent); text-transform:uppercase; margin-bottom:14px; }
+  h2 { font-size:27px; letter-spacing:-.02em; margin:0 0 12px; font-weight:600; }
+  .lede { color:var(--dim); margin:0 0 26px; max-width:660px; }
+
+  .card { background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:22px; margin:16px 0; }
+  .card.tight { padding:16px 18px; }
+  label { display:block; font:11px/1 var(--mono); letter-spacing:.1em; text-transform:uppercase; color:var(--faint); margin-bottom:8px; }
+  input[type=text], textarea {
+    width:100%; background:var(--panel2); border:1px solid var(--line); border-radius:8px;
+    color:var(--ink); padding:11px 13px; font:14px var(--mono); outline:none;
+  }
+  input[type=text]:focus, textarea:focus { border-color:var(--accent); }
+  textarea { resize:vertical; min-height:80px; font-family:inherit; font-size:15px; }
+
+  button {
+    background:var(--ink); color:#0a0b0d; border:0; border-radius:8px;
+    padding:11px 18px; font-size:14px; font-weight:600; cursor:pointer; margin:4px 6px 4px 0;
+  }
+  button:hover { opacity:.88; }
+  button.ghost { background:transparent; color:var(--ink); border:1px solid var(--line); }
+  button.ghost:hover { border-color:var(--dim); }
+
+  .kv { display:grid; grid-template-columns:180px 1fr; gap:9px 18px; font:12.5px var(--mono); }
+  .kv dt { color:var(--faint); }
+  .kv dd { margin:0; word-break:break-all; color:var(--ink); }
+
+  .mono { font-family:var(--mono); font-size:12.5px; word-break:break-all; }
+  .ok { color:var(--ok); } .bad { color:var(--bad); } .warn { color:var(--warn); } .dim { color:var(--faint); }
+
+  .verdict { border-radius:10px; padding:15px 17px; margin:16px 0 0; font-size:14.5px; line-height:1.6; }
+  .verdict.bad  { background:rgba(255,107,107,.09); border:1px solid rgba(255,107,107,.28); }
+  .verdict.good { background:rgba(62,207,142,.09); border:1px solid rgba(62,207,142,.28); }
+  .verdict.warn { background:rgba(240,184,73,.09); border:1px solid rgba(240,184,73,.28); }
+  .verdict a { color:var(--ok); }
+
+  .note { font-size:14px; color:var(--dim); margin:14px 0 0; }
+  .note.ok { color:var(--ok); } .note.warn { color:var(--warn); }
+
+  .split { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  @media (max-width:720px){ .split{grid-template-columns:1fr;} .kv{grid-template-columns:1fr;gap:3px 0;} h1{font-size:34px;} }
+
+  .pill { display:inline-block; font:11px/1 var(--mono); padding:5px 9px; border-radius:20px; letter-spacing:.05em; }
+  .pill.ok { background:rgba(62,207,142,.14); color:var(--ok); }
+  .pill.warn { background:rgba(240,184,73,.14); color:var(--warn); }
+
+  pre { background:var(--panel2); border:1px solid var(--line); border-radius:8px; padding:14px;
+        overflow-x:auto; font:12px/1.55 var(--mono); color:var(--dim); margin:12px 0 0;
+        white-space:pre-wrap; word-break:break-all; }
+  .relay { display:flex; justify-content:space-between; padding:9px 0; border-bottom:1px solid var(--line); font-size:13px; }
+  .relay:last-child { border:0; }
+  .hidden { display:none; }
+  a { color:var(--accent); }
+  .foot { padding:48px 0 0; color:var(--faint); font-size:13px; }
+  .steps { counter-reset:s; padding:0; margin:18px 0 0; list-style:none; }
+  .steps li { counter-increment:s; position:relative; padding-left:34px; margin-bottom:11px; color:var(--dim); font-size:14.5px; }
+  .steps li::before { content:counter(s); position:absolute; left:0; top:1px; width:22px; height:22px;
+    border:1px solid var(--line); border-radius:50%; text-align:center; font:11px/21px var(--mono); color:var(--faint); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>Your identity is <span class="g">derived, not stored</span>.<br>Prove it in ninety seconds.</h1>
+  <p class="sub">
+    Everything below runs in your browser, using the real protocol code. No server, no account,
+    no analytics. Open devtools and check — that is the entire point.
+  </p>
+  <div class="meta">
+    context: <span id="ctx">…</span><br>
+    only outbound connections this page can make: <span id="net">…</span>
+  </div>
+</header>
+
+<!-- ══════════════ ACT I ══════════════ -->
+<section>
+  <div class="act">Act I — why the obvious design fails</div>
+  <h2>The version everyone builds first</h2>
+  <p class="lede">
+    The tempting shortcut: hash someone's X user ID into a private key. One login, no seed phrase,
+    same identity everywhere. Type any number below and watch what an attacker gets.
+  </p>
+
+  <div class="card">
+    <label for="xid">Any X user ID (they are public — every account has one)</label>
+    <input type="text" id="xid" value="12345678" spellcheck="false">
+    <div class="split" style="margin-top:18px">
+      <div>
+        <label>What the account owner derives</label>
+        <div class="mono" id="v1-victim"></div>
+      </div>
+      <div>
+        <label>What a stranger derives, knowing only that number</label>
+        <div class="mono bad" id="v1-attacker"></div>
+      </div>
+    </div>
+    <div class="verdict bad" id="v1-verdict"></div>
+    <p class="note">Throughput measured live in this tab: <span class="bad" id="v1-rate"></span></p>
+  </div>
+
+  <div class="card tight">
+    <label>The same attack against v2</label>
+    <p class="note" id="v2-attempt" style="margin-top:0"></p>
+  </div>
+</section>
+
+<!-- ══════════════ ACT II ══════════════ -->
+<section>
+  <div class="act">Act II — the fix, without the seed phrase</div>
+  <h2>Touch the sensor. That's the whole onboarding.</h2>
+  <p class="lede">
+    Your key comes from a WebAuthn PRF: 32 bytes computed inside your authenticator, bound to that
+    credential, never transmitted. Nostr's adoption problem was never ideology — it was twelve words
+    on a piece of paper. This removes them without handing custody to anyone.
+  </p>
+
+  <div class="card">
+    <button id="enrol-btn">Create passkey identity</button>
+    <button id="signin-btn" class="ghost">Sign in again</button>
+    <button id="soft-btn" class="ghost">Use a software key instead</button>
+    <p class="note" id="id-status">No identity yet.</p>
+
+    <div id="id-card" class="hidden" style="margin-top:22px">
+      <dl class="kv">
+        <dt>npub</dt><dd class="ok" id="id-npub"></dd>
+        <dt>pubkey (hex)</dt><dd id="id-pubkey"></dd>
+        <dt>key source</dt><dd><span class="pill" id="id-mode"></span></dd>
+        <dt>scalar valid</dt><dd id="id-valid"></dd>
+        <dt>retry counter</dt><dd id="id-attempt"></dd>
+      </dl>
+    </div>
+  </div>
+
+  <ol class="steps">
+    <li>Click <strong>Create passkey identity</strong> and approve with your fingerprint, face, or PIN.</li>
+    <li>Click <strong>Sign in again</strong>. Same npub, every time — it is recomputed, not retrieved.</li>
+    <li>Reload this page and sign in once more. Still the same npub. Nothing was persisted server-side, because there is no server.</li>
+  </ol>
+</section>
+
+<!-- ══════════════ ACT III ══════════════ -->
+<section>
+  <div class="act">Act III — the part that cannot be faked</div>
+  <h2>Publish to machines nobody here controls</h2>
+  <p class="lede">
+    Sign a note with the key you just derived and send it to independent relays. The spec only counts
+    a publish as successful at two or more acceptances from two or more operators — so this either
+    genuinely lands on the open network, or it honestly says it didn't.
+  </p>
+
+  <div class="card" id="publish-gate">
+    <p class="note" style="margin:0">Create an identity above first.</p>
+  </div>
+
+  <div class="card hidden" id="publish-ui">
+    <label for="post">Your note</label>
+    <textarea id="post">Testing Berm v2. This key was derived in my browser and has never left it.</textarea>
+    <button id="publish-btn" style="margin-top:12px">Sign &amp; publish</button>
+
+    <div id="pub-result" class="hidden" style="margin-top:20px">
+      <dl class="kv">
+        <dt>event id</dt><dd id="pub-id"></dd>
+        <dt>signature</dt><dd class="ok" id="pub-sig"></dd>
+      </dl>
+      <div style="margin-top:16px"><label>relay responses</label><div id="relay-list"></div></div>
+      <div id="pub-verdict"></div>
+      <button id="readback-btn" class="ghost hidden" style="margin-top:14px">Fetch it back from a fresh connection</button>
+      <p class="note" id="readback-out" class="hidden"></p>
+      <details style="margin-top:16px">
+        <summary class="dim" style="cursor:pointer;font-size:13px">the signed event, verbatim</summary>
+        <pre id="pub-json"></pre>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ BINDING ══════════════ -->
+<section>
+  <div class="act">What X is actually for</div>
+  <h2>An attestation, not a credential</h2>
+  <p class="lede">
+    X proves which human is behind an account. It never produces, protects, or touches key material.
+    The link is a post you make yourself — no API writes, no automation, nothing to revoke.
+  </p>
+
+  <div class="card">
+    <label for="handle">Your X handle</label>
+    <input type="text" id="handle" placeholder="yourhandle" spellcheck="false">
+
+    <div style="margin-top:18px">
+      <label>What you post, verbatim (NIP-39)</label>
+      <pre id="bind-proof">Create an identity above.</pre>
+      <a id="bind-intent" href="#" target="_blank" rel="noopener" style="font-size:13.5px"></a>
+    </div>
+
+    <div style="margin-top:18px">
+      <label>What lands in your Nostr profile</label>
+      <pre id="bind-tag">—</pre>
+    </div>
+
+    <div style="margin-top:18px">
+      <label>Three states, never conflated</label>
+      <dl class="kv">
+        <dt>post + live handle match</dt><dd><span class="pill" id="state-verified">—</span></dd>
+        <dt>post only, no live check</dt><dd><span class="pill" id="state-claimed">—</span></dd>
+        <dt>post, but handle now differs</dt><dd><span class="pill" id="state-other">—</span></dd>
+      </dl>
+    </div>
+
+    <div class="verdict good">
+      <strong>If X bans the project tomorrow, you lose a badge — not a login, not a key, not one byte of content.</strong>
+      That inversion is the whole architecture.
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ AUDIT ══════════════ -->
+<section>
+  <div class="act">Verify, don't trust</div>
+  <h2>Every input on this page, in the open</h2>
+  <p class="lede">
+    Nothing here is secret except <code>prf_out</code>, and that only ever exists in this tab.
+    The page recomputes your identity from the displayed values and tells you whether it matches.
+  </p>
+
+  <div class="card">
+    <dl class="kv">
+      <dt>prf_out (secret)</dt><dd id="aud-prf">—</dd>
+      <dt>credential_id (public)</dt><dd id="aud-cred">—</dd>
+      <dt>PRF salt (public)</dt><dd id="aud-prf-salt">—</dd>
+      <dt>HKDF salt (public)</dt><dd id="aud-hkdf-salt">—</dd>
+      <dt>HKDF info</dt><dd id="aud-info">—</dd>
+      <dt>curve order n</dt><dd id="aud-n">—</dd>
+      <dt>scalar check</dt><dd class="ok" id="aud-sk-valid">—</dd>
+      <dt>public key</dt><dd id="aud-pub">—</dd>
+    </dl>
+    <div class="verdict good" id="aud-recompute">—</div>
+
+    <div style="margin-top:22px">
+      <label>NIP-01 canonical serialization (sample kind 0)</label>
+      <pre id="aud-serial">—</pre>
+      <label style="margin-top:12px">its event id</label>
+      <div class="mono" id="aud-evid">—</div>
+    </div>
+  </div>
+
+  <div class="card tight">
+    <p class="note" style="margin:0">
+      <strong style="color:var(--ink)">Check it yourself.</strong> Open the Network tab and repeat every step above.
+      You will see websocket frames to the relays listed at the top of this page and nothing else — no key,
+      no telemetry, no beacon. This file is one self-contained HTML document with no external requests.
+    </p>
+  </div>
+</section>
+
+<div class="foot">
+  Berm v2 · MIT · the identity layer is deliberately boring so the rest can be interesting.<br>
+  Note: this page ships a software-key fallback so the tour works over <code>file://</code>.
+  Production has no such fallback — a missing PRF routes you to a NIP-07 extension or a NIP-46 signer, and never to a weaker key.
+</div>
+
+</div>
+<script>/*BUNDLE*/</script>
+</body>
+</html>

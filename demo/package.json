@@ -1,0 +1,20 @@
+{
+  "name": "@berm/demo",
+  "version": "2.0.0",
+  "private": true,
+  "description": "Berm v2 live proof page — single self-contained HTML, no CDN, no backend.",
+  "type": "module",
+  "scripts": {
+    "build": "node build.mjs",
+    "verify": "node verify-e2e.mjs",
+    "serve": "node serve.mjs"
+  },
+  "devDependencies": {
+    "@noble/curves": "^2.2.0",
+    "@noble/hashes": "^2.2.0",
+    "esbuild": "^0.28.1",
+    "nostr-tools": "^2.24.0",
+    "playwright": "^1.49.0",
+    "ws": "^8.18.0"
+  }
+}

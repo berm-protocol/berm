@@ -1,0 +1,7 @@
+* text=auto eol=lf
+
+# The frozen vectors are a baseline, not a fixture. Line-ending translation
+# would change the file hash and make every identity look like it moved.
+crypto/vectors/test-vectors.json -text linguist-generated
+
+*.png binary

@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>XOnly composer — post what X can't render</title>
+<style>
+  :root {
+    --bg:#0d0e11; --panel:#141720; --ink:#e8eaed; --dim:#9aa1ad; --line:#252a35;
+    --accent:#7c9cff; --good:#3ecf8e; --warn:#f5a524; --bad:#f5556d;
+    --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Inter,system-ui,sans-serif;
+    --mono:ui-monospace,'SF Mono',Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 var(--sans)}
+  header{padding:22px 26px;border-bottom:1px solid var(--line);display:flex;
+         align-items:baseline;gap:14px;flex-wrap:wrap}
+  header h1{font-size:18px;margin:0;font-weight:650;letter-spacing:-.01em}
+  header p{margin:0;color:var(--dim);font-size:13.5px}
+  .grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:0;
+        min-height:calc(100vh - 66px)}
+  @media(max-width:1000px){.grid{grid-template-columns:1fr}}
+  .col{padding:24px 26px}
+  .col+.col{border-left:1px solid var(--line)}
+  @media(max-width:1000px){.col+.col{border-left:0;border-top:1px solid var(--line)}}
+  h2{font-size:12px;text-transform:uppercase;letter-spacing:.09em;color:var(--dim);
+     margin:0 0 12px;font-weight:600}
+  h2+h2,section+section{margin-top:26px}
+  label{display:block;font-size:12.5px;color:var(--dim);margin:0 0 5px}
+  input,textarea,select{width:100%;background:var(--panel);color:var(--ink);
+    border:1px solid var(--line);border-radius:8px;padding:9px 11px;font:14px/1.5 var(--sans)}
+  textarea{resize:vertical}
+  #artifact{font:13px/1.55 var(--mono);min-height:120px;white-space:pre}
+  #text{min-height:92px}
+  input:focus,textarea:focus,select:focus{outline:none;border-color:var(--accent)}
+  .row{display:flex;gap:10px}.row>*{flex:1}
+  .count{font:600 13px var(--mono);color:var(--dim)}
+  .count.near{color:var(--warn)}.count.over{color:var(--bad)}
+  #count-note{font-size:12px;color:var(--dim);margin-top:3px}
+  #advice{font-size:13px;color:var(--dim);margin:12px 0 0;padding:10px 12px;
+          background:rgba(124,156,255,.07);border-left:2px solid var(--accent);border-radius:0 6px 6px 0}
+  button{background:var(--accent);color:#0a0b0d;border:0;border-radius:8px;
+         padding:10px 16px;font:600 14px var(--sans);cursor:pointer}
+  button:disabled{opacity:.4;cursor:not-allowed}
+  button.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+  .btns{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin-top:12px}
+  .msg{font-size:12.5px;color:var(--dim);margin-top:8px;min-height:1.5em}
+  #approval{font-size:13px;color:var(--ink);background:var(--panel);border:1px solid var(--line);
+            border-radius:8px;padding:11px 13px;margin-top:10px}
+  #state{display:inline-block;font:600 12px var(--sans);padding:4px 10px;border-radius:99px;
+         border:1px solid var(--line);color:var(--dim)}
+  #state[data-s=signed]{color:var(--good);border-color:rgba(62,207,142,.4)}
+  #state[data-s=offered]{color:var(--warn);border-color:rgba(245,165,36,.4)}
+  #card{width:100%;border:1px solid var(--line);border-radius:10px;display:block;background:#000}
+  #who{font:12px var(--mono);color:var(--dim);word-break:break-all}
+  pre{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:12px;
+      font:11.5px/1.5 var(--mono);overflow:auto;max-height:230px;white-space:pre-wrap;
+      word-break:break-all;color:var(--dim)}
+  .meta{font:11.5px var(--mono);color:var(--dim);word-break:break-all;margin-top:6px}
+  .meta b{color:var(--ink);font-weight:600}
+  .sheet{position:fixed;inset:0;background:rgba(0,0,0,.66);display:flex;
+         align-items:center;justify-content:center;padding:20px;z-index:9}
+  .sheet.hidden{display:none}
+  .sheet-card{background:var(--panel);border:1px solid var(--line);border-radius:14px;
+              padding:22px;max-width:480px;width:100%}
+  .sheet-card h3{margin:0 0 12px;font-size:16px}
+  .sheet-card .what{font-size:14px;line-height:1.6;background:rgba(124,156,255,.08);
+                    border-left:2px solid var(--accent);padding:11px 13px;border-radius:0 6px 6px 0}
+  .sheet-card .notwhat{font-size:13px;line-height:1.55;color:var(--dim);margin-top:10px;
+                       padding:9px 12px;border-left:2px solid var(--line);border-radius:0 6px 6px 0}
+  .sheet-card .fine{font-size:12px;color:var(--dim);margin:12px 0 16px}
+  .sheet-row{display:flex;gap:9px;justify-content:flex-end}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>XOnly composer</h1>
+  <p>Signed to Nostr first. X second, and only if you press the button yourself.</p>
+</header>
+
+<div class="grid">
+
+  <div class="col">
+    <section>
+      <h2>1 · Write</h2>
+      <label for="text">Post</label>
+      <textarea id="text" placeholder="What you'd type into X."></textarea>
+      <div class="row" style="align-items:flex-end;margin-top:4px">
+        <div><span class="count" id="count">0 / 280 units</span>
+             <div id="count-note"></div></div>
+      </div>
+
+      <label for="heading" style="margin-top:14px">Card heading <span style="opacity:.6">(optional)</span></label>
+      <input id="heading" placeholder="Shown large on the card">
+    </section>
+
+    <section>
+      <h2>2 · The thing X would ruin</h2>
+      <div class="row">
+        <div style="flex:1.1">
+          <label for="kind">Artifact</label>
+          <select id="kind">
+            <option value="none">None</option>
+            <option value="table">Table</option>
+            <option value="code">Code</option>
+            <option value="art">Diagram</option>
+            <option value="quote">Pull quote</option>
+          </select>
+        </div>
+        <div><label for="lang">Detail</label><input id="lang" placeholder="language (optional)" hidden></div>
+      </div>
+      <div id="artifact-wrap" hidden style="margin-top:10px">
+        <textarea id="artifact"></textarea>
+      </div>
+      <p id="advice"></p>
+    </section>
+
+    <section>
+      <h2>3 · Identity</h2>
+      <div class="row">
+        <div><label for="author">Name</label><input id="author" placeholder="Your name" value="You"></div>
+        <div><label for="handle">X handle</label><input id="handle" placeholder="without the @"></div>
+      </div>
+      <div class="btns"><button id="connect" class="ghost">Connect dev signer</button></div>
+      <div id="who" style="margin-top:8px"></div>
+    </section>
+  </div>
+
+  <div class="col">
+    <section>
+      <h2>Card · 1200 × 630</h2>
+      <img id="card" width="1200" height="630" alt="">
+      <div class="meta"><b>alt</b> <span id="alt"></span></div>
+      <div class="btns"><button id="download" class="ghost">Download PNG</button></div>
+    </section>
+
+    <section>
+      <h2>Publish</h2>
+      <div id="approval"></div>
+      <div class="btns">
+        <button id="sign">Sign &amp; publish to Nostr</button>
+        <button id="offer" class="ghost" disabled>Open X composer</button>
+        <span id="state" data-s="draft">Not published</span>
+      </div>
+      <div class="msg" id="intent-msg"></div>
+      <div class="msg" id="result"></div>
+    </section>
+
+    <section>
+      <h2>Permalink</h2>
+      <div class="meta"><b id="ptitle"></b><br><span id="permalink"></span></div>
+      <pre id="page-preview"></pre>
+    </section>
+
+    <section>
+      <h2>Signed event</h2>
+      <pre id="event">nothing signed yet</pre>
+    </section>
+  </div>
+
+</div>
+
+<div class="sheet hidden" id="approval-sheet">
+  <div class="sheet-card">
+    <h3>Approve this signature</h3>
+    <div class="what" id="approval-what"></div>
+    <div class="notwhat" id="approval-not"></div>
+    <p class="fine">A signer that asks &ldquo;sign this?&rdquo; without saying what <em>this</em> is has trained you to click yes.</p>
+    <div class="sheet-row">
+      <button class="ghost" id="approve-no">Decline</button>
+      <button id="approve-yes">Approve</button>
+    </div>
+  </div>
+</div>
+
+<script>/*BUNDLE*/</script>
+</body>
+</html>

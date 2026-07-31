@@ -1,0 +1,130 @@
+{
+  "origin": "https://signer.xonly.ai",
+  "path": "/dist/signer.js",
+  "releasePub": "44a129ffbacde093a3a1c9d35690a99e54d33c3c02475af87a0276dd9f393c37",
+  "attackerPub": "bfbe1107a69e7c85542c4a9c3bac6b34d0b2044ca574506b7e4f6c8c3539cc4e",
+  "goodBody": "/* signer v2.4.1 — the real thing */",
+  "evilBody": "/* signer v2.4.1 — exfiltrates prf_out */",
+  "goodHash": "2044e8c5b0af07485201486ee23be947bb22e99dadac47a280bd8448f8d80271",
+  "evilHash": "462a58c597ef5d374b463e072476a7f49d4b9588a356e6297209d216cc93f458",
+  "genuine": {
+    "kind": 30078,
+    "created_at": 1785446586,
+    "tags": [
+      [
+        "d",
+        "berm:signer-build:v1"
+      ],
+      [
+        "origin",
+        "https://signer.xonly.ai"
+      ],
+      [
+        "version",
+        "2.4.1"
+      ],
+      [
+        "sha256",
+        "2044e8c5b0af07485201486ee23be947bb22e99dadac47a280bd8448f8d80271"
+      ],
+      [
+        "path",
+        "/dist/signer.js"
+      ]
+    ],
+    "content": "",
+    "pubkey": "44a129ffbacde093a3a1c9d35690a99e54d33c3c02475af87a0276dd9f393c37",
+    "id": "a800b8e1bb9c9a597fc9f6e33ffd27a8488997a5d20f11aea04f0579af737d27",
+    "sig": "9382b7f52c97e85e2dffc153904267b111dffd0a0ffcd595701369e83267e36afcc6c5087f4e3d7c0b9032f964770aa07e161ae12e3255f15d9807c46f9f3e47"
+  },
+  "forgedNewer": {
+    "kind": 30078,
+    "created_at": 1785446685,
+    "tags": [
+      [
+        "d",
+        "berm:signer-build:v1"
+      ],
+      [
+        "origin",
+        "https://signer.xonly.ai"
+      ],
+      [
+        "version",
+        "2.4.1"
+      ],
+      [
+        "sha256",
+        "462a58c597ef5d374b463e072476a7f49d4b9588a356e6297209d216cc93f458"
+      ],
+      [
+        "path",
+        "/dist/signer.js"
+      ]
+    ],
+    "content": "",
+    "pubkey": "bfbe1107a69e7c85542c4a9c3bac6b34d0b2044ca574506b7e4f6c8c3539cc4e",
+    "id": "6c1a8d47dbd28a3e3283e5414117d3790c2010e0c20a7d48e77ec6387658144f",
+    "sig": "364d21940bbe4f09d180b203ce5abf0a403491c8e9ab3602e6c55f3fc6970dbae073a3d4facef5fdd474437521adcd4c150b2b9b64678269e541f4b6d1cf14b4"
+  },
+  "wrongOrigin": {
+    "kind": 30078,
+    "created_at": 1785446586,
+    "tags": [
+      [
+        "d",
+        "berm:signer-build:v1"
+      ],
+      [
+        "origin",
+        "https://signer.evil.tld"
+      ],
+      [
+        "version",
+        "2.4.1"
+      ],
+      [
+        "sha256",
+        "2044e8c5b0af07485201486ee23be947bb22e99dadac47a280bd8448f8d80271"
+      ],
+      [
+        "path",
+        "/dist/signer.js"
+      ]
+    ],
+    "content": "",
+    "pubkey": "44a129ffbacde093a3a1c9d35690a99e54d33c3c02475af87a0276dd9f393c37",
+    "id": "9cf1adb0af3a19f671bead278969f1513b7869c858a361c2f6dcb598195c6172",
+    "sig": "2b59920b0a6bea4cbcc09cc787ec3e7ad38eaac78c02a9b68971aef83fd80941d6507c723d383bdcf2fd35f8357ec28f1ff6d3b7104fa13b00e0c89c8beb6862"
+  },
+  "stale": {
+    "kind": 30078,
+    "created_at": 1780262686,
+    "tags": [
+      [
+        "d",
+        "berm:signer-build:v1"
+      ],
+      [
+        "origin",
+        "https://signer.xonly.ai"
+      ],
+      [
+        "version",
+        "2.4.1"
+      ],
+      [
+        "sha256",
+        "2044e8c5b0af07485201486ee23be947bb22e99dadac47a280bd8448f8d80271"
+      ],
+      [
+        "path",
+        "/dist/signer.js"
+      ]
+    ],
+    "content": "",
+    "pubkey": "44a129ffbacde093a3a1c9d35690a99e54d33c3c02475af87a0276dd9f393c37",
+    "id": "9126fc0138172672782e7ff83eea88a3ae43fcd3df911a586ca9e73f92307e33",
+    "sig": "5b8ce1dd69f389758b8dff4271512ff6a9e3f2b8e3178db8b5ab3155cc794efdaebbc420032c1ee1b86e64bc81dd5079a48e08799d3980e2a38260865c039f9b"
+  }
+}

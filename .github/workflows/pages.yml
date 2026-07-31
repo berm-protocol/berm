@@ -1,0 +1,97 @@
+# Docs → GitHub Pages.
+#
+# WHY PAGES. The bytes a reader receives come from a public commit anyone can
+# diff against the source. On a VPS nobody can see what was actually uploaded.
+# `manifest.json` carries a SHA-256 of every deployed file, so the claim is
+# checkable rather than merely made.
+#
+# GATED ON THE FULL SUITE. Deploying documentation that describes behaviour the
+# code no longer has is worse than not deploying — a reader has no way to tell
+# the difference, and this project's entire posture is that claims are checkable.
+# So `scripts/verify-all.mjs` runs first and a red run blocks the deploy.
+#
+# It calls the same entry point a developer calls. A pipeline with its own
+# command list goes green while the repo is broken.
+
+name: Pages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/**'
+      - '.github/workflows/pages.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# One deploy at a time, and never cancel one in flight — a half-published docs
+# site is a worse outcome than a slightly stale one.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    name: verify before deploying
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      # Chromium is needed for the browser groups. Without it they SKIP, and a
+      # skip must never look like a pass — so this job installs it and runs the
+      # whole suite rather than --fast.
+      - name: install chromium
+        run: npx --yes playwright@1.49.0 install --with-deps chromium
+
+      - name: full suite
+        run: node scripts/verify-all.mjs
+
+  build:
+    name: build docs
+    needs: verify
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      # Conformance first: frontmatter, dead links, dead anchors, X Article
+      # rules. A build that renders a broken link into HTML has laundered it.
+      - name: docs conformance
+        run: node docs/check.mjs
+
+      - name: build
+        run: node docs/build.mjs
+
+      # The build asserts its own no-external-origin and no-JavaScript rules and
+      # exits non-zero otherwise; this re-states the claim in the log so a reader
+      # of the Actions output sees it without reading the script.
+      - name: show what is being published
+        run: |
+          echo "files:"
+          node -e "const m=require('./docs/dist/manifest.json');
+                   for (const [f,h] of Object.entries(m.files)) console.log('  ' + h.slice(0,16) + '  ' + f);"
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs/dist
+
+  deploy:
+    name: deploy
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Security vulnerability
+    url: https://github.com/berm-protocol/berm/blob/main/SECURITY.md
+    about: Do NOT open a public issue. Email security@xonly.ai instead.
+  - name: Documentation
+    url: https://docs.xonly.ai
+    about: Quickstart, SDK reference, threat model, and the limits.

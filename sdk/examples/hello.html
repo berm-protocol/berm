@@ -1,0 +1,85 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>berm — hello</title>
+<style>
+  body { font: 15px/1.6 ui-sans-serif, system-ui, sans-serif; max-width: 46rem; margin: 4rem auto; padding: 0 1.5rem;
+         background: #0b0d10; color: #e6e9ef; }
+  h1 { font-size: 1.3rem; margin: 0 0 .3rem; }
+  p.sub { color: #8b94a7; margin: 0 0 2rem; }
+  button { font: inherit; padding: .6rem 1.1rem; border-radius: .5rem; border: 1px solid #2a3040;
+           background: #171b23; color: #e6e9ef; cursor: pointer; }
+  button:hover:not(:disabled) { border-color: #4c8dff; }
+  button:disabled { opacity: .45; cursor: default; }
+  pre { background: #11141a; border: 1px solid #1f2531; border-radius: .5rem; padding: 1rem;
+        overflow-x: auto; font-size: 13px; white-space: pre-wrap; word-break: break-all; }
+  .row { display: flex; gap: .6rem; margin-bottom: 1.2rem; flex-wrap: wrap; }
+  .tag { display: inline-block; font-size: 12px; padding: .1rem .5rem; border-radius: 1rem;
+         border: 1px solid #2a3040; color: #8b94a7; }
+  .warn { color: #ffb454; }
+</style>
+
+<h1>hello, sovereign world</h1>
+<p class="sub">
+  Connect, sign, publish. No X developer app, no API key, no rate limit —
+  nothing anyone can revoke. <span class="tag" id="backend">not connected</span>
+</p>
+
+<div class="row">
+  <button id="connect">Connect</button>
+  <button id="publish" disabled>Sign &amp; publish a note</button>
+</div>
+
+<pre id="out">Ready.</pre>
+
+<p class="sub warn" id="devnote"></p>
+
+<script src="../dist/berm-sdk.global.js"></script>
+<script>
+// ?relays=ws://…,ws://… to point at your own. Omit for the public defaults.
+const relays = new URLSearchParams(location.search).get('relays')?.split(',');
+
+/* ── the whole integration, ten lines ──────────────────────────────── */
+const sdk = Berm.install({ dev: true, relays });            // 1  tier 0/1/2, dev on localhost
+
+connect.onclick = async () => {
+  const s = await sdk.connect();                            // 2  may prompt, may be declined
+  show({ npub: s.npub, tier: s.tier, custody: s.custody });  // 3
+  publish.disabled = false;
+};
+
+publish.onclick = async () => {
+  const ev = await sdk.signEvent({                          // 4  the user approves this
+    kind: 1, created_at: Math.floor(Date.now() / 1000),     // 5
+    tags: [], content: 'hello from berm',                   // 6
+  });
+  const receipt = await sdk.publish(ev);                    // 7  ≥2 relays or it did not publish
+  show(receipt);                                          // 8
+};
+/* ──────────────────────────────────────────────────────────────────── */
+
+function show(o) {
+  out.textContent = JSON.stringify(o, null, 2);
+  backend.textContent = sdk.backend;
+}
+
+// Everything below is presentation, not integration.
+window.addEventListener('error', (e) => { out.textContent = 'Error: ' + e.message; });
+for (const b of [connect, publish]) {
+  const orig = b.onclick;
+  b.onclick = async () => {
+    b.disabled = true;
+    const label = b.textContent;
+    b.textContent = 'Waiting for signer…';
+    try { await orig(); }
+    catch (e) {
+      out.textContent = e instanceof Berm.UserDeclinedError
+        ? 'You declined. Nothing was signed and nothing was published.'
+        : `${e.name}: ${e.message}`;
+    }
+    finally { b.textContent = label; b.disabled = b === connect; }
+  };
+}
+devnote.textContent = sdk.backend === 'dev'
+  ? 'Running on the development signer: a raw key in localStorage. It refuses to load on a public origin.'
+  : '';
+</script>

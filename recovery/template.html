@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Recovery — XOnly</title>
+<style>
+  :root{--bg:#0a0b0d;--panel:#101216;--panel2:#15181f;--line:#22262f;--line2:#2c313c;
+        --ink:#e8eaed;--dim:#8b919c;--faint:#5a606b;--ok:#3ecf8e;--bad:#ff6b6b;--warn:#f0b849;
+        --accent:#7c9cff;--mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+        --sans:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Inter,sans-serif}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.65 var(--sans);-webkit-font-smoothing:antialiased}
+  .wrap{max-width:760px;margin:0 auto;padding:0 24px 120px}
+  header{padding:60px 0 24px}
+  h1{font-size:34px;letter-spacing:-.025em;margin:0 0 12px;font-weight:600}
+  h1 span{background:linear-gradient(100deg,#7c9cff,#3ecf8e);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .lede{color:var(--dim);margin:0;max-width:600px}
+  .who{display:flex;align-items:center;gap:10px;margin-top:18px;font:12px var(--mono);color:var(--faint)}
+  button{background:var(--ink);color:#0a0b0d;border:0;border-radius:8px;padding:10px 17px;
+         font:600 13.5px var(--sans);cursor:pointer;margin:0 6px 6px 0}
+  button:hover{opacity:.88} button:disabled{opacity:.4}
+  button.ghost{background:transparent;color:var(--ink);border:1px solid var(--line2)}
+  button.ghost:hover{border-color:var(--dim);opacity:1}
+  .sect{font:11px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--faint);margin:38px 0 12px}
+  .verdict{border-radius:10px;padding:16px 18px;font-size:15px;line-height:1.6;margin-bottom:18px}
+  .verdict.ok{background:rgba(62,207,142,.09);border:1px solid rgba(62,207,142,.28)}
+  .verdict.warn{background:rgba(240,184,73,.09);border:1px solid rgba(240,184,73,.28)}
+  .verdict.critical{background:rgba(255,107,107,.09);border:1px solid rgba(255,107,107,.3)}
+  .check{background:var(--panel);border:1px solid var(--line);border-left-width:3px;border-radius:10px;
+         padding:15px 17px;margin-bottom:10px}
+  .check.ok{border-left-color:var(--ok)} .check.warn{border-left-color:var(--warn)}
+  .check.critical{border-left-color:var(--bad)}
+  .chd{display:flex;align-items:center;gap:9px;margin-bottom:7px}
+  .dot{width:7px;height:7px;border-radius:50%;flex:none}
+  .check.ok .dot{background:var(--ok)} .check.warn .dot{background:var(--warn)}
+  .check.critical .dot{background:var(--bad)}
+  .ct{font-size:14.5px;font-weight:600}
+  .cons{margin:0;font-size:13.5px;color:var(--dim);line-height:1.6}
+  .act{margin:9px 0 0;font-size:13px;color:var(--accent)}
+  .fix{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:18px;margin-bottom:12px}
+  .fix h3{margin:0 0 6px;font-size:15px}
+  .fix p{margin:0 0 12px;font-size:13.5px;color:var(--dim);line-height:1.6}
+  input[type=password],textarea{width:100%;background:var(--panel2);border:1px solid var(--line2);
+    border-radius:8px;color:var(--ink);padding:10px 12px;font:13px var(--mono);outline:none;margin-bottom:10px}
+  textarea{min-height:74px;resize:vertical}
+  input:focus,textarea:focus{border-color:var(--accent)}
+  .losses{display:flex;gap:8px;flex-wrap:wrap}
+  .path{border-radius:10px;padding:18px;margin-top:14px}
+  .path.ok{background:rgba(62,207,142,.07);border:1px solid rgba(62,207,142,.28)}
+  .path.critical{background:rgba(255,107,107,.07);border:1px solid rgba(255,107,107,.3)}
+  .path h3{margin:0 0 10px;font-size:16px}
+  .path ol{margin:0;padding-left:20px;font-size:14px;line-height:1.75}
+  .path li{margin-bottom:7px}
+  .path .note{margin:14px 0 0;font-size:13px;color:var(--dim);line-height:1.6}
+  .pill{display:inline-block;font:11px var(--mono);padding:4px 9px;border-radius:20px;margin-bottom:10px}
+  .pill.bad{background:rgba(255,107,107,.15);color:var(--bad)}
+  .note-box{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:15px 17px;
+            font-size:13px;color:var(--dim);line-height:1.65}
+  .note-box strong{color:var(--ink)}
+  .hidden{display:none !important}
+  .backdrop{position:fixed;inset:0;background:rgba(0,0,0,.66);display:flex;align-items:center;
+            justify-content:center;z-index:100;backdrop-filter:blur(3px)}
+  .modal{background:var(--panel2);border:1px solid var(--line2);border-radius:14px;padding:24px;max-width:400px}
+  .modal h3{margin:0 0 6px;font-size:17px}
+  .modal .what{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:13px;
+               font-size:14px;margin:12px 0}
+  .modal .row{display:flex;gap:8px;justify-content:flex-end;margin-top:16px}
+  .flash{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(70px);
+         background:var(--ink);color:#0a0b0d;padding:10px 18px;border-radius:8px;font:600 13.5px var(--sans);
+         transition:transform .22s;z-index:120}
+  .flash.show{transform:translateX(-50%) translateY(0)}
+</style></head>
+<body><div class="wrap">
+
+<header>
+  <h1>Recovery <span>readiness</span></h1>
+  <p class="lede">
+    A recovery page that only helps after a loss is half a page. By then your options were already
+    decided by what you set up months earlier. So this answers one question first:
+    <strong>if you lost this device right now, what would happen?</strong>
+  </p>
+  <button id="connect" style="margin-top:18px">Sign in</button>
+  <div class="who hidden" id="who">identity: <span id="who-npub"></span></div>
+</header>
+
+<div id="main" class="hidden">
+  <div class="sect">If you lost this device today</div>
+  <div id="verdict"></div>
+  <div id="checks"></div>
+
+  <div id="fix-panel" class="hidden">
+    <div class="sect">Close the gaps</div>
+
+    <div class="fix">
+      <h3>Enrol a second device</h3>
+      <p>Passkeys sync inside an ecosystem, so a broken phone is survivable. An iPhone plus a Windows
+         PC is not — that is the gap a second credential closes. Both unwrap the same identity.</p>
+      <button id="add-device">Enrol another device</button>
+    </div>
+
+    <div class="fix">
+      <h3>Download an encrypted backup</h3>
+      <p>The only unrecoverable loss in the system. Articles, follows and pages all come back from
+         relays; the key does not. Store this away from your devices.</p>
+      <input type="password" id="backup-pass" placeholder="Passphrase — 12 characters minimum">
+      <button id="download-backup">Download backup</button>
+    </div>
+
+    <div class="fix">
+      <h3>Name guardians</h3>
+      <p>If your key is ever lost, guardians can attest that a new one is you. This must be published
+         <strong>before</strong> the loss — a pre-commitment added afterwards proves nothing, which is
+         exactly when you would want it.</p>
+      <textarea id="guardians" placeholder="npub1…&#10;npub1…&#10;npub1…"></textarea>
+      <button id="set-guardians">Publish guardians</button>
+    </div>
+  </div>
+
+  <div class="sect">Something already happened</div>
+  <div class="losses">
+    <button class="ghost" data-loss="x-account">My X account is gone</button>
+    <button class="ghost" data-loss="one-device">I lost a device</button>
+    <button class="ghost" data-loss="all-devices">I lost every device</button>
+    <button class="ghost" data-loss="everything">I lost everything</button>
+  </div>
+  <div id="path" class="hidden"></div>
+
+  <div class="sect">What guardians can and cannot do</div>
+  <div class="note-box">
+    <p style="margin:0 0 10px"><strong>There is no account to recover.</strong> Your identity is your
+      key. Guardians cannot restore it — they can only attest that a new key is the same person.
+      That is social consensus, not cryptography, and it works because relying parties choose to
+      honour it.</p>
+    <p style="margin:0"><strong>Removing a device does not revoke it.</strong> The identity key is
+      unchanged, so a kept copy of the blob plus that authenticator still unwraps it. Real revocation
+      means rotating to a new key.</p>
+  </div>
+
+  <div style="margin-top:30px"><button class="ghost" id="reset-demo">Reset demo state</button></div>
+</div>
+
+</div>
+<div class="backdrop hidden" id="approval"><div class="modal">
+  <h3>Approve signature</h3>
+  <div class="what" id="approval-what"></div>
+  <div class="row"><button class="ghost" id="approve-no">Decline</button><button id="approve-yes">Approve</button></div>
+</div></div>
+<div class="flash" id="flash"></div>
+<script>/*BUNDLE*/</script>
+</body></html>

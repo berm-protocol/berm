@@ -1,0 +1,72 @@
+# Rebuild this node from relays and publish it.
+#
+# Runs on a schedule because a node is a MIRROR: it should pick up new posts
+# without you doing anything. If the author stops posting, nothing changes; if
+# relays are down, the build refuses rather than replacing your archive with a
+# shorter one.
+
+name: Publish node
+
+on:
+  schedule:
+    - cron: '17 */6 * * *'   # four times a day, off the hour
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      allow_shrink:
+        description: 'Publish even if fewer posts were found than last time'
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - run: npm ci --no-audit --no-fund
+
+      # The previous build's post count, so a shrunken archive can be detected.
+      # Without it every run looks like a first run and the guard never fires.
+      - name: restore previous count
+        uses: actions/cache@v4
+        with:
+          path: .state.json
+          key: berm-node-state-${{ github.run_id }}
+          restore-keys: berm-node-state-
+
+      - name: build
+        run: node prepare.mjs && node build.mjs ${{ inputs.allow_shrink && '--allow-shrink' || '' }}
+
+      - name: what is being published
+        run: |
+          node -e "const m=require('./dist/manifest.json');
+                   for (const [f,h] of Object.entries(m.files)) console.log('  ' + h.slice(0,16) + '  ' + f);"
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

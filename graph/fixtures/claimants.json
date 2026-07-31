@@ -1,0 +1,62 @@
+{
+  "v": 1,
+  "generated_at": 1785000000,
+  "claimants": [
+    {
+      "uid": "1000000000",
+      "pubkey": "c68a7e13a929475f1a55872c3dce6f09e827905fafce554ddfd3c1fab3928b13",
+      "npub": "npub1c698uyaf99r47xj4sukrmnn0p85z0yzl4l892nwl60ql4vuj3vfsc4pd6z",
+      "handle": "dorian",
+      "verified": true
+    },
+    {
+      "uid": "1000000001",
+      "pubkey": "4c6dc5e69b0511abd3f8d3accfde2d31c597f807acb48db3fad47de724bde178",
+      "npub": "npub1f3kute5mq5g6h5lc6wkvlh3dx8ze07q84j6gmvl66377wf9au9uqk8kryd",
+      "handle": "jack",
+      "verified": true
+    },
+    {
+      "uid": "1000000002",
+      "pubkey": "742c9144d5dd14c8726ab86b689990e6b7957c79a75d8b8dba8327c96e554778",
+      "npub": "npub1wskfz3x4m52vsun2hp4k3xvsu6me2lre5awchrd6svnujmj4gauqxf4yn5",
+      "handle": "elon",
+      "verified": true
+    },
+    {
+      "uid": "1000000003",
+      "pubkey": "ffa5fc745b61ac700492530c3558a38708178fd508cebea7998b567ebbbb8c3a",
+      "npub": "npub1l7jlcazmvxk8qpyj2vxr2k9rsuyp0r74pr8tafue3dt8awam3saqu09k4e",
+      "handle": "nostrdev",
+      "verified": true
+    },
+    {
+      "uid": "1000000004",
+      "pubkey": "eb29552e9c1ee2098041b045c8145db467996f261df849f66c627013a2e10fc5",
+      "npub": "npub1av542t5urm3qnqzpkpzus9zak3nejmexrhuynanvvfcp8ghpplzs2jm3d0",
+      "handle": "sovereign",
+      "verified": true
+    },
+    {
+      "uid": "1000000005",
+      "pubkey": "2b3ebea19ec300003f2d595440026888b8b3c64b279a9e7a9ee87788cd9d041c",
+      "npub": "npub19vltagv7cvqqq0edt92yqqng3zut83jty7dfu757apmc3nvaqswq33ffd8",
+      "handle": "archivist",
+      "verified": true
+    },
+    {
+      "uid": "1000000006",
+      "pubkey": "2cc6e5cde861d6906fec21dcf98fd671bd9fa7d480a39b90a6b009de31f94602",
+      "npub": "npub19nrwtn0gv8tfqmlvy8w0nr7kwx7elf75sz3ehy9xkqyauv0egcpq7wmpqp",
+      "handle": "relayop",
+      "verified": true
+    },
+    {
+      "uid": "1000000007",
+      "pubkey": "9e73d9bb8919bf3447cb7bc63c4137dc51b5fb3f6cea029cb2c36257da7ccc48",
+      "npub": "npub1neeanwufrxlng37t00rrcsfhm3gmt7eldn4q989jcd390knue3yq8rlaxn",
+      "handle": "builder",
+      "verified": false
+    }
+  ]
+}

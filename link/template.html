@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Link your X handle — XOnly</title>
+<style>
+  :root{--bg:#0a0b0d;--panel:#101216;--panel2:#15181f;--line:#22262f;--line2:#2c313c;
+        --ink:#e8eaed;--dim:#8b919c;--faint:#5a606b;--ok:#3ecf8e;--bad:#ff6b6b;--warn:#f0b849;
+        --accent:#7c9cff;--mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+        --sans:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Inter,sans-serif}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.65 var(--sans);-webkit-font-smoothing:antialiased}
+  .wrap{max-width:720px;margin:0 auto;padding:0 24px 120px}
+  header{padding:60px 0 8px}
+  h1{font-size:34px;letter-spacing:-.025em;margin:0 0 12px;font-weight:600}
+  h1 span{background:linear-gradient(100deg,#7c9cff,#3ecf8e);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .lede{color:var(--dim);margin:0;max-width:580px}
+  .nokeys{margin-top:18px;font:12px var(--mono);color:var(--faint)}
+
+  .step{border-left:2px solid var(--line2);padding:0 0 30px 26px;position:relative;margin-left:12px}
+  .step:last-child{border-left-color:transparent}
+  .step::before{content:attr(data-n);position:absolute;left:-15px;top:0;width:28px;height:28px;
+    border-radius:50%;background:var(--bg);border:1px solid var(--line2);color:var(--faint);
+    font:12px/26px var(--mono);text-align:center}
+  .step.active::before{border-color:var(--accent);color:var(--accent)}
+  .step.done::before{content:'✓';border-color:var(--ok);color:var(--ok);background:rgba(62,207,142,.12)}
+  .step.warn::before{content:'!';border-color:var(--warn);color:var(--warn)}
+  .step.done{border-left-color:rgba(62,207,142,.35)}
+  .step h2{font-size:17px;margin:2px 0 6px;font-weight:600}
+  .step .why{color:var(--dim);font-size:13.5px;margin:0 0 14px;line-height:1.6}
+  .step .detail{font-size:13.5px;line-height:1.7;margin-top:12px}
+
+  button{background:var(--ink);color:#0a0b0d;border:0;border-radius:8px;padding:10px 17px;
+         font:600 13.5px var(--sans);cursor:pointer;margin:0 6px 6px 0}
+  button:hover{opacity:.88} button:disabled{opacity:.4;cursor:default}
+  button.ghost{background:transparent;color:var(--ink);border:1px solid var(--line2)}
+  button.ghost:hover{border-color:var(--dim);opacity:1}
+  a.btn{display:inline-block;background:var(--ink);color:#0a0b0d;border-radius:8px;padding:10px 17px;
+        font:600 13.5px var(--sans);text-decoration:none;margin:0 6px 6px 0}
+  a.btn:hover{opacity:.88}
+
+  input[type=text]{width:100%;background:var(--panel2);border:1px solid var(--line2);border-radius:8px;
+                   color:var(--ink);padding:11px 13px;font:13px var(--mono);outline:none}
+  input[type=text]:focus{border-color:var(--accent)}
+  label{display:block;font:11px var(--mono);letter-spacing:.08em;text-transform:uppercase;
+        color:var(--faint);margin:14px 0 6px}
+
+  pre.proof{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:14px;
+            font:13px/1.6 var(--mono);color:var(--accent);white-space:pre-wrap;word-break:break-all;margin:0 0 12px}
+  code{font:12px var(--mono);background:rgba(255,255,255,.07);padding:2px 5px;border-radius:4px}
+  .brk{word-break:break-all}
+  .dim{color:var(--faint)} .warn{color:var(--warn)} .ok{color:var(--ok)}
+  a{color:var(--accent)}
+  .hidden{display:none !important}
+
+  .note{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px;
+        font-size:13px;color:var(--dim);line-height:1.65;margin:12px 0 0}
+  .note strong{color:var(--ink)}
+
+  .done{background:rgba(62,207,142,.07);border:1px solid rgba(62,207,142,.3);border-radius:12px;
+        padding:20px;margin-top:20px}
+  .done h3{margin:0 0 14px;font-size:16px}
+  .done dl{display:grid;grid-template-columns:120px 1fr;gap:7px 14px;margin:0;font-size:13px}
+  .done dt{color:var(--faint);font:11px var(--mono);text-transform:uppercase;letter-spacing:.06em}
+  .done dd{margin:0;word-break:break-all}
+
+  .backdrop{position:fixed;inset:0;background:rgba(0,0,0,.66);display:flex;align-items:center;
+            justify-content:center;z-index:100;backdrop-filter:blur(3px)}
+  .modal{background:var(--panel2);border:1px solid var(--line2);border-radius:14px;padding:24px;max-width:400px}
+  .modal h3{margin:0 0 6px;font-size:17px}
+  .modal .sig{font:12px var(--mono);color:var(--faint);margin-bottom:16px}
+  .modal .what{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:13px;
+               font-size:14px;margin-bottom:8px}
+  .modal .fine{font-size:12.5px;color:var(--faint);line-height:1.55;margin-bottom:18px}
+  .modal .row{display:flex;gap:8px;justify-content:flex-end}
+  .flash{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(70px);
+         background:var(--ink);color:#0a0b0d;padding:10px 18px;border-radius:8px;font:600 13.5px var(--sans);
+         transition:transform .22s;z-index:120}
+  .flash.show{transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>Link your <span>X handle</span></h1>
+  <p class="lede">
+    Bind your X account to an identity you own, with evidence that survives the account
+    being deleted — so nobody can take your handle later and claim to be you.
+  </p>
+  <div class="nokeys">no developer account · no API key · no seed phrase · nothing to pay for</div>
+</header>
+
+<div class="step active" id="step-1" data-n="1">
+  <h2>Create your identity</h2>
+  <p class="why">A key is derived on this device. You will never see a seed phrase, and nothing is stored on a server.</p>
+  <button id="connect">Create identity</button>
+  <div class="detail" id="step-1-detail"></div>
+</div>
+
+<div class="step" id="step-2" data-n="2">
+  <h2>Post the proof on X</h2>
+  <p class="why">This exact text, posted by you. It is what lets anyone confirm the two accounts are the same person — and it needs no API, just the normal composer.</p>
+  <div id="step2-body" class="hidden">
+    <pre class="proof" id="proof-text">—</pre>
+    <a class="btn" id="intent-link" href="#" target="_blank" rel="noopener">Open X composer</a>
+    <button class="ghost" id="copy-proof">Copy text</button>
+    <div class="note">
+      Post it verbatim. A single changed character breaks verification, and the check is
+      deliberately strict — a fuzzy match would accept a post that merely mentions someone else's key.
+    </div>
+  </div>
+  <div class="detail" id="step-2-detail"></div>
+</div>
+
+<div class="step" id="step-3" data-n="3">
+  <h2>Paste the link to that post</h2>
+  <p class="why">Open your new post on X, copy its URL from the address bar, and paste it here.</p>
+  <input type="text" id="post-url" placeholder="https://x.com/yourhandle/status/1789456123456789012" spellcheck="false">
+  <div class="detail" id="step-3-detail"></div>
+</div>
+
+<div class="step" id="step-4" data-n="4">
+  <h2>Archive the proof</h2>
+  <p class="why">
+    This is the step everyone skips and the one that matters most. Your proof post dies with your
+    X account — so the evidence disappears at exactly the moment someone else has your old handle
+    and is claiming to be you. An archived copy is held by a third party with no stake in the fight.
+  </p>
+  <div id="step4-body" class="hidden">
+    <button id="archive-btn" disabled>Archive it</button>
+    <button class="ghost" id="skip-archive">Skip</button>
+    <div class="note">
+      A Wayback tab opens and captures the post. Leave it open until it finishes — this page
+      polls until the snapshot appears, then records the exact URL and capture time.
+    </div>
+  </div>
+  <div class="detail" id="step-4-detail"></div>
+</div>
+
+<div class="step" id="step-5" data-n="5">
+  <h2>Sign and publish</h2>
+  <p class="why">
+    Two events: a standard NIP-39 claim any Nostr client understands, and an XOnly attestation
+    carrying the archived proof and your account id.
+  </p>
+  <div id="step5-body" class="hidden">
+    <label for="account-id">X numeric account id <span class="dim">— optional but strongly recommended</span></label>
+    <input type="text" id="account-id" placeholder="1234567890" spellcheck="false">
+    <div class="note" style="margin-bottom:14px">
+      <strong>Handles recycle; numeric ids never do.</strong> If your account is ever deleted, someone
+      can register your handle — and a claim bound only to the handle cannot tell you apart from them.
+      Find yours by searching &ldquo;find my X user id&rdquo;; it is public.
+    </div>
+    <button id="publish">Sign &amp; publish</button>
+  </div>
+  <div class="detail" id="step-5-detail"></div>
+</div>
+
+<div class="done hidden" id="done-panel">
+  <h3>Linked.</h3>
+  <dl>
+    <dt>identity</dt><dd id="done-npub"></dd>
+    <dt>X handle</dt><dd id="done-handle"></dd>
+    <dt>proof</dt><dd id="done-snapshot"></dd>
+  </dl>
+  <div class="note" style="margin-top:16px">
+    Put your lookup URL in every bio you will ever have. It does not live on X, so it does not die with X.
+  </div>
+</div>
+
+</div>
+
+<div class="backdrop hidden" id="approval">
+  <div class="modal">
+    <h3>Approve signature</h3>
+    <div class="sig">your signer · tier 1</div>
+    <div class="what" id="approval-what"></div>
+    <p class="fine">A signer that asks &ldquo;sign this?&rdquo; without saying what <em>this</em> is has trained you to click yes.</p>
+    <div class="row">
+      <button class="ghost" id="approve-no">Decline</button>
+      <button id="approve-yes">Approve</button>
+    </div>
+  </div>
+</div>
+
+<div class="flash" id="flash"></div>
+<script>/*BUNDLE*/</script>
+</body>
+</html>

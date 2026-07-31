@@ -1,0 +1,50 @@
+node_modules/
+dist/
+out/
+coverage/
+*.log
+.DS_Store
+.env
+.env.*
+!.env.example
+
+# Build outputs that are regenerated and hash-verified in CI
+sdk/dist/
+graph/dist/
+card/out/
+**/*.png.sha256
+
+# Never commit a credential, an archive, or a key file
+*.pem
+*.key
+!**/test/**/*.key
+x-archive/
+**/following.js
+**/account.js
+**/tweets.js
+**/direct-messages*.js
+
+# Tool caches
+.vite/
+.vitest/
+.turbo/
+*.tsbuildinfo
+playwright-report/
+test-results/
+.env.local
+docs/dist/
+
+# Verification screenshots. Every one of these is rewritten by `npm run verify`
+# in its package, so committing them means every green run produces a diff.
+# The proof is the exit code, not the pixels.
+explorer/who.png
+graph/import.png
+link/link.png
+recovery/recovery.png
+sdk/examples/hello.png
+editor/shot-*.png
+landing/shot-*.png
+post/shot-*.png
+demo/shot-*.png
+prf-check/shot-*.png
+wordpress/tests/card.png

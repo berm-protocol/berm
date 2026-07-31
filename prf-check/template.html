@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Berm — PRF hardware check</title>
+<style>
+  :root{--bg:#0a0b0d;--panel:#101216;--panel2:#15181f;--line:#22262f;--line2:#2c313c;
+        --ink:#e8eaed;--dim:#8b919c;--faint:#5a606b;--ok:#3ecf8e;--bad:#ff6b6b;--warn:#f0b849;
+        --accent:#7c9cff;--mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+        --sans:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Inter,sans-serif}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.65 var(--sans);-webkit-font-smoothing:antialiased}
+  .wrap{max-width:780px;margin:0 auto;padding:0 24px 100px}
+  header{padding:60px 0 30px;border-bottom:1px solid var(--line)}
+  h1{font-size:34px;letter-spacing:-.02em;margin:0 0 12px;font-weight:600}
+  h1 span{background:linear-gradient(100deg,#7c9cff,#3ecf8e);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .lede{color:var(--dim);margin:0;max-width:600px}
+  .env{margin-top:22px;font:12px/1.8 var(--mono);color:var(--faint)}
+  .env code{color:var(--dim)}
+  .env a{color:var(--accent)}
+
+  .bar{display:flex;align-items:center;gap:10px;padding:22px 0;position:sticky;top:0;background:var(--bg);
+       z-index:10;border-bottom:1px solid var(--line)}
+  button{background:var(--ink);color:#0a0b0d;border:0;border-radius:8px;padding:10px 17px;
+         font:600 14px var(--sans);cursor:pointer}
+  button:hover{opacity:.88} button:disabled{opacity:.45;cursor:default}
+  button.ghost{background:transparent;color:var(--ink);border:1px solid var(--line2)}
+  button.ghost:hover{border-color:var(--dim);opacity:1}
+  .spacer{flex:1}
+  #summary{font:13px var(--mono);color:var(--dim)}
+  #summary strong{color:var(--ink)} #summary .bad{color:var(--bad)}
+
+  .check{border:1px solid var(--line);border-left-width:3px;border-radius:10px;padding:14px 16px;
+         margin:12px 0;background:var(--panel)}
+  .check.pass{border-left-color:var(--ok)} .check.fail{border-left-color:var(--bad)}
+  .check.warn{border-left-color:var(--warn)} .check.pending{border-left-color:var(--faint)}
+  .check.skip{border-left-color:var(--line2);opacity:.72}
+  .check .hd{display:flex;align-items:center;gap:11px;margin-bottom:7px}
+  .tag{font:10px var(--mono);letter-spacing:.1em;padding:3px 7px;border-radius:5px;
+       background:rgba(255,255,255,.07);color:var(--faint);flex:none;min-width:46px;text-align:center}
+  .pass .tag{background:rgba(62,207,142,.16);color:var(--ok)}
+  .fail .tag{background:rgba(255,107,107,.16);color:var(--bad)}
+  .warn .tag{background:rgba(240,184,73,.16);color:var(--warn)}
+  .nm{font-size:14.5px;font-weight:600}
+  .det{font-size:13.5px;color:var(--dim);line-height:1.62}
+  .det code{font:12px var(--mono);background:rgba(255,255,255,.07);padding:1.5px 5px;border-radius:4px}
+  .det strong{color:var(--ink)}
+  pre.data{background:var(--panel2);border:1px solid var(--line);border-radius:7px;padding:11px;
+           font:11.5px/1.55 var(--mono);color:var(--faint);overflow-x:auto;margin:10px 0 0;
+           white-space:pre-wrap;word-break:break-all}
+
+  .sect{font:11px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--faint);margin:36px 0 12px}
+  .note{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:15px 17px;
+        font-size:13.5px;color:var(--dim);line-height:1.65}
+  .note strong{color:var(--ink)}
+  .note code{font:12px var(--mono);background:rgba(255,255,255,.07);padding:1.5px 5px;border-radius:4px}
+  .hidden{display:none !important}
+  .row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>PRF <span>hardware check</span></h1>
+  <p class="lede">
+    Everything else in Berm is covered by unit tests. This is the one layer only a human with a
+    real authenticator can prove — and the whole of Tier 1 rests on it.
+  </p>
+  <div class="env">
+    this origin's RP ID: <code id="this-rp">…</code><br>
+    for the scoping test, open: <a id="other-host" href="#">…</a>
+  </div>
+</header>
+
+<div class="bar">
+  <button id="run">Run the checks</button>
+  <button class="ghost" id="scope-btn">Test RP-ID scoping</button>
+  <button class="ghost" id="persist-btn">Test after reload</button>
+  <div class="spacer"></div>
+  <div id="summary"></div>
+</div>
+
+<div id="checks"></div>
+
+<div class="row hidden" id="export-row">
+  <button class="ghost" id="export">Export result as JSON</button>
+  <button class="ghost" id="reset">Reset stored credential</button>
+</div>
+
+<div class="sect">How to run this properly</div>
+<div class="note">
+  <p style="margin-top:0"><strong>1.</strong> Press <strong>Run the checks</strong> and approve with your
+  fingerprint, face, or PIN. You'll be asked twice — the second one is the determinism test.</p>
+
+  <p><strong>2.</strong> Reload the page, then press <strong>Test after reload</strong>. Same npub means
+  the identity is recomputed rather than retrieved, which is the entire product promise.</p>
+
+  <p><strong>3.</strong> Open the other hostname linked above and press <strong>Test RP-ID scoping</strong>
+  there. <code>localhost</code> and <code>127.0.0.1</code> are different RP IDs even on the same port, so
+  this reproduces the cross-origin case locally. The browser <em>must</em> refuse. That refusal is why
+  custody has to live at a single signer origin — a per-site passkey would mean a per-site identity.</p>
+
+  <p><strong>4.</strong> Export the JSON and attach it to the release record. An unrecorded platform is
+  an untested platform.</p>
+
+  <p style="margin-bottom:0"><strong>If PRF is unsupported</strong>, that is a legitimate result, not a
+  broken run. The correct product behaviour is to route the user to a NIP-07 extension or a NIP-46
+  signer — never to a weaker derivation. Record the platform and move on.</p>
+</div>
+
+<div class="sect">Platforms worth recording</div>
+<div class="note">
+  Chrome and Safari on macOS · Safari on iOS · Chrome on Android · Chrome and Firefox on Windows ·
+  Firefox on Android (expected to fail — a useful negative) · any hardware security key you own.
+</div>
+
+<script>/*BUNDLE*/</script>
+</body>
+</html>

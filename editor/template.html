@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>XOnly Editor</title>
+<style>
+  :root{
+    --bg:#0a0b0d; --panel:#101216; --panel2:#15181f; --line:#22262f; --line2:#2c313c;
+    --ink:#e8eaed; --dim:#8b919c; --faint:#5a606b;
+    --ok:#3ecf8e; --bad:#ff6b6b; --warn:#f0b849; --accent:#7c9cff;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    --sans:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Inter,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.6 var(--sans);
+       -webkit-font-smoothing:antialiased;overflow:hidden}
+
+  /* ── top bar ─────────────────────────────────────────── */
+  .top{height:52px;display:flex;align-items:center;gap:14px;padding:0 18px;
+       border-bottom:1px solid var(--line);background:var(--panel)}
+  .logo{font-weight:700;letter-spacing:-.02em;font-size:16px}
+  .logo span{background:linear-gradient(100deg,#7c9cff,#3ecf8e);-webkit-background-clip:text;
+             background-clip:text;color:transparent}
+  .stats{display:flex;gap:16px;font:12px var(--mono);color:var(--faint);margin-left:8px}
+  .spacer{flex:1}
+  .who{display:flex;align-items:center;gap:10px;font-size:13px}
+  .who .av{width:26px;height:26px;border-radius:50%;
+           background:linear-gradient(135deg,#7c9cff,#3ecf8e)}
+  .who .np{font:11px var(--mono);color:var(--faint)}
+
+  button{background:var(--ink);color:#0a0b0d;border:0;border-radius:7px;padding:8px 14px;
+         font-size:13.5px;font-weight:600;cursor:pointer;font-family:var(--sans)}
+  button:hover{opacity:.88} button:disabled{opacity:.45;cursor:default}
+  button.ghost{background:transparent;color:var(--ink);border:1px solid var(--line2)}
+  button.ghost:hover{border-color:var(--dim);opacity:1}
+
+  /* ── layout ──────────────────────────────────────────── */
+  .main{display:grid;grid-template-columns:1fr 420px;height:calc(100% - 52px)}
+  .left{overflow-y:auto;padding:56px 0 200px}
+  .right{border-left:1px solid var(--line);background:var(--panel);overflow-y:auto}
+
+  /* ── editor ──────────────────────────────────────────── */
+  .doc{max-width:680px;margin:0 auto;padding:0 56px}
+  textarea#title,textarea#subtitle{width:100%;background:none;border:0;outline:none;color:var(--ink);
+      resize:none;overflow:hidden;font-family:var(--sans);display:block}
+  #title{font-size:42px;line-height:1.14;font-weight:700;letter-spacing:-.025em;margin-bottom:10px}
+  #subtitle{font-size:20px;line-height:1.45;color:var(--dim);margin-bottom:22px}
+  textarea::placeholder{color:var(--faint)}
+
+  .coverrow{display:flex;align-items:center;gap:10px;margin-bottom:30px;
+            padding-bottom:22px;border-bottom:1px solid var(--line)}
+  .coverrow input{flex:1;background:var(--panel2);border:1px solid var(--line);border-radius:7px;
+                  color:var(--ink);padding:8px 11px;font:12.5px var(--mono);outline:none}
+  .coverrow input:focus{border-color:var(--accent)}
+  .coverrow label{font:11px var(--mono);color:var(--faint);letter-spacing:.08em;text-transform:uppercase}
+
+  .blockrow{position:relative;display:flex;align-items:flex-start;gap:4px;margin-left:-34px}
+  .handle{width:26px;height:26px;padding:0;margin-top:6px;background:none;color:var(--faint);
+          border:0;border-radius:5px;opacity:0;font-size:12px;letter-spacing:-2px;flex:none}
+  .blockrow:hover .handle{opacity:1}
+  .handle:hover{background:var(--panel2);color:var(--ink);opacity:1}
+  .blk{flex:1;outline:none;min-width:0}
+  .blk.p{font-size:18px;line-height:1.72;margin:0 0 4px;padding:3px 0}
+  .blk.h1{font-size:32px;font-weight:700;letter-spacing:-.02em;margin:26px 0 4px;padding:2px 0}
+  .blk.h2{font-size:25px;font-weight:700;letter-spacing:-.015em;margin:24px 0 4px;padding:2px 0}
+  .blk.h3{font-size:20px;font-weight:600;margin:20px 0 4px;padding:2px 0}
+  .blk.quote{border-left:3px solid var(--accent);padding:4px 0 4px 18px;margin:16px 0;
+             color:var(--dim);font-size:18px;font-style:italic}
+  .blk.code{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:14px;
+            font:13.5px/1.6 var(--mono);margin:16px 0;white-space:pre-wrap;color:var(--dim)}
+  .blk.list{padding-left:24px;margin:8px 0;font-size:18px;line-height:1.7}
+  .blk.list li{margin-bottom:6px;outline:none}
+  .blk.hr hr{border:0;border-top:1px solid var(--line2);margin:26px 0}
+  .blk.media{margin:18px 0}
+  .blk.media img{width:100%;border-radius:9px;display:block}
+  .blk.media .url,.blk.media .cap{width:100%;background:var(--panel2);border:1px solid var(--line);
+      border-radius:7px;color:var(--ink);padding:10px 12px;font:13px var(--mono);outline:none;margin-top:8px}
+  .blk.media .url:focus,.blk.media .cap:focus{border-color:var(--accent)}
+  .embedcard{background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:14px;
+             display:flex;flex-direction:column;gap:6px}
+  .embedcard code{font:12px var(--mono);color:var(--accent);word-break:break-all}
+  [contenteditable]:empty:before{content:attr(data-placeholder);color:var(--faint);pointer-events:none}
+  .blk a{color:var(--accent)}
+  .blk code{background:rgba(127,127,127,.16);padding:2px 5px;border-radius:4px;font:.88em var(--mono)}
+
+  /* ── block menu ──────────────────────────────────────── */
+  .blockmenu{position:absolute;z-index:60;background:var(--panel2);border:1px solid var(--line2);
+             border-radius:10px;padding:6px;min-width:196px;box-shadow:0 14px 40px rgba(0,0,0,.6)}
+  .blockmenu button{display:flex;align-items:center;gap:11px;width:100%;background:none;color:var(--ink);
+                    border:0;padding:8px 10px;border-radius:6px;font-size:13.5px;font-weight:400;text-align:left}
+  .blockmenu button:hover{background:rgba(255,255,255,.07);opacity:1}
+  .blockmenu .ic{width:22px;color:var(--faint);font:12px var(--mono);flex:none}
+  .blockmenu .sep{height:1px;background:var(--line);margin:6px 4px}
+  .blockmenu .danger{color:var(--bad)}
+
+  /* ── right panel ─────────────────────────────────────── */
+  .tabs{display:flex;gap:2px;padding:12px 14px 0;border-bottom:1px solid var(--line)}
+  .tab{padding:8px 12px;font:12px var(--mono);color:var(--faint);cursor:pointer;
+       border-radius:6px 6px 0 0;letter-spacing:.04em}
+  .tab.on{color:var(--ink);background:var(--panel2)}
+  .pane{display:none;padding:18px 16px 80px}
+  .pane.on{display:block}
+
+  .sect{font:11px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--faint);
+        margin:0 0 10px}
+  .sect:not(:first-child){margin-top:26px}
+
+  .cardprev{background:var(--panel2);border:1px solid var(--line2);border-radius:14px;overflow:hidden}
+  .cardprev img{width:100%;display:block;background:#0a0b0d;aspect-ratio:1200/630}
+  .cardmeta{padding:11px 13px;border-top:1px solid var(--line)}
+  .cardmeta .d{font:11.5px var(--mono);color:var(--faint);margin-bottom:3px}
+  .cardmeta .t{font-size:14px;font-weight:600;line-height:1.35;margin-bottom:3px}
+  .cardmeta .s{font-size:13px;color:var(--dim);line-height:1.4}
+
+  .field{margin-bottom:14px}
+  .field label{display:block;font:11px var(--mono);letter-spacing:.08em;text-transform:uppercase;
+               color:var(--faint);margin-bottom:6px}
+  .field input{width:100%;background:var(--panel2);border:1px solid var(--line);border-radius:7px;
+               color:var(--ink);padding:9px 11px;font:13px var(--mono);outline:none}
+  .field input:focus{border-color:var(--accent)}
+  .hint{font-size:12.5px;color:var(--faint);line-height:1.55;margin-top:6px}
+
+  .badge{display:inline-block;font:11px var(--mono);padding:4px 9px;border-radius:20px;letter-spacing:.05em}
+  .badge.verified{background:rgba(62,207,142,.15);color:var(--ok)}
+  .badge.claimed{background:rgba(240,184,73,.15);color:var(--warn)}
+  .badge.unlinked{background:rgba(255,255,255,.07);color:var(--faint)}
+
+  .target{border:1px solid var(--line);border-radius:10px;padding:13px;margin-bottom:10px;
+          background:var(--panel2)}
+  .target .hd{display:flex;align-items:center;gap:9px;margin-bottom:7px}
+  .target .dot{width:8px;height:8px;border-radius:50%;background:var(--faint);flex:none}
+  .target.busy .dot{background:var(--warn);animation:pulse 1s infinite}
+  .target.ok .dot{background:var(--ok)}
+  .target.fail .dot{background:var(--bad)}
+  .target.skip .dot{background:var(--faint)}
+  @keyframes pulse{50%{opacity:.25}}
+  .target .nm{font-size:13.5px;font-weight:600}
+  .target .det{font-size:12.5px;color:var(--dim);line-height:1.6;word-break:break-word}
+  .target .det code{font:11.5px var(--mono);background:rgba(255,255,255,.06);
+                    padding:1.5px 5px;border-radius:4px}
+  .target .det a{color:var(--ok)}
+
+  pre.out{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:12px;
+          font:11.5px/1.55 var(--mono);color:var(--dim);overflow-x:auto;max-height:340px;
+          white-space:pre-wrap;word-break:break-all;margin:0}
+
+  /* ── approval modal ──────────────────────────────────── */
+  .backdrop{position:fixed;inset:0;background:rgba(0,0,0,.66);display:flex;align-items:center;
+            justify-content:center;z-index:100;backdrop-filter:blur(3px)}
+  .modal{background:var(--panel2);border:1px solid var(--line2);border-radius:14px;padding:24px;
+         max-width:400px;box-shadow:0 24px 70px rgba(0,0,0,.7)}
+  .modal h3{margin:0 0 6px;font-size:17px}
+  .modal .sig{font:12px var(--mono);color:var(--faint);margin-bottom:16px}
+  .modal .what{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:13px;
+               font-size:14px;margin-bottom:8px}
+  .modal .fine{font-size:12.5px;color:var(--faint);line-height:1.55;margin-bottom:18px}
+  .modal .row{display:flex;gap:8px;justify-content:flex-end}
+
+  .flash{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(70px);
+         background:var(--ink);color:#0a0b0d;padding:10px 18px;border-radius:8px;font-size:13.5px;
+         font-weight:600;transition:transform .22s;z-index:120}
+  .flash.show{transform:translateX(-50%) translateY(0)}
+  .hidden{display:none !important}
+  .tsel{background:transparent;color:var(--ink);border:1px solid var(--line2);border-radius:7px;
+        padding:8px 10px;font:13.5px var(--sans);cursor:pointer}
+  .tsel option{background:var(--panel2);color:var(--ink)}
+  .warns{margin:0;padding-left:18px;font-size:13px;color:var(--warn);line-height:1.6}
+  .warns li{margin-bottom:5px}
+  .ximg{display:flex;align-items:center;gap:11px;padding:9px 0;border-bottom:1px solid var(--line)}
+  .ximg:last-child{border:0}
+  .ximg .thumb{width:56px;height:38px;flex:none;background:var(--panel2);border:1px solid var(--line);
+               border-radius:5px;overflow:hidden;display:flex;align-items:center;justify-content:center}
+  .ximg .thumb img{width:100%;height:100%;object-fit:cover}
+  .ximg .meta{flex:1;min-width:0}
+  .ximg .lbl{font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ximg .mk{font:10px var(--mono);background:rgba(124,156,255,.18);color:var(--accent);
+            padding:2px 5px;border-radius:4px;margin-right:5px}
+  .ximg .kind{font:11px var(--mono)}
+  button.mini{background:transparent;border:1px solid var(--line2);color:var(--dim);
+              border-radius:6px;padding:5px 9px;font:11px var(--mono);cursor:pointer;margin:0}
+  button.mini:hover{border-color:var(--dim);color:var(--ink)}
+  .tablewrap{margin:16px 0}
+  .edtable{width:100%;border-collapse:collapse;font-size:15px}
+  .edtable th,.edtable td{border:1px solid var(--line2);padding:8px 10px;outline:none;min-width:70px}
+  .edtable tr.head th{background:var(--panel2);font-weight:600}
+  .tablebar{display:flex;gap:5px;margin-top:8px;flex-wrap:wrap}
+  .artwrap{margin:16px 0}
+  .artinput{width:100%;background:var(--panel2);border:1px solid var(--line);border-radius:8px;
+            color:var(--ink);padding:14px;font:14px/1.45 var(--mono);outline:none;resize:vertical;
+            white-space:pre;overflow-x:auto;tab-size:4}
+  .artinput:focus{border-color:var(--accent)}
+  .artwrap .cap,.tablewrap .cap{width:100%;background:var(--panel2);border:1px solid var(--line);
+    border-radius:7px;color:var(--ink);padding:9px 11px;font:13px var(--mono);outline:none;margin-top:8px}
+  .dim{color:var(--faint)}
+  ::-webkit-scrollbar{width:9px;height:9px}
+  ::-webkit-scrollbar-thumb{background:var(--line2);border-radius:9px}
+  ::-webkit-scrollbar-track{background:transparent}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <div class="logo">X<span>Only</span></div>
+  <div class="stats">
+    <span><span id="stat-words">0</span> words</span>
+    <span id="stat-mins">1 min</span>
+    <span><span id="stat-blocks">1</span> blocks</span>
+  </div>
+  <div class="spacer"></div>
+  <select id="template-select" class="tsel" title="Start from a template">
+    <option value="">Template…</option>
+  </select>
+  <button class="ghost" id="sample">Load example</button>
+  <div class="who hidden" id="who">
+    <div class="av"></div>
+    <div>
+      <div id="who-name">You</div>
+      <div class="np" id="who-npub"></div>
+    </div>
+  </div>
+  <button id="connect">Connect identity</button>
+  <button id="publish">Publish</button>
+</div>
+
+<div class="main">
+  <div class="left">
+    <div class="doc">
+      <textarea id="title" rows="1" placeholder="Title"></textarea>
+      <textarea id="subtitle" rows="1" placeholder="A one-line subtitle"></textarea>
+      <div class="coverrow">
+        <label for="cover">Cover</label>
+        <input id="cover" placeholder="https://… (optional)">
+      </div>
+      <div id="blocks"></div>
+    </div>
+  </div>
+
+  <div class="right">
+    <div class="tabs">
+      <div class="tab on" data-pane="publish">PUBLISH</div>
+      <div class="tab" data-pane="card">CARD</div>
+      <div class="tab" data-pane="xexport">FOR X</div>
+      <div class="tab" data-pane="output">OUTPUT</div>
+    </div>
+
+    <!-- PUBLISH -->
+    <div class="pane on" id="pane-publish">
+      <div class="sect">Identity</div>
+      <div class="field">
+        <label for="handle">Your X handle</label>
+        <input id="handle" placeholder="yourhandle">
+      </div>
+      <div><span class="badge unlinked" id="badge">unlinked</span></div>
+      <p class="hint" id="badge-note">No X handle linked.</p>
+
+      <div class="sect">X access</div>
+      <div class="field">
+        <label for="x-token">OAuth 2.0 user token (optional)</label>
+        <input id="x-token" placeholder="Bearer token with tweet.write">
+      </div>
+      <p class="hint">
+        Leave empty and the X step is skipped — the exact request is still built and shown,
+        so nothing changes when your developer access clears.
+      </p>
+
+      <div class="sect">Targets</div>
+      <div class="hidden" id="publish-panel">
+        <div class="target" id="t-nostr">
+          <div class="hd"><div class="dot"></div><div class="nm">Nostr · kind 30023</div></div>
+          <div class="det" id="t-nostr-detail">Waiting…</div>
+        </div>
+        <div class="target" id="t-node">
+          <div class="hd"><div class="dot"></div><div class="nm">Node page · canonical URL</div></div>
+          <div class="det" id="t-node-detail">Waiting…</div>
+        </div>
+        <div class="target" id="t-x">
+          <div class="hd"><div class="dot"></div><div class="nm">X · native Article</div></div>
+          <div class="det" id="t-x-detail">Waiting…</div>
+        </div>
+        <button class="ghost hidden" id="open-node" style="width:100%;margin-top:6px">Open the node page</button>
+        <div class="sect">Request that was built</div>
+        <pre class="out" id="req-preview">—</pre>
+      </div>
+      <p class="hint" id="pre-publish-hint">
+        Press <strong>Publish</strong> and all three run. The article is signed once; each target
+        is a rendering of the same signed document.
+      </p>
+    </div>
+
+    <!-- CARD -->
+    <div class="pane" id="pane-card">
+      <div class="sect">How it looks in a feed</div>
+      <div class="cardprev">
+        <img id="card-img" alt="">
+        <div class="cardmeta">
+          <div class="d" id="card-domain">xonly.ai</div>
+          <div class="t" id="card-title">Untitled</div>
+          <div class="s" id="card-desc"></div>
+        </div>
+      </div>
+      <button class="ghost" id="download-card" style="width:100%;margin-top:12px">Download card image</button>
+      <p class="hint">
+        1200×630, generated live. X's crawler is anonymous — no cookies, no session — so a card can
+        never be personalised per viewer. It is personalised <em>per URL</em>, which is all that's
+        needed: a unique path renders a unique image.
+      </p>
+
+      <div class="sect">Card metadata</div>
+      <pre class="out" id="out-meta">—</pre>
+    </div>
+
+    <!-- FOR X -->
+    <div class="pane" id="pane-xexport">
+      <div class="sect">Paste into X</div>
+      <button class="ghost" id="copy-x-title" style="width:100%;margin-bottom:8px">Copy title</button>
+      <button id="copy-x-body" style="width:100%">Copy body as rich text</button>
+      <p class="hint">
+        Two pastes, because a body paste leaves X’s title field empty. The body is transformed
+        for what X can actually render — measured against the real editor, not the docs.
+      </p>
+
+      <div class="sect">Before you paste</div>
+      <ul class="warns" id="x-warnings"></ul>
+
+      <div class="sect">Images to add by hand</div>
+      <div id="x-images"></div>
+      <p class="hint">
+        X drops every image on paste — hosted URLs and data URLs alike. Tables and diagrams are
+        rendered here as PNGs so you can drop them straight in at the markers.
+      </p>
+
+      <div class="sect">Body being copied</div>
+      <pre class="out" id="x-body-preview">—</pre>
+    </div>
+
+    <!-- OUTPUT -->
+    <div class="pane" id="pane-output">
+      <div class="sect">NIP-23 markdown</div>
+      <pre class="out" id="out-md">—</pre>
+      <div class="sect">Nostr event (kind 30023)</div>
+      <pre class="out" id="out-nostr">—</pre>
+      <div class="sect">X Articles payload (DraftJS)</div>
+      <pre class="out" id="out-draftjs">—</pre>
+    </div>
+  </div>
+</div>
+
+<!-- approval -->
+<div class="backdrop hidden" id="approval">
+  <div class="modal">
+    <h3>Approve signature</h3>
+    <div class="sig">your signer · tier 1</div>
+    <div class="what" id="approval-what"></div>
+    <p class="fine">
+      A signer that asks “sign this?” without saying what <em>this</em> is has trained you to click
+      yes. Production shows exactly this prompt, from a separate origin.
+    </p>
+    <div class="row">
+      <button class="ghost" id="approve-no">Decline</button>
+      <button id="approve-yes">Approve</button>
+    </div>
+  </div>
+</div>
+
+<div class="flash" id="flash"></div>
+
+<script>/*BUNDLE*/</script>
+</body>
+</html>

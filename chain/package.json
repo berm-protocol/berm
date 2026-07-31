@@ -1,0 +1,23 @@
+{
+  "name": "@berm/chain",
+  "version": "0.1.0",
+  "private": true,
+  "description": "A durable anchor that makes domains, hosts and this project disposable — and does not pretend to fix T9.",
+  "type": "module",
+  "scripts": {
+    "compile": "node compile.mjs",
+    "test": "vitest run",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "verify": "node compile.mjs && node evm.mjs"
+  },
+  "devDependencies": {
+    "@ethereumjs/common": "^4.4.0",
+    "@ethereumjs/tx": "^5.4.0",
+    "@ethereumjs/util": "^9.1.0",
+    "@ethereumjs/vm": "^8.1.1",
+    "@noble/hashes": "^2.2.0",
+    "solc": "^0.8.28",
+    "typescript": "^5.7.0",
+    "vitest": "^3.0.0"
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "name": "@berm/node-pages",
+  "version": "0.1.0",
+  "private": true,
+  "description": "A Berm node you can fork: relays in, static site out, deployable to GitHub Pages with no server.",
+  "type": "module",
+  "scripts": {
+    "test": "vitest run",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "build": "node prepare.mjs && node build.mjs",
+    "prepare-lib": "node prepare.mjs",
+    "verify": "node prepare.mjs && node verify.mjs"
+  },
+  "devDependencies": {
+    "@noble/hashes": "^2.2.0",
+    "esbuild": "^0.28.1",
+    "nostr-tools": "^2.24.0",
+    "typescript": "^5.7.0",
+    "vitest": "^3.0.0",
+    "ws": "^8.18.0"
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "name": "@berm/sdk",
+  "version": "0.1.0",
+  "description": "The window.berm surface. Sovereign identity for apps that on-ramp from X, with no X API credential to revoke.",
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": "./dist/index.js",
+    "./dev": "./dist/backends/dev.js"
+  },
+  "files": [
+    "dist",
+    "examples"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "bundle": "node bundle.mjs",
+    "example": "node examples/serve.mjs",
+    "example:verify": "node examples/verify.mjs"
+  },
+  "dependencies": {
+    "@noble/hashes": "^2.2.0",
+    "nostr-tools": "^2.24.0"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.1",
+    "playwright": "^1.62.0",
+    "typescript": "^5.6.0",
+    "vitest": "^2.1.0",
+    "ws": "^8.21.1"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

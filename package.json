@@ -1,0 +1,15 @@
+{
+  "name": "xonly",
+  "version": "0.1.0",
+  "private": true,
+  "description": "X as the on-ramp, not the custodian. Sovereign identity for apps that welcome users from X.",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "verify": "node scripts/verify-all.mjs",
+    "verify:fast": "node scripts/verify-all.mjs --fast",
+    "check:supply-chain": "node scripts/check-supply-chain.mjs",
+    "check:docs": "node docs/check.mjs"
+  },
+  "engines": { "node": ">=20" }
+}

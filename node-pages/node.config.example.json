@@ -1,0 +1,14 @@
+{
+  "npub": "npub1yourkeyhere",
+  "handle": "yourhandle",
+  "name": "Your Name",
+  "bio": "One line about you.",
+  "origin": "https://yourname.github.io/your-repo",
+  "relays": [
+    "wss://relay.damus.io",
+    "wss://nos.lol",
+    "wss://relay.nostr.band"
+  ],
+  "kinds": [1, 30023],
+  "ctaUrl": "https://xonly.ai"
+}

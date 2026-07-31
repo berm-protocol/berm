@@ -1,0 +1,37 @@
+/* Canonical article page. Standalone by design — it must render correctly even
+   if the active theme is gone or broken, because this is the URL that has to
+   survive. */
+:root{--ink:#16181c;--dim:#5b6270;--line:#e6e8ec;--bg:#fff;--accent:#3b5bdb}
+@media (prefers-color-scheme:dark){:root{--ink:#e8eaed;--dim:#9aa1ad;--line:#262a33;--bg:#0d0e11}}
+*{box-sizing:border-box}
+body.xonly-page{margin:0;background:var(--bg);color:var(--ink);
+  font:19px/1.72 ui-serif,Georgia,'Times New Roman',serif;-webkit-font-smoothing:antialiased}
+.xonly-article{max-width:680px;margin:0 auto;padding:64px 22px 120px}
+.xonly-article h1{font-size:44px;line-height:1.13;letter-spacing:-.02em;margin:0 0 14px;
+  font-family:ui-sans-serif,system-ui,-apple-system,'Segoe UI',sans-serif;font-weight:700}
+.xonly-sub{font-size:21px;color:var(--dim);margin:0 0 26px;line-height:1.5}
+.xonly-byline{font:14px/1.4 ui-sans-serif,system-ui,sans-serif;color:var(--dim);
+  padding-bottom:26px;border-bottom:1px solid var(--line);margin-bottom:34px}
+.xonly-body h1{font-size:32px;margin:44px 0 12px}
+.xonly-body h2{font-size:29px;letter-spacing:-.015em;margin:44px 0 12px;
+  font-family:ui-sans-serif,system-ui,sans-serif;font-weight:700}
+.xonly-body h3{font-size:23px;margin:32px 0 10px;font-family:ui-sans-serif,system-ui,sans-serif;font-weight:600}
+.xonly-body p{margin:0 0 22px}
+.xonly-body a{color:var(--accent)}
+.xonly-body blockquote{margin:26px 0;padding:2px 0 2px 20px;border-left:3px solid var(--accent);
+  color:var(--dim);font-style:italic}
+.xonly-body pre{background:rgba(127,127,127,.09);border:1px solid var(--line);border-radius:8px;
+  padding:15px;overflow-x:auto;font:14px/1.6 ui-monospace,Menlo,Consolas,monospace}
+.xonly-body code{font:.88em ui-monospace,Menlo,Consolas,monospace;background:rgba(127,127,127,.12);
+  padding:2px 5px;border-radius:4px}
+.xonly-body pre code{background:none;padding:0}
+.xonly-body ul,.xonly-body ol{margin:0 0 22px;padding-left:26px}
+.xonly-body li{margin-bottom:8px}
+.xonly-body figure{margin:32px 0}
+.xonly-body figure img{width:100%;border-radius:10px;display:block}
+.xonly-body hr{border:0;border-top:1px solid var(--line);margin:40px 0}
+.xonly-provenance{margin-top:64px;padding-top:26px;border-top:1px solid var(--line);
+  font:13.5px/1.7 ui-sans-serif,system-ui,sans-serif;color:var(--dim)}
+.xonly-provenance code{font-size:12px;word-break:break-all}
+.xonly-btn{display:inline-block;background:#16181c;color:#fff;padding:11px 18px;border-radius:8px;
+  text-decoration:none;font:600 14px ui-sans-serif,system-ui,sans-serif}

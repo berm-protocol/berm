@@ -1,0 +1,190 @@
+{
+  "$schema": "Berm v2 §7 test vectors",
+  "generatedBy": "@berm/crypto@2.0.0 — scripts/generate-vectors.ts",
+  "frozen": true,
+  "note": "FROZEN BASELINE. A change to any value here changes every existing user identity. Do not regenerate to make a failing test pass.",
+  "V1_derivation_stability": {
+    "description": "Fixed PRF output + credential id must always yield the same identity, in every browser, on every device, across rebuilds. This determinism is what lets a user sign in on a new machine with only a synced passkey.",
+    "cases": [
+      {
+        "label": "prf=A cred=A",
+        "prfOutHex": "75709aa882e938b5d165c16613e592f87e0a12aabf1da30e0da5ec8b84907739",
+        "credentialIdHex": "413e479efa23e444efb6c1a68d881f70",
+        "infoHex": "736563703235366b317c413e479efa23e444efb6c1a68d881f707c00",
+        "secretKeyHex": "f340ba483d94aa35d1c1a1078d2e2a02646cc5c228d5f63af96408b2e94ec224",
+        "pubkeyHex": "699c94128e6f6348bf6ebf3ab4dcb527f4b26a3414f76ccda1285b2bfd03f60a",
+        "npub": "npub1dxwfgy5wda3530mwhuatfh94yl6ty635znmkendp9pdjhlgr7c9qm5fe94",
+        "nsec": "nsec17dqt5jpajj4rt5wp5yrc6t32qfjxe3wz9r2lvwhevsyt962wcgjqkwdt9d",
+        "attempt": 0
+      },
+      {
+        "label": "prf=B cred=A — different PRF must give a different identity",
+        "prfOutHex": "9185808766675c7c26244249d8685cfc6e7dd1be15a4cc47974f167c4d4865fd",
+        "credentialIdHex": "413e479efa23e444efb6c1a68d881f70",
+        "secretKeyHex": "b387afcc1d10bc92cb670da2d687faa246af6f65ed8204a63ee874865b5925af",
+        "pubkeyHex": "d91ab2a755b0b5ea3b1c08baed683f895cd5d7c4b5935e39d0473226f7c0b791",
+        "npub": "npub1mydt9f64kz675wcupzaw66pl39wdt47ykkf4uwwsguezda7qk7gsvvh4qq",
+        "attempt": 0
+      },
+      {
+        "label": "prf=A cred=B — different credential must give a different identity",
+        "prfOutHex": "75709aa882e938b5d165c16613e592f87e0a12aabf1da30e0da5ec8b84907739",
+        "credentialIdHex": "96d8dacbb23b2740bb52ae31e2dc53f2",
+        "secretKeyHex": "59ce78e93267fcb5137679c263a718fa2b931fe2b93cf9209ef6268002adf9eb",
+        "pubkeyHex": "c6182439b38acc12d1ba8c1613031cbc8d305ee576ebdaf00c338e51684f6536",
+        "npub": "npub1ccvzgwdn3txp95d63stpxqcuhjxnqhh9wm4a4uqvxw89z6z0v5mq4j6gda",
+        "attempt": 0
+      }
+    ]
+  },
+  "V2_scalar_validation": {
+    "description": "Boundary conditions for 0 < sk < n, plus the counter-retry branch. A natural retry case is unreachable: P(HKDF output >= n) < 2^-128, so the branch is exercised by injecting a stub KDF. This is a deliberate substitution, documented rather than hidden.",
+    "curveOrderHex": "fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141",
+    "boundary": [
+      {
+        "label": "zero",
+        "hex": "0000000000000000000000000000000000000000000000000000000000000000",
+        "valid": false
+      },
+      {
+        "label": "one",
+        "hex": "0000000000000000000000000000000000000000000000000000000000000001",
+        "valid": true
+      },
+      {
+        "label": "n minus 1",
+        "hex": "fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364140",
+        "valid": true
+      },
+      {
+        "label": "n exactly",
+        "hex": "fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141",
+        "valid": false
+      },
+      {
+        "label": "n plus 1",
+        "hex": "fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364142",
+        "valid": false
+      },
+      {
+        "label": "all 0xff",
+        "hex": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+        "valid": false
+      },
+      {
+        "label": "wrong length (31 bytes)",
+        "hex": "00000000000000000000000000000000000000000000000000000000000001",
+        "valid": false
+      }
+    ],
+    "retry": {
+      "description": "Stub KDF returns n (invalid) at counter 0, then a valid scalar at counter 1. deriveSecretKey must return attempt=1, not throw and not clamp.",
+      "counter0Hex": "fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141",
+      "counter1Hex": "000000000000000000000000000000000000000000000000000000000000002a",
+      "expectedAttempt": 1
+    }
+  },
+  "V3_event_id": {
+    "description": "NIP-01 canonical serialization and event id for a kind 0 carrying two NIP-39 claims. Pinned because a serialization bug produces events that relays reject silently.",
+    "event": {
+      "pubkey": "699c94128e6f6348bf6ebf3ab4dcb527f4b26a3414f76ccda1285b2bfd03f60a",
+      "created_at": 1785000000,
+      "kind": 0,
+      "tags": [
+        [
+          "i",
+          "twitter:dorian_handle",
+          "1789456123456789012"
+        ],
+        [
+          "i",
+          "github:dorian",
+          "9721ce4ee4fceb91c9711ca2a6c9a5ab"
+        ]
+      ],
+      "content": "{\"name\":\"dorian\",\"display_name\":\"Dorian\",\"about\":\"Building Berm.\",\"nip05\":\"_@xonly.ai\",\"website\":\"https://xonly.ai\"}"
+    },
+    "serialized": "[0,\"699c94128e6f6348bf6ebf3ab4dcb527f4b26a3414f76ccda1285b2bfd03f60a\",1785000000,0,[[\"i\",\"twitter:dorian_handle\",\"1789456123456789012\"],[\"i\",\"github:dorian\",\"9721ce4ee4fceb91c9711ca2a6c9a5ab\"]],\"{\\\"name\\\":\\\"dorian\\\",\\\"display_name\\\":\\\"Dorian\\\",\\\"about\\\":\\\"Building Berm.\\\",\\\"nip05\\\":\\\"_@xonly.ai\\\",\\\"website\\\":\\\"https://xonly.ai\\\"}\"]",
+    "id": "dc3449039859540c0a81604c19275b7d7301384f024210adc62f02eb215ce036"
+  },
+  "V4_nip44": {
+    "description": "NIP-44 v2 only. NIP-04 is deprecated and prohibited repo-wide. The conversation-key cases are copied verbatim from the official nip44.vectors.json and are the cross-implementation anchor.",
+    "officialConversationKeys": [
+      {
+        "sec1": "315e59ff51cb9209768cf7da80791ddcaae56ac9775eb25b6dee1234bc5d2268",
+        "pub2": "c2f9d9948dc8c7c38321e4b85c8558872eafa0641cd269db76848a6073e69133",
+        "conversation_key": "3dfef0ce2a4d80a25e7a328accf73448ef67096f65f79588e358d9a0eb9013f1"
+      },
+      {
+        "sec1": "a1e37752c9fdc1273be53f68c5f74be7c8905728e8de75800b94262f9497c86e",
+        "pub2": "03bb7947065dde12ba991ea045132581d0954f042c84e06d8c00066e23c1a800",
+        "conversation_key": "4d14f36e81b8452128da64fe6f1eae873baae2f444b02c950b90e43553f2178b"
+      }
+    ],
+    "selfEncryption": {
+      "description": "kind 30078 app state is self-encrypted (§4.3).",
+      "pubkeyHex": "699c94128e6f6348bf6ebf3ab4dcb527f4b26a3414f76ccda1285b2bfd03f60a",
+      "conversationKeyHex": "13565cf6a8c90e7c74301b352babc921bc62d1f571ff0eaa5dd31c3e32912cfc",
+      "plaintext": "{\"theme\":\"dark\",\"apps\":[\"wp-shop-node\"]}"
+    }
+  },
+  "V5_origin_scoping": {
+    "description": "NEGATIVE VECTOR. Key derivation must refuse to run anywhere except the signer origin, and two signer origins must yield two different RP IDs and therefore two non-interchangeable identities. The full WebAuthn RP-ID guarantee is a browser property and is covered by the manual e2e checklist; what is unit-tested here is our own origin guard.",
+    "signerOrigin": "https://signer.xonly.ai",
+    "expectedRpId": "signer.xonly.ai",
+    "mustThrow": [
+      "https://blog-a.com",
+      "https://xonly.ai",
+      "https://signer.xonly.ai.evil.tld",
+      "http://signer.xonly.ai"
+    ]
+  },
+  "V6_v1_regression_guard": {
+    "description": "NEGATIVE VECTOR. The v1 derivation is a public function of a public value. An attacker holding only the X user ID reproduces the key exactly. This vector exists so the broken primitive can never re-enter the codebase unnoticed.",
+    "publicXUserId": "12345678",
+    "note": "The expected key is intentionally NOT recorded here. The test computes both the victim-side and attacker-side derivations and asserts they are equal — the assertion is the equality itself, not a stored constant.",
+    "alsoAsserts": [
+      "a 6-digit PIN is recovered by exhaustive offline search in well under a second",
+      "no file under src/ (excluding src/quarantine/) contains the v1 salt literal",
+      "no file under src/ or test/ references nip04"
+    ]
+  },
+  "V7_nip39_binding": {
+    "description": "Binding state resolution must never render \"claimed\" as \"verified\".",
+    "npub": "npub1dxwfgy5wda3530mwhuatfh94yl6ty635znmkendp9pdjhlgr7c9qm5fe94",
+    "proofText": "Verifying my account on nostr My Public Key: \"npub1dxwfgy5wda3530mwhuatfh94yl6ty635znmkendp9pdjhlgr7c9qm5fe94\"",
+    "shareIntentUrl": "https://x.com/intent/tweet?text=Verifying%20my%20account%20on%20nostr%20My%20Public%20Key%3A%20%22npub1dxwfgy5wda3530mwhuatfh94yl6ty635znmkendp9pdjhlgr7c9qm5fe94%22",
+    "claimTag": [
+      "i",
+      "twitter:dorian_handle",
+      "1789456123456789012"
+    ],
+    "states": [
+      {
+        "claim": "dorian_handle",
+        "liveHandle": "dorian_handle",
+        "expected": "verified"
+      },
+      {
+        "claim": "dorian_handle",
+        "liveHandle": "DORIAN_HANDLE",
+        "expected": "verified"
+      },
+      {
+        "claim": "dorian_handle",
+        "liveHandle": null,
+        "expected": "claimed"
+      },
+      {
+        "claim": "dorian_handle",
+        "liveHandle": "someone_else",
+        "expected": "claimed"
+      },
+      {
+        "claim": null,
+        "liveHandle": "dorian_handle",
+        "expected": "unlinked"
+      }
+    ]
+  }
+}
