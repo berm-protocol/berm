@@ -3,6 +3,7 @@ import { createServer } from 'node:http';
 import { readFileSync } from 'node:fs';
 import { verifyEvent } from 'nostr-tools';
 import { startRelay } from './local-relay.mjs';
+import { launch } from '../scripts/chromium.mjs';
 
 const html = readFileSync('dist/berm-live-proof.html');
 const http = createServer((_,res)=>{res.setHeader('content-type','text/html');res.end(html);}).listen(8099);
@@ -11,7 +12,7 @@ console.log('starting two independent relays (each verifies signatures itself)')
 const r1 = startRelay(7447, 'relay-A');
 const r2 = startRelay(7448, 'relay-B');
 
-const browser = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' });
+const browser = await launch(chromium);
 const page = await browser.newPage();
 const errs = []; page.on('pageerror', e=>errs.push(e.message));
 

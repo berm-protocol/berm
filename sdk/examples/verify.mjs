@@ -14,6 +14,7 @@ import { spawn } from 'node:child_process';
 import { existsSync } from 'node:fs';
 import { chromium } from 'playwright';
 import { startRelay, ready } from '../test/relay-harness.mjs';
+import { launch } from '../../scripts/chromium.mjs';
 
 const PORT = 8111;
 const A = startRelay(7811);
@@ -33,13 +34,7 @@ const server = spawn(process.execPath, ['examples/serve.mjs'], {
 });
 await new Promise((r) => setTimeout(r, 600));
 
-// The sandbox ships a Chromium that Playwright's version-pinned download path
-// does not point at. Harmless here; a normal machine can drop the override.
-const browser = await chromium.launch(
-  process.env.CHROMIUM_PATH || existsSync('/opt/pw-browsers/chromium')
-    ? { executablePath: process.env.CHROMIUM_PATH || '/opt/pw-browsers/chromium' }
-    : {},
-);
+const browser = await launch(chromium);
 const page = await browser.newPage();
 
 const errors = [];

@@ -26,6 +26,7 @@
 import { chromium } from 'playwright';
 import { existsSync, mkdirSync } from 'node:fs';
 import { createHash } from 'node:crypto';
+import { launch } from '../scripts/chromium.mjs';
 
 const W = 1200, H = 630;
 
@@ -179,9 +180,7 @@ const CARDS = [
 
 if (!existsSync('out')) mkdirSync('out');
 
-const browser = await chromium.launch(
-  existsSync('/opt/pw-browsers/chromium') ? { executablePath: '/opt/pw-browsers/chromium' } : {},
-);
+const browser = await launch(chromium);
 const page = await browser.newPage({ viewport: { width: W, height: H }, deviceScaleFactor: 2 });
 
 for (const [name, body] of CARDS) {

@@ -16,6 +16,7 @@ import { nip19 } from 'nostr-tools';
 import { createHash } from 'node:crypto';
 import { startRelay } from './relays.mjs';
 import { renderLanding } from './dist/render.mjs';
+import { launch } from '../scripts/chromium.mjs';
 
 const hydrateJs = readFileSync(new URL('./dist/hydrate.js', import.meta.url), 'utf8');
 
@@ -97,7 +98,7 @@ function pageFor(relays, opts = {}) {
 }
 
 /* ---------- run ---------- */
-const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' });
+const b = await launch(chromium);
 const ctx = await b.newContext({ viewport: { width: 900, height: 1100 } });
 const page = await ctx.newPage();
 const errs = [];

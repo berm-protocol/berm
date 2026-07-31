@@ -16,6 +16,7 @@ import { verifyEvent } from 'nostr-tools';
 // mistake the SDK types shim exists to prevent. Hoisting all of them to one
 // shared module is a known cleanup, recorded in README rather than silently owed.
 import { startRelay } from '../link/local-relay.mjs';
+import { launch } from '../scripts/chromium.mjs';
 
 const html = readFileSync(new URL('./dist/xonly-post.html', import.meta.url));
 const http = createServer((q, r) => {
@@ -27,7 +28,7 @@ const http = createServer((q, r) => {
 const r1 = startRelay(7457, 'A');
 const r2 = startRelay(7458, 'B');
 
-const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' });
+const b = await launch(chromium);
 const ctx = await b.newContext({ viewport: { width: 1500, height: 1000 }, deviceScaleFactor: 2 });
 // x.com is not reachable from this sandbox and must not be. Stubbed so the tab
 // resolves and its URL survives — the assertion is about which URL the button

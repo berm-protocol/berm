@@ -13,6 +13,7 @@ import { spawn } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { chromium } from 'playwright';
+import { launch } from '../scripts/chromium.mjs';
 
 const PORT = 8121;
 const BASE = `http://127.0.0.1:${PORT}`;
@@ -32,9 +33,7 @@ server.on('exit', (code) => {
 });
 await new Promise((r) => setTimeout(r, 700));
 
-const browser = await chromium.launch(
-  existsSync('/opt/pw-browsers/chromium') ? { executablePath: '/opt/pw-browsers/chromium' } : {},
-);
+const browser = await launch(chromium);
 
 const claimants = JSON.parse(readFileSync('fixtures/claimants.json', 'utf8')).claimants;
 

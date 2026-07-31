@@ -143,6 +143,9 @@ const GROUPS = [
     // Cross-package imports are real and undeclared ones only fail on a clean
     // checkout, i.e. in a stranger's terminal rather than in ours.
     ['node', ['scripts/check-package-graph.mjs']],
+    // Ten verify scripts once hardcoded a browser path that exists in exactly
+    // one sandbox. Passed there, failed everywhere, including CI.
+    ['node', ['scripts/check-no-machine-paths.mjs']],
   ]},
 ];
 

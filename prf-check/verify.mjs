@@ -1,11 +1,12 @@
 import { chromium } from 'playwright';
 import { createServer } from 'node:http';
 import { readFileSync } from 'node:fs';
+import { launch } from '../scripts/chromium.mjs';
 
 const html = readFileSync('dist/prf-check.html');
 const srv = createServer((_,r)=>{r.setHeader('content-type','text/html');r.end(html);}).listen(8102,'0.0.0.0');
 
-const b = await chromium.launch({ executablePath:'/opt/pw-browsers/chromium' });
+const b = await launch(chromium);
 const ctx = await b.newContext();
 const page = await ctx.newPage();
 const errs=[]; page.on('pageerror',e=>errs.push(e.message));

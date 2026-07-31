@@ -3,6 +3,7 @@ import { createServer } from 'node:http';
 import { readFileSync } from 'node:fs';
 import { startRelay } from './local-relay.mjs';
 import { seed } from './seed.mjs';
+import { launch } from '../scripts/chromium.mjs';
 
 const html = readFileSync('dist/who.html');
 const http = createServer((_,r)=>{r.setHeader('content-type','text/html');r.end(html);}).listen(8104);
@@ -13,7 +14,7 @@ console.log('seeded two competing claims for @dorian');
 console.log('  owner   :', ownerNpub);
 console.log('  squatter:', squatNpub, '(back-dated to 2019, unanchored)\n');
 
-const b = await chromium.launch({ executablePath:'/opt/pw-browsers/chromium' });
+const b = await launch(chromium);
 const p = await b.newPage({ viewport:{width:900,height:1100}, deviceScaleFactor:2 });
 const errs=[]; p.on('pageerror',e=>errs.push(e.message));
 p.on('console',m=>{if(m.type()==='error')errs.push('CONSOLE: '+m.text())});

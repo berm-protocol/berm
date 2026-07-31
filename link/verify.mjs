@@ -2,12 +2,13 @@ import { chromium } from 'playwright';
 import { createServer } from 'node:http';
 import { readFileSync } from 'node:fs';
 import { startRelay } from './local-relay.mjs';
+import { launch } from '../scripts/chromium.mjs';
 
 const html = readFileSync('dist/link.html');
 const http = createServer((_,r)=>{r.setHeader('content-type','text/html');r.end(html);}).listen(8105);
 const r1=startRelay(7447,'A'), r2=startRelay(7448,'B');
 
-const b = await chromium.launch({ executablePath:'/opt/pw-browsers/chromium' });
+const b = await launch(chromium);
 const ctx = await b.newContext({ permissions:['clipboard-read','clipboard-write'] });
 const p = await ctx.newPage({ viewport:{width:820,height:1200}, deviceScaleFactor:2 });
 const errs=[]; p.on('pageerror',e=>errs.push(e.message));

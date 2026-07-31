@@ -1,11 +1,12 @@
 import { chromium } from 'playwright';
 import { createServer } from 'node:http';
 import { readFileSync } from 'node:fs';
+import { launch } from '../scripts/chromium.mjs';
 
 const html = readFileSync('dist/berm-live-proof.html');
 const server = createServer((_, res) => { res.setHeader('content-type','text/html'); res.end(html); }).listen(8099);
 
-const browser = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' });
+const browser = await launch(chromium);
 const ctx = await browser.newContext();
 const page = await ctx.newPage();
 
