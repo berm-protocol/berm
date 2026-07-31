@@ -4,9 +4,10 @@ import { readFileSync } from 'node:fs';
 import { verifyEvent } from 'nostr-tools';
 import { startRelay } from './local-relay.mjs';
 import { launch } from '../scripts/chromium.mjs';
+import { claimPort } from '../scripts/ports.mjs';
 
 const html = readFileSync('dist/xonly-editor.html');
-const http = createServer((_,r)=>{r.setHeader('content-type','text/html');r.end(html);}).listen(8100);
+const http = claimPort(createServer((_,r)=>{r.setHeader('content-type','text/html');r.end(html);}), 8100, 'the editor suite').listen(8100);
 const r1 = startRelay(7447,'A'), r2 = startRelay(7448,'B');
 
 const b = await launch(chromium);

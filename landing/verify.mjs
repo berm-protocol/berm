@@ -17,6 +17,7 @@ import { createHash } from 'node:crypto';
 import { startRelay } from './relays.mjs';
 import { renderLanding } from './dist/render.mjs';
 import { launch } from '../scripts/chromium.mjs';
+import { claimPort } from '../scripts/ports.mjs';
 
 const hydrateJs = readFileSync(new URL('./dist/hydrate.js', import.meta.url), 'utf8');
 
@@ -56,7 +57,7 @@ const liar = startRelay(7475, 'L', { mode: 'liar', altEvent });
 /* ---------- a host for the page and the card ---------- */
 const HOST = 'http://localhost:8114';
 let currentHtml = '';
-const http = createServer((q, r) => {
+const http = claimPort(createServer((q, r) => {
   if (q.url === '/favicon.ico') { r.statusCode = 204; return r.end(); }
   if (q.url?.endsWith('.png')) {
     r.setHeader('content-type', 'image/png');
@@ -65,7 +66,7 @@ const http = createServer((q, r) => {
   }
   r.setHeader('content-type', 'text/html; charset=utf-8');
   r.end(currentHtml);
-}).listen(8114);
+}), 8114, 'the landing suite').listen(8114);
 
 const nevent = nip19.neventEncode({ id: event.id, author: pk, relays: ['ws://localhost:7471'] });
 

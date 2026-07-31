@@ -4,9 +4,10 @@ import { readFileSync } from 'node:fs';
 import { startRelay } from './local-relay.mjs';
 import { seed } from './seed.mjs';
 import { launch } from '../scripts/chromium.mjs';
+import { claimPort } from '../scripts/ports.mjs';
 
 const html = readFileSync('dist/who.html');
-const http = createServer((_,r)=>{r.setHeader('content-type','text/html');r.end(html);}).listen(8104);
+const http = claimPort(createServer((_,r)=>{r.setHeader('content-type','text/html');r.end(html);}), 8104, 'the explorer suite').listen(8104);
 const r1=startRelay(7447,'A'), r2=startRelay(7448,'B');
 
 const { ownerNpub, squatNpub } = await seed(['ws://localhost:7447','ws://localhost:7448']);

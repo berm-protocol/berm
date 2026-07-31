@@ -4,9 +4,10 @@ import { readFileSync } from 'node:fs';
 import { verifyEvent } from 'nostr-tools';
 import { startRelay } from './local-relay.mjs';
 import { launch } from '../scripts/chromium.mjs';
+import { claimPort } from '../scripts/ports.mjs';
 
 const html = readFileSync('dist/berm-live-proof.html');
-const http = createServer((_,res)=>{res.setHeader('content-type','text/html');res.end(html);}).listen(8099);
+const http = claimPort(createServer((_,res)=>{res.setHeader('content-type','text/html');res.end(html);}), 8099, 'the demo end-to-end suite').listen(8099);
 
 console.log('starting two independent relays (each verifies signatures itself)');
 const r1 = startRelay(7447, 'relay-A');

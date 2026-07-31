@@ -2,9 +2,10 @@ import { chromium } from 'playwright';
 import { createServer } from 'node:http';
 import { readFileSync } from 'node:fs';
 import { launch } from '../scripts/chromium.mjs';
+import { claimPort } from '../scripts/ports.mjs';
 
 const html = readFileSync('dist/berm-live-proof.html');
-const server = createServer((_, res) => { res.setHeader('content-type','text/html'); res.end(html); }).listen(8099);
+const server = claimPort(createServer((_, res) => { res.setHeader('content-type','text/html'); res.end(html); }), 8099, 'the demo suite').listen(8099);
 
 const browser = await launch(chromium);
 const ctx = await browser.newContext();

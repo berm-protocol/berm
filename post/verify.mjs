@@ -17,13 +17,14 @@ import { verifyEvent } from 'nostr-tools';
 // shared module is a known cleanup, recorded in README rather than silently owed.
 import { startRelay } from '../link/local-relay.mjs';
 import { launch } from '../scripts/chromium.mjs';
+import { claimPort } from '../scripts/ports.mjs';
 
 const html = readFileSync(new URL('./dist/xonly-post.html', import.meta.url));
-const http = createServer((q, r) => {
+const http = claimPort(createServer((q, r) => {
   if (q.url === '/favicon.ico') { r.statusCode = 204; return r.end(); }
   r.setHeader('content-type', 'text/html; charset=utf-8');
   r.end(html);
-}).listen(8112);
+}), 8112, 'the post composer suite').listen(8112);
 
 const r1 = startRelay(7457, 'A');
 const r2 = startRelay(7458, 'B');

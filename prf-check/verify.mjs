@@ -2,9 +2,10 @@ import { chromium } from 'playwright';
 import { createServer } from 'node:http';
 import { readFileSync } from 'node:fs';
 import { launch } from '../scripts/chromium.mjs';
+import { claimPort } from '../scripts/ports.mjs';
 
 const html = readFileSync('dist/prf-check.html');
-const srv = createServer((_,r)=>{r.setHeader('content-type','text/html');r.end(html);}).listen(8102,'0.0.0.0');
+const srv = claimPort(createServer((_,r)=>{r.setHeader('content-type','text/html');r.end(html);}), 8102, 'the PRF check suite').listen(8102,'0.0.0.0');
 
 const b = await launch(chromium);
 const ctx = await b.newContext();

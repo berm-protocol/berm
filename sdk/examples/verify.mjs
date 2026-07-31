@@ -15,6 +15,7 @@ import { existsSync } from 'node:fs';
 import { chromium } from 'playwright';
 import { startRelay, ready } from '../test/relay-harness.mjs';
 import { launch } from '../../scripts/chromium.mjs';
+import { assertPortFree } from '../../scripts/ports.mjs';
 
 const PORT = 8111;
 const A = startRelay(7811);
@@ -36,6 +37,12 @@ if (!existsSync('dist/berm-sdk.global.js')) {
   console.error('\n  dist/berm-sdk.global.js is missing. Run `npm run bundle` first.\n');
   process.exit(1);
 }
+
+// The child is spawned with stdio 'ignore', so it takes a bind failure to the
+// grave and this script would then test whatever else is on the port. That is
+// not hypothetical: a stale server from an earlier run held 8111 and three
+// consecutive runs failed with a misleading message about the dev-signer note.
+await assertPortFree(PORT, 'the SDK example suite');
 
 const server = spawn(process.execPath, ['examples/serve.mjs'], {
   env: { ...process.env, PORT: String(PORT) },
