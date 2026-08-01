@@ -4,8 +4,10 @@ Fee continuity for Bags launches. Not an integration with Bags — a fix for the
 identity fragility a Bags launch inherits.
 
 ```bash
-npm install
-npm test          # 17 assertions, offline, no API key
+npm ci
+npm test          # 34 assertions, offline, no API key
+npm run build     # the dispute screen → dist/dispute.html
+npm run verify    # 26 browser checks, mostly about what it refuses to say
 npm run probe     # read-only; needs BAGS_API_KEY
 ```
 
@@ -115,6 +117,51 @@ launch plumbing now would be building the fourth step during the second.
 What is worth having for the pitch is the **demonstration**: a creator whose fee
 claim survives losing their X account. That is one screen, and it is the thing
 Bags cannot currently offer anyone.
+
+## The dispute screen
+
+`npm run build` produces one self-contained page: two parties claiming `@alice`,
+one fee share, and what an operator actually has to go on.
+
+It exists because everything above prepares evidence, and evidence is worth
+having or it is decoration. The screen puts **what Bags can see today** beside
+**what a continuity record adds**, because without that comparison a reader sees
+a tidy record and feels no gap.
+
+Four scenarios, and three of them are cases where we lose:
+
+| Scenario | Verdict |
+|---|---|
+| Account suspended, handle re-registered | `demonstrable` — a neutral archive predating the re-registration |
+| Creator verified but never archived | `unresolved`. A claim today says nothing about the past |
+| A challenger archives the page today | `contested`. Earlier is stronger; two archives is a real conflict |
+| Neither side archived anything | `unresolved`, and it says the operator gained nothing |
+
+**The ranking rule.** Evidence is worth what its timestamp is worth, and a
+timestamp is worth what the holder does *not* control. A capture by
+`web.archive.org` beats any assertion made after a dispute began; a "proof"
+hosted by the claimant proves they can write files. `NEUTRAL_ARCHIVES` is a short
+allowlist rather than a heuristic — "looks like an archive" is not a property
+somebody's revenue should rest on, and `isNeutralArchive` rejects
+`web.archive.org.attacker.com`, which a substring check would accept.
+
+**Possession is ranked last, deliberately.** In every failure mode this package
+exists for, the wrong party is the one holding the handle.
+
+**It never names a winner.** `adjudicate()` returns `demonstrable`, `contested`
+or `unresolved` and an operator decides. A model that always produces a name
+launders a guess into a verdict, and the person relying on it cannot tell the
+confident case from the coin flip.
+
+The browser suite is mostly negative assertions — that the page does not render
+`demonstrable` without a neutral archive behind it, does not promise Bags will
+honour anything, and contains no wording suggesting funds moved. A screen that
+strengthens a claim on its way to the reader is this package's own failure mode,
+one layer up, and no unit test that stops at the module boundary can see it.
+
+**The scenarios are fixtures and the page does not pretend otherwise.** They
+become real the moment there is a real npub with a real Wayback capture. A demo
+that looked live would be the same overstatement in a nicer font.
 
 ## Safety
 

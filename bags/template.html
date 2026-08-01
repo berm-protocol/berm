@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Who owns this fee share? — Berm</title>
+<style>
+  :root{--bg:#0a0b0d;--panel:#101216;--panel2:#15181f;--line:#22262f;--line2:#2c313c;
+        --ink:#e8eaed;--dim:#8b919c;--faint:#5a606b;--ok:#3ecf8e;--bad:#ff6b6b;--warn:#f0b849;
+        --accent:#7c9cff;--mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+        --sans:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Inter,sans-serif}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.65 var(--sans);-webkit-font-smoothing:antialiased}
+  .wrap{max-width:840px;margin:0 auto;padding:0 24px 120px}
+  header{padding:56px 0 4px}
+  h1{font-size:32px;letter-spacing:-.025em;margin:0 0 12px;font-weight:600}
+  h1 span{background:linear-gradient(100deg,#7c9cff,#3ecf8e);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .lede{color:var(--dim);margin:0;max-width:640px}
+  h2{font-size:13px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;
+     color:var(--faint);margin:44px 0 14px;font-family:var(--mono)}
+
+  .stake{display:flex;gap:22px;flex-wrap:wrap;background:var(--panel);border:1px solid var(--line);
+         border-radius:12px;padding:16px 20px;margin-top:26px}
+  .stake div{min-width:130px}
+  .stake .k{font:11px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--faint)}
+  .stake .v{font:600 19px var(--sans);margin-top:3px}
+
+  /* Two columns: what the platform sees, and what the evidence shows. The
+     comparison IS the argument, so they are always side by side. */
+  .cols{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  @media (max-width:720px){.cols{grid-template-columns:1fr}}
+  .col{border:1px solid var(--line);border-radius:12px;padding:18px 20px;background:var(--panel)}
+  .col.today{border-style:dashed;background:transparent}
+  .col h3{margin:0 0 4px;font-size:15px;font-weight:600}
+  .col .sub{font:11px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--faint);margin-bottom:12px}
+  .col p{margin:0;font-size:13.5px;line-height:1.7;color:var(--dim)}
+  .col.today p{color:var(--warn)}
+
+  .side{border:1px solid var(--line);border-radius:12px;padding:18px 20px;margin-bottom:14px;background:var(--panel)}
+  .side.lead{border-color:rgba(62,207,142,.4);background:linear-gradient(180deg,rgba(62,207,142,.05),transparent)}
+  .side .top{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+  .side .name{font-size:17px;font-weight:600}
+  .side .shows{margin:10px 0 0;font-size:13.5px;line-height:1.7;color:var(--dim)}
+  .side dl{display:grid;grid-template-columns:auto 1fr;gap:5px 14px;margin:14px 0 0;
+           font:12.5px var(--mono);align-items:baseline}
+  .side dt{color:var(--faint);white-space:nowrap}
+  .side dd{margin:0;word-break:break-all}
+
+  .tag{font:11px var(--mono);letter-spacing:.05em;padding:2px 8px;border-radius:20px;border:1px solid var(--line2);color:var(--dim)}
+  .tag.neutral{border-color:rgba(62,207,142,.5);color:var(--ok)}
+  .tag.holds{border-color:rgba(240,184,73,.5);color:var(--warn)}
+  .tag.nothing{border-color:rgba(255,107,107,.4);color:var(--bad)}
+
+  .verdict{border-radius:12px;padding:20px 22px;margin:0 0 8px;border:1px solid var(--line2);background:var(--panel2)}
+  .verdict .label{font:11px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}
+  .verdict .state{font-size:24px;font-weight:600;margin:6px 0 10px;letter-spacing:-.02em}
+  .verdict p{margin:0;font-size:14px;line-height:1.7;color:var(--dim)}
+  .verdict[data-verdict="demonstrable"]{border-color:rgba(62,207,142,.45)}
+  .verdict[data-verdict="demonstrable"] .state{color:var(--ok)}
+  .verdict[data-verdict="contested"]{border-color:rgba(240,184,73,.45)}
+  .verdict[data-verdict="contested"] .state{color:var(--warn)}
+  .verdict[data-verdict="unresolved"]{border-color:rgba(255,107,107,.35)}
+  .verdict[data-verdict="unresolved"] .state{color:var(--bad)}
+
+  .limit{background:rgba(240,184,73,.07);border:1px solid rgba(240,184,73,.3);border-radius:10px;
+         padding:14px 17px;font-size:13px;color:var(--dim);line-height:1.7;margin-top:16px}
+  .limit strong{color:var(--warn)}
+
+  .scenarios{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+  button{background:transparent;color:var(--ink);border:1px solid var(--line2);border-radius:8px;
+         padding:8px 14px;font:500 13px var(--sans);cursor:pointer}
+  button:hover{border-color:var(--dim)}
+  button[aria-pressed="true"]{background:var(--ink);color:#0a0b0d;border-color:var(--ink);font-weight:600}
+
+  a{color:var(--accent)}
+  footer{margin-top:56px;padding-top:22px;border-top:1px solid var(--line);
+         font:12px var(--mono);color:var(--faint);line-height:1.9}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>Two people claim <span>@alice</span>. One fee share.</h1>
+  <p class="lede">
+    A Bags launch binds a share of trading fees to a social handle. Handles get
+    renamed, suspended and re-registered by strangers. When that happens, an
+    operator has to decide who the money belongs to — and today the only fact
+    available to them is the one that changed.
+  </p>
+</header>
+
+<div class="stake">
+  <div><div class="k">Handle</div><div class="v" id="s-handle">—</div></div>
+  <div><div class="k">Fee share</div><div class="v" id="s-bps">—</div></div>
+  <div><div class="k">Claimants</div><div class="v" id="s-count">—</div></div>
+</div>
+
+<h2>Pick a scenario</h2>
+<div class="scenarios" id="scenarios"></div>
+
+<h2>What an operator has to go on</h2>
+<div class="cols">
+  <div class="col today">
+    <h3>Bags today</h3>
+    <div class="sub">handle → wallet</div>
+    <p id="without">—</p>
+  </div>
+  <div class="col">
+    <h3>With a continuity record</h3>
+    <div class="sub">key → claim → archived proof</div>
+    <p id="with">—</p>
+  </div>
+</div>
+
+<h2>The evidence, strongest first</h2>
+<div id="sides"></div>
+
+<h2>Verdict</h2>
+<div class="verdict" id="verdict" data-verdict="unresolved">
+  <div class="label">Assessment</div>
+  <div class="state" id="v-state">—</div>
+  <p id="v-summary">—</p>
+</div>
+
+<div class="limit" id="limit">
+  <strong>This is evidence, not a transfer.</strong>
+  Nothing on this page moves funds, re-points a fee wallet or touches a chain — there is no
+  code in this package that can. Whether Bags acts on a record like this is Bags' decision,
+  and no amount of engineering on our side makes that decision for them.
+</div>
+
+<footer>
+  berm-protocol/berm · bags/ · every claim on this page is computed by
+  <code>src/dispute.ts</code> and asserted in <code>test/dispute.test.ts</code>
+</footer>
+
+</div>
+<script>/*BUNDLE*/</script>
+</body>
+</html>

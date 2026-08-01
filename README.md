@@ -91,6 +91,7 @@ That is the whole integration. No registration, no key to obtain, no quota.
 | [`wordpress/`](wordpress) | The node. Pure-PHP BIP-340 — no GMP, no BCMath, any shared host | 15 official vectors |
 | [`node-pages/`](node-pages) | A node publishes only what it verified, and refuses to truncate | 18 tests + 17 relay checks |
 | [`signer-log/`](signer-log) | Build attestations, so a swapped signer is detectable | 20 tests |
+| [`bags/`](bags) | Fee continuity for Bags launches, and the dispute screen that is the point of it | 34 tests + 26 browser checks |
 | [`docs/`](docs) | Published as signed Nostr events, through the protocol it documents | conformance-checked |
 
 ## Verify it yourself
@@ -100,7 +101,7 @@ node scripts/verify-all.mjs --fast    # unit suites, ~1 min
 node scripts/verify-all.mjs           # everything, needs Chromium
 ```
 
-Twenty-one groups, one entry point. CI calls exactly this command — a pipeline
+Twenty-two groups, one entry point. CI calls exactly this command — a pipeline
 with its own command list goes green while the repo is broken.
 
 Every claim on the docs site has a command behind it. A few worth running:

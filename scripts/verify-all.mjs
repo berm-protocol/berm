@@ -124,10 +124,14 @@ const GROUPS = [
     ['npm', ['run', 'build']],
     ['npm', ['run', 'verify']],
   ]},
-  { name: 'bags', dir: 'bags', why: 'fee-split validation and continuity grading', steps: [
+  { name: 'bags', dir: 'bags', why: 'fee-split validation, continuity grading, dispute adjudication', steps: [
     ['npm', ['ci', '--no-audit', '--no-fund']],
     ['npx', ['vitest', 'run']],
     ['npx', ['tsc', '-p', 'tsconfig.json', '--noEmit']],
+  ]},
+  { name: 'bags-browser', dir: 'bags', browser: true, needs: ['bags'], why: 'the screen never renders a stronger claim than the model computed', steps: [
+    ['npm', ['run', 'build']],
+    ['npm', ['run', 'verify']],
   ]},
   { name: 'signer-log', dir: 'signer-log', why: 'build attestations and mismatch detection', steps: [
     ['npm', ['ci', '--no-audit', '--no-fund']],
