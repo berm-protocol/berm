@@ -18,6 +18,7 @@ layer, says who can break it, and refuses to round any of it up.
 | The dev actually funding a distribution | they simply don't | the dev | **No.** This is the dev↔user trust boundary, and it is the only one v1 asks anyone to accept |
 | A distribution, once funded | nothing | nobody — no admin, no owner, no upgrade, no sweep | **Yes** |
 | The root matching the published subscriber set | a different root gets published | the publisher — but anyone can recompute it from public events and say so | **Verifiable**, which is not the same as enforced |
+| The weight ranges tiling `[0, W)` | overlapping ranges over-commit the vault; gaps strand revenue | the publisher — a Merkle proof shows membership, never that the set is well-formed | **Verifiable**, not enforced |
 | The identity behind a claim | key exclusivity | see [custody tiers](../docs/content/custody.md) — tier 1 depends on one DNS name | **Tier-dependent**, stated per user |
 
 Nothing above is a discovery about Bags behaving badly. Every one of those powers
@@ -68,11 +69,31 @@ findings were about machinery, not about the promise.
 
 - The root is set **at deployment** and is immutable. No re-init, no update.
 - Anyone may fund the contract, at any time, with the quote asset.
-- `claim(index, account, amount, proof)` is **permissionless** and pays the
-  address committed inside the leaf — not an address supplied as an argument.
-- One bit per index, set on claim.
+- A leaf commits a **weight range**, not an amount: `[range_start, range_end)`
+  inside a committed `total_weight`. Entitlement against revenue `R` is
+  `floor(R·range_end/W) − floor(R·range_start/W)`.
+- `claim(index, …, proof)` is **permissionless** and pays the address committed
+  inside the leaf — not an address supplied as an argument. It pays the
+  difference between what the leaf is now entitled to and what it has already
+  received, so it may be called repeatedly as revenue accrues.
 - **No admin. No owner. No upgrade path. No sweep. No deadline. No pause.**
-- Want a second epoch? Deploy a second contract. Epochs are deployments.
+
+**Why ranges rather than amounts.** Contiguous ranges telescope: the payouts sum
+to exactly `R` for any revenue and any weights, so there is no rounding dust and
+no dust recipient to argue about. Naive per-share flooring loses a unit per
+claimant and needs somewhere to put it. Verified over 400 randomised
+partitions — zero mismatches. It also means the contract survives **continuing**
+revenue rather than one pot, which is what a fee share actually is, without a
+second deployment per epoch.
+
+**What ranges do not fix, and it must be said out loud:** a proof shows one leaf
+is in the tree. It cannot show that the leaves **tile** `[0, W)`. Overlapping
+ranges over-commit — two leaves spanning 60% and 70% owe 130% of revenue, so
+early claimers are paid and late ones bounce off an empty vault — and gapped
+ranges strand the gap permanently. The tiling is **recomputable by anyone** from
+the published subscriber set and **not enforced on chain**. That is the same class
+as the root itself: verifiable, not enforced, and it belongs in the table above
+rather than in a footnote.
 
 What that removes, by finding:
 
