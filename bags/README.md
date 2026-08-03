@@ -409,6 +409,13 @@ Which is the argument for publishing an unbuilt spec: intentions are cheap to
 correct, and an immutable program holding other people's money cannot be corrected
 at all.
 
+[`SOVEREIGNTY.md`](SOVEREIGNTY.md) is the disclosure that came out of it: every
+layer, who can break it, and the two sentences no marketing copy may exceed. It
+also specifies the **minimum shippable contract** — claim-only, no admin, no
+sweep, no upgrade, epochs are deployments — which removes five of the six CRITICAL
+findings by removing the machinery they were about. Berm is an app on Bags. Bags
+is the trusted layer. That goes first, not in a footnote.
+
 ## Safety
 
 `probe.mjs` issues GET requests and nothing else. There is no code path in this
