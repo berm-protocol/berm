@@ -21,8 +21,12 @@ const WALLETS: Record<string, string> = {
   'twitter:bob': 'B0bWa11etAddre5500000000000000000000000000',
 };
 
-const mockResolver: WalletResolver = async (provider, username) =>
-  WALLETS[`${provider}:${username.toLowerCase()}`] ?? null;
+// Shaped like the real response now that the spec has been read: a wallet, the
+// chain it was resolved on, and the platform's own account id.
+const mockResolver: WalletResolver = async (provider, username, chain = 'SOL') => {
+  const wallet = WALLETS[`${provider}:${username.toLowerCase()}`];
+  return wallet ? { wallet, chain, platformData: { id: '1234567890', username } } : null;
+};
 
 const anchored = (username: string): IdentityBinding => ({
   npub: 'npub1fn27skur6m05z747px3epnlclf8etedhahky9zxrwxad8gll2lm',
@@ -200,5 +204,69 @@ describe('the launch summary surfaces what is fragile', () => {
     const r = await buildRecord(
       { provider: 'twitter', username: 'alice', bps: 10000 }, anchored('alice'), mockResolver);
     expect(summarise([r]).verdict).toMatch(/Handle loss costs nobody their revenue/);
+  });
+});
+
+/* ------------------------------------------------------------------ */
+
+describe("the platform account id corroborates and never founds a claim", () => {
+  // Reading Bags' OpenAPI spec revealed that the fee-share resolution returns
+  // `platformData.id` with nothing but an API key. We had assumed an immutable
+  // account id was reachable only through X OAuth on a node. It is not — and the
+  // temptation is to let it upgrade a grade, which it must not.
+  const claimer: FeeClaimer = { provider: 'twitter', username: 'alice', bps: 2500 };
+
+  const noAccountId = (): IdentityBinding => ({
+    npub: 'npub1fn27skur6m05z747px3epnlclf8etedhahky9zxrwxad8gll2lm',
+    provider: 'twitter', username: 'alice', state: 'verified',
+    proofUrl: 'https://x.com/alice/status/1',
+    archiveUrl: 'https://web.archive.org/web/2024/https://x.com/alice/status/1',
+    archivedAt: 1_710_000_000,
+    // deliberately no accountId
+  });
+
+  it('records the id Bags returned', async () => {
+    const r = await buildRecord(claimer, noAccountId(), mockResolver);
+    expect(r.platformAccountId).toBe('1234567890');
+  });
+
+  it('but does NOT upgrade the grade with it', async () => {
+    // Bags' record is what a platform said at a moment nobody timestamped. It
+    // corroborates; it cannot found. Upgrading here would manufacture confidence
+    // out of a third party's cache.
+    const r = await buildRecord(claimer, noAccountId(), mockResolver);
+    expect(r.strength).toBe('claim-only');
+    expect(r.gaps.some((g) => /immutable account id/.test(g))).toBe(true);
+  });
+
+  it('flags a conflict when Bags and the binding name different accounts', async () => {
+    const binding = { ...noAccountId(), accountId: '9999999999' };
+    const r = await buildRecord(claimer, binding, mockResolver);
+    expect(r.accountIdConflict).toMatch(/different accounts/);
+    expect(r.accountIdConflict).toContain('1234567890');
+    expect(r.accountIdConflict).toContain('9999999999');
+  });
+
+  it('stays quiet when they agree', async () => {
+    const binding = { ...noAccountId(), accountId: '1234567890' };
+    const r = await buildRecord(claimer, binding, mockResolver);
+    expect(r.accountIdConflict).toBeUndefined();
+  });
+
+  it('records which chain the wallet came from', async () => {
+    const sol = await buildRecord(claimer, noAccountId(), mockResolver, 'SOL');
+    const evm = await buildRecord(claimer, noAccountId(), mockResolver, 'EVM');
+    expect(sol.chain).toBe('SOL');
+    expect(evm.chain).toBe('EVM');
+    // One handle, two chains, two wallets. Conflating them would attach evidence
+    // for one payout route to a different one.
+    expect(sol.chain).not.toBe(evm.chain);
+  });
+
+  it('leaves chain null when nothing resolved', async () => {
+    const r = await buildRecord({ ...claimer, username: 'nobody' }, { ...noAccountId(), username: 'nobody' }, mockResolver);
+    expect(r.wallet).toBeNull();
+    expect(r.chain).toBeNull();
+    expect(r.platformAccountId).toBeNull();
   });
 });

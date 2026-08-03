@@ -31,7 +31,7 @@
  * Bags' decision — the same honest limit as guardian rotation.
  */
 
-import type { FeeClaimer, ResolvedClaimer, SocialProvider, WalletResolver } from './bags.js';
+import type { Chain, FeeClaimer, ResolvedClaimer, SocialProvider, WalletResolver } from './bags.js';
 
 /** A verified X↔npub binding, as produced by the link flow. */
 export interface IdentityBinding {
@@ -57,12 +57,32 @@ export interface ContinuityRecord {
   provider: SocialProvider;
   username: string;
   wallet: string | null;
+  /** Which chain the wallet was resolved on. Bags resolves SOL and EVM separately. */
+  chain: Chain | null;
   bps: number;
   strength: ContinuityStrength;
+  /**
+   * The platform account id Bags holds for this handle, when it returns one.
+   *
+   * Recorded because it is the field that does NOT move when a handle is
+   * re-registered. Deliberately does not raise `strength`: it is Bags' record of
+   * what a platform said at an untimestamped past moment, which corroborates a
+   * claim and cannot found one. Using it to upgrade would be manufacturing
+   * confidence out of a third party's cache.
+   */
+  platformAccountId: string | null;
   /** Plain-English statement of what survives handle loss. */
   survives: string;
   /** What is missing, in the order worth fixing. */
   gaps: string[];
+  /**
+   * Set when Bags' account id and the binding's disagree.
+   *
+   * This is the loudest thing in the record. Same id means the handle Bags pays
+   * and the handle we hold evidence for are the same account. Different ids mean
+   * they are not, and the fee share is pointing somewhere the evidence does not.
+   */
+  accountIdConflict?: string;
 }
 
 /**
@@ -118,6 +138,7 @@ export async function buildRecord(
   claimer: FeeClaimer,
   binding: IdentityBinding,
   resolve: WalletResolver,
+  chain: Chain = 'SOL',
 ): Promise<ContinuityRecord> {
   if (binding.provider !== claimer.provider || binding.username.toLowerCase() !== claimer.username.toLowerCase()) {
     throw new Error(
@@ -126,18 +147,33 @@ export async function buildRecord(
     );
   }
 
-  const wallet = await resolve(claimer.provider, claimer.username);
+  const hit = await resolve(claimer.provider, claimer.username, chain);
   const { strength, gaps } = assessContinuity(binding);
+
+  const platformAccountId = hit?.platformData?.id ?? null;
+
+  // A disagreement here is worth more than any of the grading above: it says the
+  // account Bags would pay is not the account we hold evidence for.
+  let accountIdConflict: string | undefined;
+  if (platformAccountId && binding.accountId && platformAccountId !== binding.accountId) {
+    accountIdConflict =
+      `Bags resolves @${claimer.username} to platform account ${platformAccountId}, but the ` +
+      `binding is evidence for account ${binding.accountId}. The fee share and the evidence ` +
+      `are pointing at different accounts — treat the split as unsafe until this is explained.`;
+  }
 
   return {
     npub: binding.npub,
     provider: claimer.provider,
     username: claimer.username,
-    wallet,
+    wallet: hit?.wallet ?? null,
+    chain: hit?.chain ?? null,
+    platformAccountId,
     bps: claimer.bps,
     strength,
     survives: SURVIVES[strength],
     gaps,
+    ...(accountIdConflict ? { accountIdConflict } : {}),
   };
 }
 

@@ -22,12 +22,18 @@
  * Put the key in a file and source it. Do not paste it into a chat window.
  */
 
-const KEY = process.env.BAGS_API_KEY;
-const BASE = process.env.BAGS_API_BASE ?? 'https://public-api-v2.bags.fm/api/v1';
+import { API_BASE, FEE_SHARE_WALLET_PATH, AUTH_HEADER, feeShareWalletUrl } from './src/bags.js';
 
-// Documented as the social-username fee-claimer lookup. If Bags moves it, this
-// is the one line to change.
-const PATH = '/token-launch/fee-share/wallet/v2';
+const KEY = process.env.BAGS_API_KEY;
+const BASE = process.env.BAGS_API_BASE ?? API_BASE;
+
+// Path, header and query shape all come from src/bags.ts, which is checked
+// against the published OpenAPI spec. They were WRONG here for a while:
+// `/token-launch/fee-share/wallet/v2` does not exist, and the probe reported a
+// clean 401 anyway, which we read as confirmation. Authentication runs before
+// routing, so a 401 proves the host and the header and says NOTHING about the
+// path. One source now, so the probe cannot disagree with the client again.
+const PATH = FEE_SHARE_WALLET_PATH;
 
 if (!KEY) {
   console.error(`
@@ -51,13 +57,13 @@ if (!handles.length) {
   process.exit(2);
 }
 
-async function lookup(provider, username) {
-  const url = `${BASE}${PATH}?provider=${encodeURIComponent(provider)}&username=${encodeURIComponent(username)}`;
+async function lookup(provider, username, chain = 'SOL') {
+  const url = feeShareWalletUrl(provider, username, chain, BASE);
   const started = Date.now();
   try {
     const res = await fetch(url, {
       method: 'GET',                       // stated explicitly; never changes
-      headers: { 'x-api-key': KEY, accept: 'application/json' },
+      headers: { [AUTH_HEADER]: KEY, accept: 'application/json' },
     });
     const ms = Date.now() - started;
     const text = await res.text();
@@ -69,9 +75,16 @@ async function lookup(provider, username) {
   }
 }
 
+// The spec says: { success, response: { provider, platformData, wallet, chain } }.
+// The fallbacks stay because a spec is a description of intent and this script
+// exists to find out where intent and behaviour differ.
 const wallet = (b) =>
   (typeof b === 'object' && b !== null &&
-    (b.wallet ?? b.address ?? b.response?.wallet ?? b.data?.wallet)) || null;
+    (b.response?.wallet ?? b.wallet ?? b.address ?? b.data?.wallet)) || null;
+
+/** The field the spec check turned up: the account id that survives a rename. */
+const platformId = (b) =>
+  (typeof b === 'object' && b !== null && b.response?.platformData?.id) || null;
 
 console.log(`\nBags fee-share resolution probe`);
 console.log(`base: ${BASE}${PATH}`);

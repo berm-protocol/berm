@@ -5,7 +5,7 @@ identity fragility a Bags launch inherits.
 
 ```bash
 npm ci
-npm test          # 34 assertions, offline, no API key
+npm test          # 52 assertions, offline, no API key
 npm run build     # the dispute screen → dist/dispute.html
 npm run verify    # 26 browser checks, mostly about what it refuses to say
 npm run probe     # read-only; needs BAGS_API_KEY
@@ -75,20 +75,48 @@ The approval prompt says so out loud, and a test enforces it:
 Anyone signing an event near a token launch must not think they are authorising
 a payment.
 
-## Verified vs modelled
+## Checked against the spec, and one claim we had to withdraw
 
-**Verified.** The endpoint is live and the request shape is accepted: a
-`GET /token-launch/fee-share/wallet/v2` with an `x-api-key` header returns a
-clean `401 {"success":false,"error":"Invalid or inactive API key."}` on a dummy
-key — a 404 or 400 would have meant the path or header was wrong.
+**Checked.** Every path, parameter, enum and field in `src/bags.ts` is transcribed
+from Bags' published OpenAPI specification (`docs.bags.fm/api-reference/openapi.json`,
+read 2026-08-03) and pinned in `test/spec.test.ts`. The spec check corrected four
+things:
 
-**Modelled from public docs, not observed.** The response body shape, whether
-resolution requires prior onboarding, case sensitivity, and everything about
-renamed handles. `src/bags.ts` isolates all of it behind one injected
-`WalletResolver`, so the tests run offline and a change in Bags' surface touches
-one file.
+| We had | The spec says |
+|---|---|
+| `/token-launch/fee-share/wallet/v2` | `/agent/v2/fee-share-wallet` |
+| three providers | eleven, including `solana`, `tiktok`, `instagram` |
+| no chain parameter | `chain=SOL\|EVM`, default `SOL` — one handle, two wallets |
+| account id needs X OAuth | the response carries `platformData.id` for an API key |
 
-**Unknown, and it matters most.** Run `probe.mjs` with a real key:
+**Withdrawn.** This file previously said the endpoint was verified, because a
+dummy key returned a clean `401` rather than a `404`, and reasoned that *"a 404
+or 400 would have meant the path or header was wrong."*
+
+That inference does not hold. We were calling a path that **does not exist** and
+still got `401`, which means authentication is evaluated before routing. A `401`
+proves the host and the header and says nothing whatever about the path. The
+check could not have failed, which is exactly why it did not — and a check whose
+pass condition is also satisfied by the failure case is not a check.
+
+Both the probe and the client used to carry their own copy of the path, and both
+were wrong. There is one copy now, in `src/bags.ts`, and a test asserts the probe
+imports it rather than restating it.
+
+**The account id, and why it does not raise a grade.** `platformData.id` is the
+field that does not move when a handle is re-registered, and it arrives with
+nothing but an API key — so the immutable identifier we thought needed an X
+developer app is simply in the response. It is still Bags' record of what a
+platform said at a moment this response does not timestamp. So it is carried,
+displayed, and used to detect a **conflict** with the binding's own account id —
+which is the loudest thing the record can say, because it means the account being
+paid and the account we hold evidence for are different. It never upgrades
+`claim-only` to `anchored`. Founding a grade on a third party's cache is
+manufacturing confidence, which is the one thing this package exists not to do.
+
+## Still unverified, and only a key can settle it
+
+Behaviour, not shape. Run `probe.mjs` with a real key:
 
 - **Q1** Does a handle resolve for anyone, or only after onboarding to Bags?
 - **Q2** What comes back for a handle that does not exist?
@@ -96,10 +124,17 @@ one file.
 - **Q4** Does a **renamed** handle resolve to the old wallet, a new one, or
   nothing? *This decides whether fee continuity is a live problem or a
   theoretical one.* Needs a handle known to have changed.
-- **Q5** Can a claimer re-point their wallet after launch, or is the binding
-  fixed?
+- **Q5** Does `chain=EVM` return a different wallet for the same handle?
 
-Record the answers here so `src/` stops being a hypothesis.
+Record the answers here.
+
+**No partner program on Solana.** The partner mechanism — earn a share of trading
+fees on launches you bring — is documented only for Bags' EVM (Robinhood Chain)
+surface: `partnerFeeBps` defaults to 2500, taken from the protocol half, so 0.25%
+of volume, and *"the creator half is never shared with partners."* The Solana
+fee-share endpoints have no partner field at all. Anyone planning to earn as a
+launch partner on Solana should treat that as unavailable until Bags says
+otherwise.
 
 ## How far this can go, honestly
 
