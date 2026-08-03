@@ -64,6 +64,58 @@ These were found in shipped TypeScript, not just in this document.
 | **BDR-010** | `verifyProof` folded proofs of any length. | Capped at `MAX_PROOF_DEPTH = 14`. Bounding, not a forgery fix — stated as such. |
 | **BDR-013a/c** | Tree built twice; a snapshot that *lost* members was accepted silently. | Built once; non-superset snapshots refused. |
 
+### Post-R1: what the IDL settles, and one thing it makes worse
+
+The review only had this document. Re-reading the Bags Fee Share V2 IDL against
+its findings resolves two of them, hardens a third, and surfaces a limit that no
+amount of care on our side removes.
+
+**Q7 is answered: yes, a PDA can be a claimer.** Claimers are plain pubkeys held
+in `FeeShareConfig.claimers`, supplied as accounts at `create_fee_config` and
+**never signers at registration**. `claim_user`'s own doc for `user` reads *"the
+claiming user; must match `claimers[idx]`"* — matching an array entry, not
+producing a keypair. Nothing about being off-curve disqualifies an address from
+receiving.
+
+**That does not rescue §2, and BDR-001 stands.** `claim_user` marks `user` as
+`SIGNER`, and a PDA produces that signature only through `invoke_signed` by the
+program that derived it. Naming a PDA as claimer and *claiming as* that PDA are
+different problems. The published finding — `payer` and `user` are separate
+signers, so the caller need not be the claimer — is correct and unchanged; the
+error was putting the CPI in the Harvester while the seeds lived in the
+Distributor. An architecture mistake, not a wrong fact about Bags.
+
+**BDR-002's fix is enforceable on-chain, which is better than R1 assumed.**
+`manager` is a field on `FeeShareConfig` and `manager_waive_fee_config` sets it to
+`Pubkey::default()`. So the waiver is not an off-chain snapshot to be re-checked
+hopefully — the Distributor can require `fee_share_config.manager ==
+Pubkey::default()` as an **account constraint at campaign init** and refuse to
+exist otherwise.
+
+**A second, accidental protection:** errors `CannotRemoveClaimerWithFees` (6016)
+and `CannotChangeClaimerIndexWithFees` (6017) mean a claimer holding an unclaimed
+balance cannot be removed or reindexed. Note the direction of that: harvesting
+promptly *reduces* this protection. Worth knowing before writing a crank that
+drains on sight.
+
+**BDR-014 (CRITICAL, found here, not in R1). Bags' program admin outranks
+everything above.** `update_fee_config` takes `admin SIGNER` against the singleton
+`program_config` — not the manager — and carries `bps`, `from_idx`, `to_idx`.
+`force_claim_user`, `force_sol_claim_user` and `force_claim_user_to_vault` move a
+claimer's fees with no signature from the claimer, and `ForceClaimType` has an
+explicit `Admin` variant. **Manager waiver does not reach any of this.**
+
+So the headline guarantee has to be restated at the size it actually holds:
+
+> The **developer** cannot withhold, redirect or delay the split.
+> **Bags can.**
+
+That is a floor under every design built on their fee layer, ours included, and it
+cannot be engineered away from our side. It is disclosed, at the same rank as the
+tier-1 signer disclosure, or the whole exercise is dishonest — a launchpad whose
+selling point is that promises are enforceable must not conceal who can still
+break one.
+
 ### What R2 must decide before any Rust
 
 1. Revenue lifecycle — sealed epochs or cumulative weights. No hybrid.
@@ -74,6 +126,7 @@ These were found in shipped TypeScript, not just in this document.
 6. Frozen byte protocol: fixed-size canonical identities, one comparator, encoding version, published vectors.
 7. Frozen account and arithmetic constraints.
 8. Release proof: Rust differential tests against committed vectors, program-test adversarial matrix, measured compute.
+9. The disclosure text for BDR-014 — what Bags' admin retains — written before launch, not after somebody asks.
 
 **Two of my own reproductions passed for the wrong reasons** while I was fixing
 this — an over-long proof was already rejected by hash rather than by length, and

@@ -367,7 +367,8 @@ built on this is a nicer way to make unenforceable promises, and the promise was
 the only part with value.
 
 The mechanism, from Bags' published IDL: `claim_user` takes `payer` and `user` as
-**separate** signers. So the fee claimer can be a PDA with no private key, and
+**separate** signers, and claimers are plain pubkeys in the config — never signers
+at registration. So the fee claimer can be a PDA with no private key, and
 `harvest()` can be permissionless — any subscriber pays the transaction fee and
 harvests for everyone. The dev is not in the path and has nothing to withhold.
 
@@ -394,6 +395,15 @@ worst: equal `claimedAt` values let relay arrival order pick a payout address, s
 two honest parties could compute two different roots from identical data. That is
 the one property everything else rests on. Fixed, with reproductions kept in
 `test/review-r1.test.ts`.
+
+Re-reading the IDL against the review then found something the review could not
+have: `update_fee_config` answers to Bags' **program admin**, not to the manager,
+and three `force_claim_*` instructions move a claimer's fees with no signature
+from the claimer. Waiving the manager role does not reach any of it. So the
+guarantee is stated at the size it holds — **the developer cannot redirect the
+split; Bags can** — and that sits in the disclosure at the same rank as the tier-1
+signer disclosure. A launchpad whose selling point is enforceable promises does
+not get to hide who can still break one.
 
 Which is the argument for publishing an unbuilt spec: intentions are cheap to
 correct, and an immutable program holding other people's money cannot be corrected
