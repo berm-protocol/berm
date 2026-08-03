@@ -5,7 +5,7 @@ identity fragility a Bags launch inherits.
 
 ```bash
 npm ci
-npm test          # 119 assertions, offline, no API key
+npm test          # 138 assertions, offline, no API key
 npm run build     # the dispute screen → dist/dispute.html
 npm run verify    # 26 browser checks, mostly about what it refuses to say
 npm run probe     # read-only; needs BAGS_API_KEY
@@ -215,6 +215,53 @@ moves in either direction, a gift for showing up early rather than payment for
 work, and not guaranteed to be worth anything. A test asserts the text never
 mentions price, value or return — describing the mechanism is arithmetic, and
 predicting the outcome is the one sentence that would make this something else.
+
+## The campaign: schedule in, root out
+
+A batched campaign has to say who was in which batch. The obvious answer — read
+`created_at` — is wrong for the reason two other files here already establish:
+that field is set by the signer, so it is a claim about time made by exactly the
+party whose timing decides their payout. Backdating would be free.
+
+**So batch membership comes from observation, not assertion.** At each batch close
+you publish a snapshot of the set as it stood. Batch 1 is the first snapshot;
+batch 2 is the second minus the first. Subscribers never un-subscribe, so each
+snapshot is a superset of the last and the differences are exactly the batches.
+
+A backdated timestamp then buys nothing: you are in the batch where you were first
+**seen**, and nothing you sign changes what was already published.
+
+**The attempt is counted anyway.** `claimedBeforeFirstSeen` reports subscriptions
+whose asserted time precedes the snapshot they first appeared in — reported, never
+acted on, because acting on it is precisely what would make backdating worth
+trying. A rising count means people are trying it *or* relay coverage is poor, and
+both are worth seeing.
+
+**What it costs, stated plainly:** a subscription sitting on a relay nobody queried
+is not in the snapshot. That is a real way to be unfairly late. The defence is
+coverage — query many relays, publish which — not a claim that it cannot happen.
+
+### The cap and the carry
+
+A tiny first batch would hand two people ten percent each: honest, deterministic,
+and guaranteed to be read as insiders forever. So `perPersonCapBps` bounds any one
+share, and what a batch cannot use carries to the next. An empty batch keeps
+nothing and passes its whole pot on.
+
+Whatever the last batch cannot use is **residue**, and `ResiduePolicy` is required
+with no default. It is a policy question the code refuses to have an opinion on —
+and equally refuses to leave unstated, because an undeclared residue is a decision
+somebody makes later, in public, under pressure, which is the exact situation a
+pre-committed schedule exists to prevent.
+
+### What it does not do
+
+**Nothing here launches anything.** No key, no transaction, no network call — a
+test reads the source and asserts the absence of `fetch(`, `Keypair`,
+`signTransaction`, `sendTransaction` and `WebSocket`. A countdown reaching zero
+cannot launch a token, because the Bags flow ends in *sign and broadcast* and
+signing needs a key somebody holds. The schedule is the human-facing part; the
+root published at the close is the enforcement.
 
 ## The distribution commitment
 
