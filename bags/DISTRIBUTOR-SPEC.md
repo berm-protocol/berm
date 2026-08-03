@@ -1,6 +1,88 @@
 # Berm Distributor — specification for review
 
-**Status: unbuilt. This document exists to be attacked before any Rust is written.**
+> ## ⚠ R1 REVIEW: HOLD — DO NOT IMPLEMENT FROM THIS DOCUMENT
+>
+> An adversarial review (`BERM_DISTRIBUTOR_SPEC_REVIEW_20260803_R1`, subject
+> SHA-256 `89861239…bafb44fe`) returned **5 CRITICAL, 3 HIGH, 4 MEDIUM, 1 LOW**.
+> The design below does **not** yet deliver its own headline guarantee. Sections
+> 2–8 are retained unedited as the reviewed artifact; **§0 below supersedes them.**
+>
+> The review did its job: these defects cost a document to fix and would have
+> cost an unpatchable program holding other people's money.
+
+## 0. R1 findings — what is wrong with everything below
+
+### The one that breaks the architecture
+
+**BDR-001 (CRITICAL). The Harvester cannot sign for the Distributor's PDA.**
+PDA signing is program-ID-bound — only the program whose ID derived a PDA may
+`invoke_signed` for it. §2 puts `VaultAuthority` under the immutable Distributor
+and then has the upgradeable Harvester sign for it. **That is not implementable.**
+
+Moving the PDA to the Harvester makes the upgradeable program custodial. A
+Distributor that signs Harvester-supplied instructions is a signing oracle. So the
+elegant split in §2 is simply wrong, and the honest replacement is worse to live
+with: **the immutable Distributor performs the exact Bags CPI itself**, and a
+changed Bags interface means deploying a new immutable version for new campaigns.
+The coupling I tried to quarantine lives in the immutable half after all.
+
+### The one nobody had thought about
+
+**BDR-002 (CRITICAL). The dev can redirect the fees afterwards.**
+Bags V2 exposes `manager_update_fee_config` (changes claimers and BPS) and
+`manager_waive_fee_config` (sets manager to `Pubkey::default`). A dev who names
+the PDA as claimer and **keeps the manager role** can replace or dilute it later.
+
+The entire guarantee — *the dev cannot redirect revenue* — was never established.
+§1's off-chain "check the config names our PDA" is a snapshot of a mutable fact.
+**Manager waiver has to be a launch gate**, and the campaign must bind
+`fee_share_config`, `claimer_index`, `expected_bps` and the waived state.
+
+### The rest of the CRITICALs
+
+| | |
+|---|---|
+| **BDR-003** | The lifecycle is one-shot — fixed `total`, one-time bitmap — while the input is *continuing* fee revenue. Fees arriving after the last claim have no entitlement and are stranded. Pick sealed epochs **or** cumulative weights; the hybrid is undefined. |
+| **BDR-004** | `sweep()` confiscates valid unclaimed leaves. §2 says "no sweep" and §4 defines one — a flat self-contradiction — and after the deadline the first caller can permanently exclude a legitimate claimant. A sweep may move only `max(balance − outstanding_liability, 0)`. |
+| **BDR-005** | `PDA["campaign", campaign_id]` plus permissionless init means a stranger front-runs a known id with a garbage root and occupies the address forever. Content-address the seed, or authenticate initialization once with no continuing authority. |
+
+### HIGH
+
+- **BDR-006** — reading the token account's *owner* is not enough: the token program, mint, initialized state and ATA-vs-arbitrary question are all unpinned. Token-2022 substitution is live.
+- **BDR-007** — the root commits leaves but **not their sum**, so `total` is an unproven independent input. A root whose leaves exceed `total` makes claims order-dependent. Merkle-sum tree, or stop calling the aggregate cryptographically proven.
+- **BDR-008** — checked arithmetic, counter bounds, underfunded-vault behaviour, bitmap layout and error precedence are all prose, not contract.
+
+### Fixed in the reference implementation
+
+These were found in shipped TypeScript, not just in this document.
+
+| | Was | Now |
+|---|---|---|
+| **BDR-013b** | Equal `claimedAt` let *relay arrival order* pick the payout address — **two honest parties could publish different roots from identical data.** The core reproducibility claim, broken. | Ties break on the address: a total order over the data itself. |
+| **BDR-009** | The "independent" comparator used `localeCompare('en')` while production used code-unit order. Every differential fixture was ASCII, so the test proved agreement exactly where agreement was never in doubt. | Bytewise in both, plus mixed-case, diacritic, non-Latin and shared-prefix fixtures — and an assertion that those fixtures still separate the two comparators. |
+| **BDR-011** | `reconcile()` diffed npub membership only. Change an address and the root moves while both named sets stay empty: a mismatch announced and nothing pointed at. | Diffs canonical records; reports `changed` per field; when nothing it compares differs, says so and names what to check instead. |
+| **BDR-010** | `verifyProof` folded proofs of any length. | Capped at `MAX_PROOF_DEPTH = 14`. Bounding, not a forgery fix — stated as such. |
+| **BDR-013a/c** | Tree built twice; a snapshot that *lost* members was accepted silently. | Built once; non-superset snapshots refused. |
+
+### What R2 must decide before any Rust
+
+1. Revenue lifecycle — sealed epochs or cumulative weights. No hybrid.
+2. One implementable signing architecture, with a program-ID/PDA table and a CPI call graph.
+3. Manager waiver as a launch gate, with the Bags config bound into the campaign.
+4. Entitlement permanence — no sweep of liabilities, or an explicit change to a time-limited promise.
+5. Content-addressed or authenticated initialization.
+6. Frozen byte protocol: fixed-size canonical identities, one comparator, encoding version, published vectors.
+7. Frozen account and arithmetic constraints.
+8. Release proof: Rust differential tests against committed vectors, program-test adversarial matrix, measured compute.
+
+**Two of my own reproductions passed for the wrong reasons** while I was fixing
+this — an over-long proof was already rejected by hash rather than by length, and
+a comparator assertion held because production was right and the *test* was wrong.
+That is the same defect the review is about, met twice while responding to it.
+
+---
+
+**Status: unbuilt, and now known-defective. Retained below as the reviewed artifact.**
 
 A Solana program that receives Bags fee-share revenue and pays it to a committed
 list of subscribers, such that **the developer who launched the token cannot

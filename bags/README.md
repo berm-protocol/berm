@@ -5,7 +5,7 @@ identity fragility a Bags launch inherits.
 
 ```bash
 npm ci
-npm test          # 142 assertions, offline, no API key
+npm test          # 156 assertions, offline, no API key
 npm run build     # the dispute screen → dist/dispute.html
 npm run verify    # 26 browser checks, mostly about what it refuses to say
 npm run probe     # read-only; needs BAGS_API_KEY
@@ -382,9 +382,22 @@ one unambiguous bit per claimant, and an index that was passed alongside a proof
 rather than committed inside it would let anyone set a stranger's bit and lock
 them out permanently, for free.
 
-Nothing in that document has been built, tested or audited. It is published in
-that state deliberately — intentions are cheaper to correct than programs, and an
-immutable program cannot be corrected at all.
+**It came back HOLD.** An adversarial review returned 5 CRITICAL findings, and the
+design as written does not deliver its own headline guarantee — the developer can
+still redirect revenue by keeping the Bags `manager` role, and the harvester
+cannot sign for the distributor's PDA at all, because PDA signing is
+program-ID-bound. The spec now leads with those findings; §2–§8 are retained
+unedited as the reviewed artifact.
+
+Four of the findings were in **shipped TypeScript**, not just the document. The
+worst: equal `claimedAt` values let relay arrival order pick a payout address, so
+two honest parties could compute two different roots from identical data. That is
+the one property everything else rests on. Fixed, with reproductions kept in
+`test/review-r1.test.ts`.
+
+Which is the argument for publishing an unbuilt spec: intentions are cheap to
+correct, and an immutable program holding other people's money cannot be corrected
+at all.
 
 ## Safety
 

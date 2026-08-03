@@ -240,7 +240,18 @@ export function proofFor(tree: Tree, npub: string): string[] {
  * the prefix separation — have it verify. Recomputing here means the 0x00 prefix
  * is always applied and that class of forgery cannot be expressed.
  */
+/**
+ * Deepest proof any conforming tree can produce.
+ *
+ * The spec bounds a campaign at 10 000 leaves, so depth cannot exceed 14. This is
+ * not a fix for a known forgery — a wrong-length proof already folds to a wrong
+ * hash — it is a bound on input to code whose Rust twin runs under a compute
+ * budget, and one less place where two implementations could disagree.
+ */
+export const MAX_PROOF_DEPTH = 14;
+
 export function verifyProof(e: Entitlement, proof: readonly string[], root: string): boolean {
+  if (proof.length > MAX_PROOF_DEPTH) return false;
   let h: string;
   try { h = leafHash(e); } catch { return false; }
   for (const sibling of proof) {
@@ -292,6 +303,14 @@ export function distributeEqually(
 
 /* ---------- reconciliation ------------------------------------------ */
 
+/** One subscriber present in both lists whose committed record differs. */
+export interface ChangedEntry {
+  npub: string;
+  field: 'destination' | 'amount';
+  published: string;
+  computed: string;
+}
+
 export interface Reconciliation {
   matches: boolean;
   publishedRoot: string;
@@ -300,6 +319,16 @@ export interface Reconciliation {
   extra: string[];
   /** On relays but missing from the published list. */
   omitted: string[];
+  /**
+   * Present in both, but committed differently.
+   *
+   * Membership diffing alone left this invisible: the root commits index, npub,
+   * destination AND amount, so changing an address moves the root while both
+   * membership sets stay empty. The diagnostic then announced a discrepancy and
+   * pointed at nothing, which is worse than not running — a reader concludes the
+   * tool is broken, or that the mismatch is spurious.
+   */
+  changed: ChangedEntry[];
   summary: string;
 }
 
@@ -322,20 +351,45 @@ export function reconcile(
     totalBaseUnits,
   );
 
-  const pub = new Set(publishedEntries.map((e) => e.npub));
-  const rel = new Set(fromRelays.map((m) => m.npub));
+  const pub = new Map(publishedEntries.map((e) => [e.npub, e]));
+  const rel = new Map(recomputed.entries.map((e) => [e.npub, e]));
 
-  const extra = [...pub].filter((n) => !rel.has(n)).sort();
-  const omitted = [...rel].filter((n) => !pub.has(n)).sort();
+  const extra = [...pub.keys()].filter((n) => !rel.has(n)).sort();
+  const omitted = [...rel.keys()].filter((n) => !pub.has(n)).sort();
+
+  const changed: ChangedEntry[] = [];
+  for (const [npub, p] of pub) {
+    const c = rel.get(npub);
+    if (!c) continue;
+    if (p.solanaAddress !== c.solanaAddress) {
+      changed.push({ npub, field: 'destination', published: p.solanaAddress, computed: c.solanaAddress });
+    }
+    if (p.amount !== c.amount) {
+      changed.push({ npub, field: 'amount', published: String(p.amount), computed: String(c.amount) });
+    }
+  }
+  changed.sort((a, b) => (a.npub < b.npub ? -1 : a.npub > b.npub ? 1 : 0));
+
   const matches = publishedRoot === recomputed.root;
+
+  const parts: string[] = [];
+  if (omitted.length) parts.push(`${omitted.length} subscriber(s) on relays are absent from the published list`);
+  if (extra.length) parts.push(`${extra.length} in the published list are not on relays`);
+  for (const c of changed) parts.push(`${c.npub}'s ${c.field} differs (published ${c.published}, computed ${c.computed})`);
 
   const summary = matches
     ? `The published root matches the one computed from ${fromRelays.length} subscription(s) on relays.`
     : `The published root does NOT match the one computed from relays. ` +
-      `${omitted.length} subscriber(s) are on relays and absent from the published list; ` +
-      `${extra.length} are in the published list and not on relays. ` +
-      `That can be a late subscription or a relay that was down as easily as an omission — ` +
-      `the difference is shown so a reader can tell which, rather than being told.`;
+      (parts.length
+        ? parts.join('; ') + '. '
+        // A mismatch nothing explains is its own finding: the difference is in
+        // something this function does not compare, and saying so is more useful
+        // than an empty list a reader would read as "no difference".
+        : `Nothing in the membership, destinations or amounts differs, so the difference is in an ` +
+          `input this check does not compare — the allocation policy, the batch snapshots or the ` +
+          `total. Compare those before concluding anything. `) +
+      `A difference can be a late subscription or a relay that was down as easily as an omission — ` +
+      `it is shown so a reader can tell which, rather than being told.`;
 
-  return { matches, publishedRoot, computedRoot: recomputed.root, extra, omitted, summary };
+  return { matches, publishedRoot, computedRoot: recomputed.root, extra, omitted, changed, summary };
 }

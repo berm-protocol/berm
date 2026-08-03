@@ -293,8 +293,12 @@ describe('an independent implementation gets the same root', () => {
   };
 
   const independentRoot = (entries: Entitlement[]) => {
+    // BYTEWISE, matching production. This used localeCompare('en'), which
+    // disagrees with code-unit order on case and diacritics — so the differential
+    // test proved agreement on exactly the ASCII inputs where agreement was never
+    // in doubt, and would have diverged silently on anything else. R1 found it.
     const sorted = [...entries]
-      .sort((a, b) => a.npub.localeCompare(b.npub, 'en'))
+      .sort((a, b) => (a.npub < b.npub ? -1 : a.npub > b.npub ? 1 : 0))
       .map((e, index) => ({ ...e, index }));
     let level = sorted.map(independentLeaf);
     while (level.length > 1) {
@@ -311,6 +315,27 @@ describe('an independent implementation gets the same root', () => {
     const set = Array.from({ length: n }, (_, i) =>
       e(`npub1${String(i).padStart(3, '0')}`, [A, B, C][i % 3]!, BigInt((i + 1) * 137)));
     expect(independentRoot(set)).toBe(buildTree(set).root);
+  });
+
+  // Fixtures that are NOT tidy ASCII, because the tidy ones could not have failed.
+  it.each([
+    ['mixed case',        ['npub1Z', 'npub1a', 'npub1A', 'npub1z']],
+    ['diacritics',        ['npub1é', 'npub1e', 'npub1E', 'npub1ê']],
+    ['non-latin',         ['npub1ω', 'npub1a', 'npub1д', 'npub1中']],
+    ['digits vs letters', ['npub19', 'npub1a', 'npub10', 'npub1Z']],
+    ['long shared prefix',['npub1aaaaaaaab', 'npub1aaaaaaaaa', 'npub1aaaaaaaac']],
+  ])('agrees on %s, where a locale comparator would not', (_name, npubs) => {
+    const set = npubs.map((npub, i) => e(npub, [A, B, C][i % 3]!, BigInt(i + 1)));
+    expect(independentRoot(set)).toBe(buildTree(set).root);
+  });
+
+  it('and those fixtures really do separate the two comparators', () => {
+    // Guards against the fixtures quietly becoming ASCII-equivalent again, which
+    // would make every assertion above pass for the wrong reason.
+    const tricky = ['npub1Z', 'npub1a', 'npub1A', 'npub1z'];
+    const bytewise = [...tricky].sort((a, b) => (a < b ? -1 : a > b ? 1 : 0));
+    const locale = [...tricky].sort((a, b) => a.localeCompare(b, 'en'));
+    expect(locale).not.toEqual(bytewise);
   });
 
   it('agrees on a proof, so a Rust verifier written from the same text will too', () => {

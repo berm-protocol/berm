@@ -102,6 +102,22 @@ export function assignBatches(
   const batchOf = new Map<string, number>();
   const members: string[][] = [];
 
+  // Snapshots must be supersets — subscribers never un-subscribe. A snapshot that
+  // LOST someone is not a later view of the same set, it is a different set, and
+  // silently accepting one would let a batch boundary be redrawn after the fact.
+  for (let i = 1; i < batches.length; i++) {
+    const previous = new Set(batches[i - 1]!.observed);
+    const now = new Set(batches[i]!.observed);
+    const dropped = [...previous].filter((n) => !now.has(n));
+    if (dropped.length) {
+      throw new CampaignError(
+        `snapshot ${i} ("${batches[i]!.label}") is missing ${dropped.length} npub(s) present in ` +
+        `snapshot ${i - 1} — snapshots must be supersets, so this is a different set rather than ` +
+        `a later view of the same one`,
+      );
+    }
+  }
+
   for (let i = 0; i < batches.length; i++) {
     const seen: string[] = [];
     for (const npub of batches[i]!.observed) {
@@ -227,6 +243,11 @@ export function allocate(
     return { index: 0, npub, solanaAddress, amount };
   });
 
+  // Built ONCE. An earlier version called buildTree twice — for the root and for
+  // the entries — which is two computations where the contract says there is one,
+  // and exactly the kind of thing that drifts when somebody edits one call site.
+  const tree = entitlements.length ? buildTree(entitlements) : null;
+
   return {
     campaign: config.campaign,
     batches: results,
@@ -235,8 +256,8 @@ export function allocate(
     residue: totalBaseUnits - allocated,
     residuePolicy: config.residue,
     claimedBeforeFirstSeen: assignment.claimedBeforeFirstSeen,
-    root: entitlements.length ? buildTree(entitlements).root : '',
-    entitlements: entitlements.length ? buildTree(entitlements).entries : [],
+    root: tree?.root ?? '',
+    entitlements: tree?.entries ?? [],
   };
 }
 
@@ -249,7 +270,20 @@ export function buildCampaign(
   const addressOf = new Map<string, string>();
   // Latest subscription wins the address — the event is replaceable precisely so
   // that losing a wallet does not cost somebody their place.
-  for (const s of [...subs].sort((a, b) => a.claimedAt - b.claimedAt)) {
+  //
+  // THE TIE-BREAK IS NOT OPTIONAL. Relays return events in arbitrary order, so
+  // sorting on `claimedAt` alone left two subscriptions sharing a timestamp to be
+  // resolved by whichever arrived first. Two honest parties fetching identical
+  // data could then publish two different roots and each be certain the other was
+  // lying — which destroys the one property this whole design rests on.
+  //
+  // So ties break on the address: a total order over the data itself, computed
+  // from the events and nothing else. Higher wins, arbitrarily but consistently.
+  for (const s of [...subs].sort((a, b) =>
+    a.claimedAt !== b.claimedAt
+      ? a.claimedAt - b.claimedAt
+      : (a.solanaAddress < b.solanaAddress ? -1 : a.solanaAddress > b.solanaAddress ? 1 : 0),
+  )) {
     addressOf.set(s.npub, s.solanaAddress);
   }
   return allocate(config, assignBatches(config.batches, subs, snapshotClosedAt), addressOf);
