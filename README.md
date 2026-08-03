@@ -91,7 +91,7 @@ That is the whole integration. No registration, no key to obtain, no quota.
 | [`wordpress/`](wordpress) | The node. Pure-PHP BIP-340 — no GMP, no BCMath, any shared host | 15 official vectors |
 | [`node-pages/`](node-pages) | A node publishes only what it verified, and refuses to truncate | 18 tests + 17 relay checks |
 | [`signer-log/`](signer-log) | Build attestations, so a swapped signer is detectable | 20 tests |
-| [`bags/`](bags) | Fee continuity for Bags launches, and the dispute screen that is the point of it | 83 tests + 26 browser checks |
+| [`bags/`](bags) | Fee continuity for Bags launches, and the dispute screen that is the point of it | 119 tests + 26 browser checks |
 | [`docs/`](docs) | Published as signed Nostr events, through the protocol it documents | conformance-checked |
 
 ## Verify it yourself

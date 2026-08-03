@@ -5,7 +5,7 @@ identity fragility a Bags launch inherits.
 
 ```bash
 npm ci
-npm test          # 83 assertions, offline, no API key
+npm test          # 119 assertions, offline, no API key
 npm run build     # the dispute screen → dist/dispute.html
 npm run verify    # 26 browser checks, mostly about what it refuses to say
 npm run probe     # read-only; needs BAGS_API_KEY
@@ -215,6 +215,54 @@ moves in either direction, a gift for showing up early rather than payment for
 work, and not guaranteed to be worth anything. A test asserts the text never
 mentions price, value or return — describing the mechanism is arithmetic, and
 predicting the outcome is the one sentence that would make this something else.
+
+## The distribution commitment
+
+One hash that anybody can rebuild. Publish the root; a stranger fetches the same
+subscriptions from relays, runs the same snapshot, builds the same tree, and
+compares. A mismatch means the published list is not what the relays support —
+checkable without anyone's cooperation.
+
+`reconcile()` does exactly that and names both sets: who is on relays and absent
+from the list, who is in the list and absent from relays. It does **not** deliver
+a verdict, because a root can differ from a late subscription or a relay that was
+down as easily as from an omission, and a test asserts the wording never says
+fraud, stole, cheated or lied.
+
+**This does not enforce anything.** It is the checkable version, not the enforced
+one — the same distinction [`chain/`](../chain) draws. A Solana program verifying
+these proofs against a root in a PDA makes it enforcement later, and the data
+model does not change when it does. That is why this half is worth building
+first: useful immediately, thrown away never.
+
+**The trust hinge that survives**, stated rather than hidden: somebody publishes
+the root, and that somebody could leave people out. What the design buys is that
+the omission is provable by a stranger in one command, because every input is
+public and the computation is deterministic. Detection, cheap and mechanical.
+
+### Three ways Merkle implementations get this wrong
+
+| Attack | What we do instead |
+|---|---|
+| **Second preimage** — present an internal node as a leaf | leaves hashed with a `0x00` prefix, nodes with `0x01`, so the two spaces are disjoint |
+| **Odd-node duplication** (CVE-2012-2459) — padding a level by repeating the last node lets two different leaf sets share a root | an odd node is **promoted unchanged** |
+| **Ambiguous leaf encoding** — `("npub1a","Xyz")` and `("npub1","aXyz")` concatenate identically | every field is length-prefixed, unambiguous by construction |
+
+`verifyProof()` takes an **entitlement**, never a pre-computed hash, so there is
+no argument through which a caller could inject a raw node hash and have it
+verified as a leaf.
+
+**Amounts are `bigint`**, so nothing rounds at the 53-bit float boundary, and the
+remainder integer division cannot split is reported as `dust` and left in the
+vault. Pushing it onto "the first member by sort order" would be deterministic
+and would also be a silent decision that somebody gets more.
+
+**An independent implementation is part of the test suite.** The scheme is
+rebuilt from the prose in `merkle.ts`'s header using `node:crypto` and a
+different structure, and the roots are compared across eight tree sizes. If that
+ever fails, either the code changed or the description stopped describing it —
+and both are the same bug, because a commitment nobody can reproduce is not a
+commitment.
 
 ## The dispute screen
 
