@@ -95,8 +95,8 @@ jobs:
       # while the same step finished in under a minute on six others. A step
       # timeout turns that into a fast, legible failure instead of a job that
       # occupies a runner until GitHub's six-hour default cuts it off.
-      - run: npx playwright install --with-deps chromium
-        timeout-minutes: 6
+      - run: node scripts/install-chromium.mjs --with-deps
+        timeout-minutes: 8
       - run: node scripts/verify-all.mjs ${{ matrix.group }}
       # The screenshots are not committed — they are rewritten by every verify
       # run, so a green suite would produce a diff. They are kept here for a week

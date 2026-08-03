@@ -47,8 +47,15 @@ jobs:
       # Chromium is needed for the browser groups. Without it they SKIP, and a
       # skip must never look like a pass — so this job installs it and runs the
       # whole suite rather than --fast.
+      #
+      # The version is READ FROM THE LOCKFILES, never written here. This step
+      # used to pin 1.49.0 while every package had drifted to 1.62.x, and since
+      # Playwright keys browser downloads to its own version, all eight browser
+      # groups failed at once with "executable doesn't exist" — an error that
+      # points at the browser rather than at the mismatch that caused it.
       - name: install chromium
-        run: npx --yes playwright@1.49.0 install --with-deps chromium
+        run: node scripts/install-chromium.mjs --with-deps
+        timeout-minutes: 8
 
       - name: full suite
         run: node scripts/verify-all.mjs

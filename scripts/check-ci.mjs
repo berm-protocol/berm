@@ -59,11 +59,29 @@ for (const g of all) {
   }
 }
 
+/* 3 — no workflow hardcodes a browser version ----------------------------- */
+
+// pages.yml pinned playwright@1.49.0 while the packages had moved to 1.62.x.
+// Playwright keys browser downloads to its own version, so the job installed a
+// Chromium nothing looked for and all eight browser groups failed at once, in a
+// job that had been green for weeks. The version must come from the lockfiles.
+for (const file of ['.github/workflows/ci.yml', '.github/workflows/pages.yml', '.github/workflows/release.yml']) {
+  const body = readFileSync(join(ROOT, file), 'utf8');
+
+  const pinned = body.match(/playwright@[\d.]+/);
+  if (pinned) {
+    fail(`${file} hardcodes ${pinned[0]} — use scripts/install-chromium.mjs, which reads the version the packages resolve`);
+  }
+  if (/npx\s+(?:--yes\s+)?playwright\s+install/.test(body)) {
+    fail(`${file} runs \`npx playwright install\` directly — that installs LATEST, which matches the packages only by luck`);
+  }
+}
+
 /* ------------------------------------------------------------------------ */
 
 console.log(
   bad
     ? `\n${bad} CI coverage problem(s)\n`
-    : `CI covers all ${all.length} groups (${matrixed.size} via derived matrices)\n`,
+    : `CI covers all ${all.length} groups (${matrixed.size} via derived matrices), no hardcoded browser version\n`,
 );
 process.exit(bad ? 1 : 0);
