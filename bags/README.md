@@ -5,7 +5,7 @@ identity fragility a Bags launch inherits.
 
 ```bash
 npm ci
-npm test          # 138 assertions, offline, no API key
+npm test          # 142 assertions, offline, no API key
 npm run build     # the dispute screen → dist/dispute.html
 npm run verify    # 26 browser checks, mostly about what it refuses to say
 npm run probe     # read-only; needs BAGS_API_KEY
@@ -355,6 +355,36 @@ one layer up, and no unit test that stops at the module boundary can see it.
 **The scenarios are fixtures and the page does not pretend otherwise.** They
 become real the moment there is a real npub with a real Wayback capture. A demo
 that looked live would be the same overstatement in a nicer font.
+
+## The distributor — specified, not built
+
+[`DISTRIBUTOR-SPEC.md`](DISTRIBUTOR-SPEC.md) is a Solana program written down
+before any Rust exists, so it can be attacked while attacking it is still cheap.
+
+**The party it defends against is the launching developer.** That is unusual and
+it is the whole point: if a dev can withhold a community's share, a launchpad
+built on this is a nicer way to make unenforceable promises, and the promise was
+the only part with value.
+
+The mechanism, from Bags' published IDL: `claim_user` takes `payer` and `user` as
+**separate** signers. So the fee claimer can be a PDA with no private key, and
+`harvest()` can be permissionless — any subscriber pays the transaction fee and
+harvests for everyone. The dev is not in the path and has nothing to withhold.
+
+Two programs, split by what holds money: an **immutable distributor** that owns
+the vault and pays against the root, and an **upgradeable harvester** that holds
+nothing and cannot choose a destination. Upgradeable usually means custody in a
+costume; here the coupling to somebody else's program interface lives entirely in
+the half that touches no funds.
+
+The index is inside the Merkle leaf for this spec's sake: an on-chain bitmap needs
+one unambiguous bit per claimant, and an index that was passed alongside a proof
+rather than committed inside it would let anyone set a stranger's bit and lock
+them out permanently, for free.
+
+Nothing in that document has been built, tested or audited. It is published in
+that state deliberately — intentions are cheaper to correct than programs, and an
+immutable program cannot be corrected at all.
 
 ## Safety
 

@@ -223,7 +223,8 @@ export function allocate(
       // a transfer that cannot happen, months after anyone could fix it.
       throw new CampaignError(`no payout address recorded for ${npub}`);
     }
-    return { npub, solanaAddress, amount };
+    // index 0 is a placeholder — buildTree assigns the real one after sorting.
+    return { index: 0, npub, solanaAddress, amount };
   });
 
   return {

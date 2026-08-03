@@ -44,6 +44,18 @@ import { sha256 } from '@noble/hashes/sha2.js';
 /* ------------------------------------------------------------------ */
 
 export interface Entitlement {
+  /**
+   * Position in the sorted set, starting at 0.
+   *
+   * IN THE LEAF because an on-chain distributor needs one bit per claimant to
+   * prevent double claims, and the bit has to be unambiguous. If the index were
+   * merely derived rather than proven, a claimant could present a valid proof
+   * and set somebody ELSE's bit — a griefing move that costs the attacker
+   * nothing and locks a stranger out permanently.
+   *
+   * Assigned by `buildTree`, never by the caller.
+   */
+  index: number;
   /** Identity that subscribed. Present for auditing; not what authorises a claim. */
   npub: string;
   /**
@@ -102,8 +114,9 @@ export function encodeLeaf(e: Entitlement): Uint8Array {
   const addr = utf8.encode(e.solanaAddress);
   const amount = u64(e.amount);
 
-  const out = new Uint8Array(4 + npub.length + 4 + addr.length + 8);
+  const out = new Uint8Array(4 + 4 + npub.length + 4 + addr.length + 8);
   let o = 0;
+  out.set(u32(e.index), o); o += 4;                    // fixed width, first
   out.set(u32(npub.length), o); o += 4;
   out.set(npub, o); o += npub.length;
   out.set(u32(addr.length), o); o += 4;
@@ -173,7 +186,12 @@ export function buildTree(entries: readonly Entitlement[]): Tree {
     if (e.amount < 0n) throw new MerkleError(`negative amount for ${e.npub}`);
   }
 
-  const sorted = [...entries].sort((a, b) => (a.npub < b.npub ? -1 : a.npub > b.npub ? 1 : 0));
+  // Index is assigned HERE, after sorting, so it is a property of the set rather
+  // than of whatever order the caller happened to pass. A caller-supplied index
+  // would be another self-asserted field, and this file already knows how that ends.
+  const sorted = [...entries]
+    .sort((a, b) => (a.npub < b.npub ? -1 : a.npub > b.npub ? 1 : 0))
+    .map((e, index) => ({ ...e, index }));
   const leaves = sorted.map(leafHash);
 
   const layers: string[][] = [leaves];
@@ -264,7 +282,8 @@ export function distributeEqually(
   if (totalBaseUnits < 0n) throw new MerkleError('total cannot be negative');
 
   const each = totalBaseUnits / BigInt(members.length);
-  const entries: Entitlement[] = members.map((m) => ({ ...m, amount: each }));
+  // index 0 is a placeholder — buildTree assigns the real one after sorting.
+  const entries: Entitlement[] = members.map((m) => ({ ...m, index: 0, amount: each }));
   const tree = buildTree(entries);
 
   const allocated = each * BigInt(members.length);

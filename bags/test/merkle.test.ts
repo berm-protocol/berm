@@ -20,8 +20,9 @@ const A = 'So11111111111111111111111111111111111111112';
 const B = '7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU';
 const C = 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v';
 
+// index 0 is a placeholder in fixtures — buildTree assigns the real one.
 const e = (npub: string, solanaAddress: string, amount: bigint): Entitlement =>
-  ({ npub, solanaAddress, amount });
+  ({ index: 0, npub, solanaAddress, amount });
 
 const SET: Entitlement[] = [
   e('npub1alice', A, 1000n),
@@ -84,7 +85,7 @@ describe('attack 1 — second preimage', () => {
     const internalNode = tree.layers[1]![0]!;
     // Try to claim by pretending the node hash is our leaf. verifyProof takes an
     // Entitlement and hashes it itself, so there is no way to inject a raw hash.
-    const forged: Entitlement = { npub: internalNode, solanaAddress: A, amount: 999_999n };
+    const forged: Entitlement = { index: 0, npub: internalNode, solanaAddress: A, amount: 999_999n };
     expect(verifyProof(forged, [], tree.root)).toBe(false);
     expect(verifyProof(forged, tree.leaves, tree.root)).toBe(false);
   });
@@ -281,7 +282,9 @@ describe('an independent implementation gets the same root', () => {
     const addr = Buffer.from(e.solanaAddress, 'utf8');
     const len = (n: number) => { const b = Buffer.alloc(4); b.writeUInt32BE(n); return b; };
     const amt = Buffer.alloc(8); amt.writeBigUInt64BE(e.amount);
-    return sha(Buffer.concat([Buffer.from([0x00]), len(npub.length), npub, len(addr.length), addr, amt]));
+    return sha(Buffer.concat([
+      Buffer.from([0x00]), len(e.index), len(npub.length), npub, len(addr.length), addr, amt,
+    ]));
   };
 
   const independentNode = (x: string, y: string) => {
@@ -290,7 +293,9 @@ describe('an independent implementation gets the same root', () => {
   };
 
   const independentRoot = (entries: Entitlement[]) => {
-    const sorted = [...entries].sort((a, b) => a.npub.localeCompare(b.npub, 'en'));
+    const sorted = [...entries]
+      .sort((a, b) => a.npub.localeCompare(b.npub, 'en'))
+      .map((e, index) => ({ ...e, index }));
     let level = sorted.map(independentLeaf);
     while (level.length > 1) {
       const next: string[] = [];
@@ -314,5 +319,47 @@ describe('an independent implementation gets the same root', () => {
     let h = independentLeaf(bob);
     for (const sibling of proofFor(tree, 'npub1bob')) h = independentNode(h, sibling);
     expect(h).toBe(tree.root);
+  });
+});
+
+describe('the claim index — what an on-chain bitmap needs', () => {
+  it('is assigned by the tree, in sorted order, starting at 0', () => {
+    const tree = buildTree([e('npub1c', C, 1n), e('npub1a', A, 2n), e('npub1b', B, 3n)]);
+    expect(tree.entries.map((x) => [x.index, x.npub]))
+      .toEqual([[0, 'npub1a'], [1, 'npub1b'], [2, 'npub1c']]);
+  });
+
+  it('a caller-supplied index is overwritten, not trusted', () => {
+    // Otherwise it is another self-asserted field, and this file already knows
+    // how those end. Someone claiming index 0 does not get index 0.
+    const tree = buildTree([
+      { index: 999, npub: 'npub1z', solanaAddress: A, amount: 1n },
+      { index: 0, npub: 'npub1a', solanaAddress: B, amount: 1n },
+    ]);
+    expect(tree.entries.find((x) => x.npub === 'npub1z')!.index).toBe(1);
+  });
+
+  it('claiming with somebody else\'s index fails', () => {
+    // THE REASON THE INDEX IS IN THE LEAF. An on-chain distributor sets one bit
+    // per claimant to stop double claims. If the index were merely passed
+    // alongside a valid proof rather than committed inside it, a claimant could
+    // set a stranger's bit and lock them out permanently, for free.
+    const tree = buildTree(SET);
+    const bob = tree.entries.find((x) => x.npub === 'npub1bob')!;
+    const proof = proofFor(tree, 'npub1bob');
+    expect(verifyProof(bob, proof, tree.root)).toBe(true);
+    for (const stolen of [0, 2, 999]) {
+      if (stolen === bob.index) continue;
+      expect(verifyProof({ ...bob, index: stolen }, proof, tree.root)).toBe(false);
+    }
+  });
+
+  it('indices are contiguous and unique across any size', () => {
+    for (const n of [1, 2, 7, 33]) {
+      const set = Array.from({ length: n }, (_, i) =>
+        e(`npub1${String(i).padStart(3, '0')}`, A, BigInt(i + 1)));
+      const tree = buildTree(set);
+      expect(tree.entries.map((x) => x.index)).toEqual([...Array(n).keys()]);
+    }
   });
 });
