@@ -5,7 +5,7 @@ identity fragility a Bags launch inherits.
 
 ```bash
 npm ci
-npm test          # 52 assertions, offline, no API key
+npm test          # 83 assertions, offline, no API key
 npm run build     # the dispute screen → dist/dispute.html
 npm run verify    # 26 browser checks, mostly about what it refuses to say
 npm run probe     # read-only; needs BAGS_API_KEY
@@ -152,6 +152,56 @@ launch plumbing now would be building the fourth step during the second.
 What is worth having for the pitch is the **demonstration**: a creator whose fee
 claim survives losing their X account. That is one screen, and it is the thing
 Bags cannot currently offer anyone.
+
+## The subscription event
+
+The one format that has to be right on the first subscriber. Everything else here
+can be fixed by shipping a new version; this cannot. A field missing from the
+signed event means going back to every subscriber and asking again, and the ones
+who have drifted away never answer.
+
+```
+kind    30078                       addressable, so the record is replaceable
+d       berm:subscribe:v1:<campaign>
+tags    campaign, chain=solana, address, alt, handle?
+content the full disclosure, verbatim, so it travels with the signature
+```
+
+**A Nostr identity is secp256k1 and a Solana address is ed25519.** An npub is not
+a Solana address and you cannot send an SPL token to one. So the subscription
+carries both under a single signature, or the payout list is a set of identities
+with nowhere to pay.
+
+**Membership and payout address are deliberately not the same field.** Membership
+is who was early: established once, snapshotted, never edited. The address is
+where to send: current and replaceable, because people lose wallets. Conflate
+them and a subscriber who changes wallets loses their place in a queue they
+already joined.
+
+**`created_at` never orders anybody.** It is set by whoever signs — a claim about
+time made by the party whose timing is in dispute, which is exactly what
+`dispute.ts` refuses to score. `snapshotMembers()` sorts by npub, so the same set
+produces the same snapshot no matter what order events arrive in and no matter
+what timestamps they assert. Ordering comes from published snapshots archived by
+a third party, one layer down but the same argument.
+
+**A subscriber count is a count of keys.** Keys are free, so N proves who was
+early and proves nothing about how many humans that is. `describeSnapshot()`
+says so in the output rather than leaving the reader to infer it, and reports
+payout addresses named by more than one key without pretending to know whether
+that is one person or several.
+
+**The address is validated at signing, not at payout.** A typo found at payout is
+a token sent somewhere unrecoverable, months after the person who could have
+fixed it stopped paying attention. The base58 decoder is checked against real
+mainnet addresses — its first draft passed every synthetic fixture and rejected
+wrapped SOL.
+
+**What the signer shows is the whole disclosure**, not a link to it: no money
+moves in either direction, a gift for showing up early rather than payment for
+work, and not guaranteed to be worth anything. A test asserts the text never
+mentions price, value or return — describing the mechanism is arithmetic, and
+predicting the outcome is the one sentence that would make this something else.
 
 ## The dispute screen
 
