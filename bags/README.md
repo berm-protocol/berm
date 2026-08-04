@@ -5,7 +5,7 @@ identity fragility a Bags launch inherits.
 
 ```bash
 npm ci
-npm test          # 156 assertions, offline, no API key
+npm test          # 160 assertions, offline, no API key
 npm run build     # the dispute screen → dist/dispute.html
 npm run verify    # 26 browser checks, mostly about what it refuses to say
 npm run probe     # read-only; needs BAGS_API_KEY
@@ -84,7 +84,7 @@ things:
 
 | We had | The spec says |
 |---|---|
-| `/token-launch/fee-share/wallet/v2` | `/agent/v2/fee-share-wallet` |
+| `/token-launch/fee-share/wallet/v2` | `/agent/v2/fee-share-wallet` — **and the spec is wrong, see below** |
 | three providers | eleven, including `solana`, `tiktok`, `instagram` |
 | no chain parameter | `chain=SOL\|EVM`, default `SOL` — one handle, two wallets |
 | account id needs X OAuth | the response carries `platformData.id` for an API key |
@@ -113,6 +113,68 @@ which is the loudest thing the record can say, because it means the account bein
 paid and the account we hold evidence for are different. It never upgrades
 `claim-only` to `anchored`. Founding a grade on a third party's cache is
 manufacturing confidence, which is the one thing this package exists not to do.
+
+## Probed live, 2026-08-04 — and the spec check was the error
+
+A real key, GET requests only. Six things came back, and the first one reverses a
+correction this file was proud of.
+
+**The path we "fixed" was the broken one.** `/agent/v2/fee-share-wallet`, taken
+from the published OpenAPI specification, returns a routed 404 on the live host.
+`/token-launch/fee-share/wallet/v2` — the path we modelled from prose and then
+replaced — returns 200 and a wallet. A published specification is evidence about
+intent, not about deployment. Where they disagree the running service wins, and
+only a request tells you which is which.
+
+Worse, `test/spec.test.ts` had pinned it: it asserted the spec path **and kept the
+real path as a negative** "so a revert is loud". A correct fix had to delete an
+assertion to land. A test written from the same source as the code checks
+transcription, not truth.
+
+**Q1 — a handle resolves for anyone.** `@jack` → `AeNScctZsCb4ayKFAD2M1MXfobuPoEJfgn3Ka3PiEmai`,
+with `platformData.id` `12`. No onboarding required.
+
+**Q2 — a handle with no wallet returns 404** and `{"success": false, "response":
+"Fee share wallet not found"}`. Clean, and distinguishable from an error.
+
+**Q3 — resolution is case-INSENSITIVE.** `@JACK` and `@jack` return the same
+wallet and the same `platformData.id`.
+
+**Q5 — yes, `chain=EVM` returns a different wallet for the same handle.**
+`@jack` on EVM is `0xf42513c915c2aB0D66113daE849204BD5940dd9f`. One handle, two
+claims on money, and a fee split that names a handle does not say which.
+
+**Q4 remains open.** It needs a handle known to have been renamed.
+
+### The finding that stops a design
+
+**`provider: 'solana'` lowercases the address, and base58 is case-sensitive.**
+
+```
+in    7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU
+out   7xkxtg2cw87d97txjsdpbd5jbkhetqa83tzrujosgasu   200 success:true
+```
+
+The returned string still decodes to 32 valid bytes, so nothing errors anywhere.
+It is a different public key, and nobody holds its private key. Fees assigned
+there are unrecoverable by anyone, including Bags.
+
+Garbage is rejected — `notanaddress` returns 404 — so there **is** validation. It
+runs after the lowercasing, on a string that is always still valid base58, because
+only 34 of the 58 base58 characters change under `toLowerCase()` and none of them
+become illegal. The check cannot catch this.
+
+There is no grinding around it either: an all-lowercase-safe 44-character address
+turns up about once in 10^10 derivations.
+
+**So naming a PDA as the Bags fee claimer is NOT established.** This endpoint is
+the only public candidate for pointing a fee share at a raw address, and it
+mangles it. Until Bags confirms a case-preserving route, an ingress-PDA design has
+no way in. `feeShareWalletUrl` now throws on a mixed-case `solana` username rather
+than warning, because the response to a mangled address is a clean 200 with a
+plausible wallet and nothing downstream can notice.
+
+Ask Bags. Do not test this with a live launch.
 
 ## Still unverified, and only a key can settle it
 

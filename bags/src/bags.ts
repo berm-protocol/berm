@@ -61,8 +61,41 @@ export type Chain = (typeof CHAINS)[number];
 /* ------------------------------------------------------------------ */
 
 export const API_BASE = 'https://public-api-v2.bags.fm/api/v1';
-export const FEE_SHARE_WALLET_PATH = '/agent/v2/fee-share-wallet';
+/**
+ * VERIFIED AGAINST THE LIVE API with a real key, 2026-08-04. Returns 200 and a
+ * wallet. The published OpenAPI spec says `/agent/v2/fee-share-wallet`; that path
+ * returns a routed 404 on the live host. We changed a WORKING path to a broken
+ * one on the strength of the spec, and shipped it. A published specification is
+ * evidence about intent, not about deployment — where they disagree, the running
+ * service wins, and only a request can tell you which is which.
+ */
+export const FEE_SHARE_WALLET_PATH = '/token-launch/fee-share/wallet/v2';
 export const AUTH_HEADER = 'x-api-key';
+
+/**
+ * `provider: 'solana'` CASE-FOLDS THE ADDRESS. Do not use it to name a wallet.
+ *
+ * Observed live: `username=7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU` returns
+ * `success: true` with `wallet` = `7xkxtg2cw87d97txjsdpbd5jbkhetqa83tzrujosgasu`.
+ * The username is lowercased — correct for a social handle, catastrophic for
+ * base58, which is case-sensitive.
+ *
+ * The lowercased string still decodes to 32 valid bytes, so nothing errors. It
+ * is simply a DIFFERENT public key, one nobody holds a private key for. Fees
+ * assigned to it are unrecoverable by anyone.
+ *
+ * There is no grinding around it: only 34 of the 58 base58 characters survive
+ * lowercasing unchanged, so an all-lowercase-safe 44-character address occurs
+ * about once in 10^10 derivations.
+ *
+ * Consequence for the distributor: **naming a PDA as the Bags fee claimer is not
+ * established** through this path, and this path is the only public candidate.
+ * It needs Bags to confirm a case-preserving route before any design depends on
+ * it. Ask; do not test it with a live launch.
+ */
+export function solanaAddressIsCaseMangled(username: string): boolean {
+  return username !== username.toLowerCase();
+}
 
 /** Spec: claimers must total exactly this, and there may be at most 100. */
 export const TOTAL_BPS = 10_000;
@@ -131,6 +164,17 @@ export function feeShareWalletUrl(
   chain: Chain = 'SOL',
   base = API_BASE,
 ): string {
+  if (provider === 'solana' && solanaAddressIsCaseMangled(username)) {
+    // Refused rather than warned. The response to a mangled address is a clean
+    // 200 with a plausible-looking wallet, so nothing downstream can notice.
+    throw new BagsError(
+      `provider 'solana' lowercases the username, and base58 is case-sensitive. ` +
+      `"${username}" would resolve to "${username.toLowerCase()}" — a different, ` +
+      `unowned public key that still decodes to 32 valid bytes. Fees sent there ` +
+      `are unrecoverable. Use a social provider, or get a case-preserving route ` +
+      `confirmed by Bags first.`,
+    );
+  }
   const u = new URL(base + FEE_SHARE_WALLET_PATH);
   u.searchParams.set('provider', provider);
   u.searchParams.set('username', username);

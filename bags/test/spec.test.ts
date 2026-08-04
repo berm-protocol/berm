@@ -29,10 +29,12 @@ describe('transcribed from the OpenAPI spec', () => {
     expect(AUTH_HEADER).toBe('x-api-key');
   });
 
-  it('the fee-share wallet path — the one we had wrong', () => {
-    expect(FEE_SHARE_WALLET_PATH).toBe('/agent/v2/fee-share-wallet');
-    // The path we modelled from prose, kept as a negative so a revert is loud.
-    expect(FEE_SHARE_WALLET_PATH).not.toBe('/token-launch/fee-share/wallet/v2');
+  it('the fee-share wallet path — WITHDRAWN, see below', () => {
+    // This test used to assert '/agent/v2/fee-share-wallet' from the spec, AND
+    // kept the real path as a negative "so a revert is loud". It was pinning the
+    // bug in place: a correct fix had to delete an assertion to land. A test
+    // written from the same source as the code checks transcription, not truth.
+    expect(FEE_SHARE_WALLET_PATH).toBe('/token-launch/fee-share/wallet/v2');
   });
 
   it('all eleven providers, not the three we guessed', () => {
@@ -53,7 +55,7 @@ describe('transcribed from the OpenAPI spec', () => {
 
   it('builds the documented query: provider, username, chain', () => {
     const u = new URL(feeShareWalletUrl('twitter', 'alice'));
-    expect(u.origin + u.pathname).toBe('https://public-api-v2.bags.fm/api/v1/agent/v2/fee-share-wallet');
+    expect(u.origin + u.pathname).toBe('https://public-api-v2.bags.fm/api/v1/token-launch/fee-share/wallet/v2');
     expect(u.searchParams.get('provider')).toBe('twitter');
     expect(u.searchParams.get('username')).toBe('alice');
     expect(u.searchParams.get('chain')).toBe('SOL');
@@ -105,5 +107,36 @@ describe('the README does not restate the refuted claim', () => {
     const claimsPathFrom401 =
       /401[^.]*\bmeans?\b[^.]*path|a 404 or 400 would have meant the path/i.test(readme);
     expect(claimsPathFrom401).toBe(false);
+  });
+});
+
+/* ------------------------------------------------------------------ *
+ * Live-API findings, 2026-08-04. Probed with a real key, GETs only.
+ * Each of these contradicts something this file previously asserted from
+ * the published OpenAPI specification.
+ * ------------------------------------------------------------------ */
+
+describe('what the live API actually does', () => {
+  it('uses the path the spec says is gone', () => {
+    // The spec's /agent/v2/fee-share-wallet returns a routed 404. This one
+    // returns 200 and a wallet. We "corrected" ourselves onto the broken one.
+    expect(FEE_SHARE_WALLET_PATH).toBe('/token-launch/fee-share/wallet/v2');
+  });
+
+  it('refuses a mixed-case address on the solana provider', () => {
+    // Live: this returns 200 with wallet = the LOWERCASED string, which is a
+    // different key that still decodes to 32 valid bytes. Silent loss of funds.
+    expect(() =>
+      feeShareWalletUrl('solana', '7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU'),
+    ).toThrow(/case-sensitive/);
+  });
+
+  it('allows an address that is already lowercase, since folding is then a no-op', () => {
+    expect(() => feeShareWalletUrl('solana', 'so11111111111111111111111111111111111111112')).not.toThrow();
+  });
+
+  it('leaves social providers alone — case folding is correct for a handle', () => {
+    // Live: @JACK and @jack both resolve to the same wallet.
+    expect(() => feeShareWalletUrl('twitter', 'JACK')).not.toThrow();
   });
 });
