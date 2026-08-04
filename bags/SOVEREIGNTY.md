@@ -15,6 +15,8 @@ layer, says who can break it, and refuses to round any of it up.
 | The token | mint, LP pull, authority games | whoever holds mint and LP authority at launch | **Depends on the launch.** Not something we provide |
 | The fee split at Bags | claimers and BPS rewritten | Bags' program admin (`update_fee_config`), **and** the dev while the `manager` role is unwaived (`manager_update_fee_config`) | **No** |
 | Fees leaving Bags | claimed to somewhere else, with no signature from the claimer | Bags' program admin (`force_claim_user`, `force_sol_claim_user`, `force_claim_user_to_vault` — `ForceClaimType` has an explicit `Admin` variant) | **No** |
+| The Bags fee-share **contract itself**, on Robinhood/EVM | every `BagsFeeShare` is a beacon proxy; a new implementation can ignore `getClaimers()` and send fees anywhere | Bags, via `BagsBeacon.upgradeTo()` — for **every token at once**, no per-token consent, and renouncing the fee share's own `owner()` does not touch it | **No — and this is stronger than the Solana admin powers above, not weaker** |
+| Naming a raw Solana address as fee earner | the public route case-folds base58 into a different, unowned key and returns `success: true` | nobody has to do anything — it is the default behaviour of `provider=solana` | **Blocked.** Probed live 2026-08-04; see `README.md` |
 | The dev actually funding a distribution | they simply don't | the dev | **No.** This is the dev↔user trust boundary, and it is the only one v1 asks anyone to accept |
 | A distribution, once funded | nothing | nobody — no admin, no owner, no upgrade, no sweep | **Yes** |
 | The root matching the published subscriber set | a different root gets published | the publisher — but anyone can recompute it from public events and say so | **Verifiable**, which is not the same as enforced |
@@ -101,7 +103,7 @@ What that removes, by finding:
 |---|---|
 | **BDR-001** signing architecture | Nothing is claimed on anyone's behalf. The dev harvests from Bags by hand and funds the contract. No CPI, no cross-program signing |
 | **BDR-002 / BDR-014** config redirection | Out of scope, and therefore disclosed rather than defended against. The contract's guarantee starts at the moment it is funded |
-| **BDR-003** continuing revenue | There is no lifecycle. One root, one funding, one contract |
+| **BDR-003** continuing revenue | Cumulative ranges handle it. One root, many top-ups, one contract |
 | **BDR-004** sweep confiscating claims | There is no sweep. Unclaimed means unclaimed, permanently |
 | **BDR-005** init squatting | Nothing is initialised permissionlessly. Deploying is the initialisation |
 

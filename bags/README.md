@@ -471,6 +471,13 @@ Which is the argument for publishing an unbuilt spec: intentions are cheap to
 correct, and an immutable program holding other people's money cannot be corrected
 at all.
 
+[`REVIEW-DUAL-CHAIN-R1.md`](REVIEW-DUAL-CHAIN-R1.md) reviews a two-chain build
+spec proposed on top of all this. Its cumulative range math is exact — verified
+over 3,000 revenue values at both nesting levels, zero dust. Its Solana half is
+blocked by the case-folding finding above. And two of its rules combine to strand
+up to 40% of lifetime revenue permanently, which is the kind of thing that costs a
+paragraph now and cannot be fixed after deployment at all.
+
 [`SOVEREIGNTY.md`](SOVEREIGNTY.md) is the disclosure that came out of it: every
 layer, who can break it, and the two sentences no marketing copy may exceed. It
 also specifies the **minimum shippable contract** — claim-only, no admin, no
