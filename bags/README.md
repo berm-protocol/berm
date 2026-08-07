@@ -478,6 +478,17 @@ blocked by the case-folding finding above. And two of its rules combine to stran
 up to 40% of lifetime revenue permanently, which is the kind of thing that costs a
 paragraph now and cannot be fixed after deployment at all.
 
+[`ENROLLMENT-SPEC.md`](ENROLLMENT-SPEC.md) is the implementation handoff, with
+[`vectors/pocket-address.json`](vectors/pocket-address.json) frozen alongside it —
+10 vectors covering both y-parity branches, anchored on the fact that secret key
+`1` derives to `0x7E5F4552091A69125d5DfCb7b8C2659029395Bdf`, the canonical Ethereum
+address for that key. An implementation that disagrees with that line is wrong and
+needs no further debugging.
+
+The ladder order changed from `POCKET.md`: paths are now ranked by **how little the
+user ends up depending on us**, not by what they already have. Create-and-download
+is the default, our own passkey signer is second with the exit signposted.
+
 [`POCKET.md`](POCKET.md) is the enrollment design: sign once, and your pocket is
 yours forever. A Nostr key is a secp256k1 keypair, so every npub has a canonical
 EVM address that only that key can spend — verified over 300 keys, including the

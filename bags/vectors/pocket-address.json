@@ -1,0 +1,109 @@
+{
+  "name": "berm/pocket/npub-to-evm-address",
+  "version": 1,
+  "frozen": true,
+  "note": "A Nostr key is a secp256k1 keypair, so every npub has one canonical EVM address. BIP-340 x-only pubkeys are the EVEN-y point, so a secret key whose point has ODD y must be negated (n - d) to obtain the key that actually controls the derived address. spendingKeyIsNegated marks those cases. Any implementation that ignores it produces a plausible address that nobody can spend from.",
+  "derivation": [
+    "xonly = x-coordinate of d*G, 32 bytes",
+    "point = 0x02 || xonly            (BIP-340: even y)",
+    "addr  = keccak256(x || y)[12:]   (uncompressed point, 04 prefix removed)",
+    "spendingKey = d if y(d*G) is even else (n - d)"
+  ],
+  "coverage": {
+    "total": 10,
+    "evenY": 8,
+    "oddY": 2
+  },
+  "vectors": [
+    {
+      "secretKeyHex": "1111111111111111111111111111111111111111111111111111111111111111",
+      "yParity": "odd",
+      "spendingKeyHex": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeda99dcbd59e378f2aaec14d7bbf253030",
+      "spendingKeyIsNegated": true,
+      "xOnlyPubkeyHex": "4f355bdcb7cc0af728ef3cceb9615d90684bb5b2ca5f859ab0f0b704075871aa",
+      "npub": "npub1fu64hh9hes90w2808n8tjc2ajp5yhddjef0ctx4s7zmsgp6cwx4qgy4eg9",
+      "pocketAddress": "0xeb88Ae7A94086Cbbe948CDd6A13C0Bd41e12d470"
+    },
+    {
+      "secretKeyHex": "0000000000000000000000000000000000000000000000000000000000000001",
+      "yParity": "even",
+      "spendingKeyHex": "0000000000000000000000000000000000000000000000000000000000000001",
+      "spendingKeyIsNegated": false,
+      "xOnlyPubkeyHex": "79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
+      "npub": "npub10xlxvlhemja6c4dqv22uapctqupfhlxm9h8z3k2e72q4k9hcz7vqpkge6d",
+      "pocketAddress": "0x7E5F4552091A69125d5DfCb7b8C2659029395Bdf"
+    },
+    {
+      "secretKeyHex": "0000000000000000000000000000000000000000000000000000000000000002",
+      "yParity": "even",
+      "spendingKeyHex": "0000000000000000000000000000000000000000000000000000000000000002",
+      "spendingKeyIsNegated": false,
+      "xOnlyPubkeyHex": "c6047f9441ed7d6d3045406e95c07cd85c778e4b8cef3ca7abac09b95c709ee5",
+      "npub": "npub1ccz8l9zpa47k6vz9gphftsrumpw80rjt3nhnefat4symjhrsnmjs38mnyd",
+      "pocketAddress": "0x2B5AD5c4795c026514f8317c7a215E218DcCD6cF"
+    },
+    {
+      "secretKeyHex": "0000000000000000000000000000000000000000000000000000000000000003",
+      "yParity": "even",
+      "spendingKeyHex": "0000000000000000000000000000000000000000000000000000000000000003",
+      "spendingKeyIsNegated": false,
+      "xOnlyPubkeyHex": "f9308a019258c31049344f85f89d5229b531c845836f99b08601f113bce036f9",
+      "npub": "npub1lycg5qvjtrp3qjf5f7zl382j9x6nrjz9sdhenvyxq8c3808qxmus6gq266",
+      "pocketAddress": "0x6813Eb9362372EEF6200f3b1dbC3f819671cBA69"
+    },
+    {
+      "secretKeyHex": "b7e151628aed2a6abf7158809cf4f3c762e7160f38b4da56a784d9045190cfef",
+      "yParity": "even",
+      "spendingKeyHex": "b7e151628aed2a6abf7158809cf4f3c762e7160f38b4da56a784d9045190cfef",
+      "spendingKeyIsNegated": false,
+      "xOnlyPubkeyHex": "dff1d77f2a671c5f36183726db2341be58feae1da2deced843240f7b502ba659",
+      "npub": "npub1mlcawle2vuw97dscxundkg6phev0atsa5t0vakzrys8hk5pt5evssm7a0a",
+      "pocketAddress": "0x741aBE8bFBDD5BA21B041DAA9392009BF7F4c745"
+    },
+    {
+      "secretKeyHex": "c90fdaa22168c234c4c6628b80dc1cd129024e088a67cc74020bbea63b14e5c9",
+      "yParity": "even",
+      "spendingKeyHex": "c90fdaa22168c234c4c6628b80dc1cd129024e088a67cc74020bbea63b14e5c9",
+      "spendingKeyIsNegated": false,
+      "xOnlyPubkeyHex": "dd308afec5777e13121fa72b9cc1b7cc0139715309b086c960e18fd969774eb8",
+      "npub": "npub1m5cg4lk9walpxysl5u4eesdhesqnju2npxcgdjtqux8aj6thf6uqgl8y4x",
+      "pocketAddress": "0x47689af7a3866FF2B81aE2cbA32d2C0bfC421f18"
+    },
+    {
+      "secretKeyHex": "16284faaf070d28ea3a14d725b25c35b14189040b55891659bf4747dd226de6d",
+      "yParity": "even",
+      "spendingKeyHex": "16284faaf070d28ea3a14d725b25c35b14189040b55891659bf4747dd226de6d",
+      "spendingKeyIsNegated": false,
+      "xOnlyPubkeyHex": "977c406a4dd40ac47a14434e5a90400fa4254b5e20d3e0b83d4cb3867a76da59",
+      "npub": "npub1ja7yq6jd6s9vg7s5gd894yzqp7jz2j67yrf7pwpafjecv7nkmfvsl95njk",
+      "pocketAddress": "0x9BeD466D3D70e3DFcfF7Db5D23a4495981c72a60"
+    },
+    {
+      "secretKeyHex": "329b0c4ca9b757f9c960a391c07be4280d2d6b719fa780458e0870868339df78",
+      "yParity": "even",
+      "spendingKeyHex": "329b0c4ca9b757f9c960a391c07be4280d2d6b719fa780458e0870868339df78",
+      "spendingKeyIsNegated": false,
+      "xOnlyPubkeyHex": "5b7bdce63e9e192399ac63b0ff4253512d66e6fd305586508391c647a274aa6b",
+      "npub": "npub1tdaaee37ncvj8xdvvwc07sjn2ykkdehaxp2cv5yrj8ry0gn54f4s775dmk",
+      "pocketAddress": "0x1ea755e4bB7a2f71b63b61Ec542B100450EAe24C"
+    },
+    {
+      "secretKeyHex": "3f858fc790328cc1e6f573f46268aa3daed79cb65cd63a0c3e3ed12741b314fa",
+      "yParity": "even",
+      "spendingKeyHex": "3f858fc790328cc1e6f573f46268aa3daed79cb65cd63a0c3e3ed12741b314fa",
+      "spendingKeyIsNegated": false,
+      "xOnlyPubkeyHex": "43bf62a2ff685b82ff273c3d0fabcc494b0a8b58ec6f0a70c77b20db942ae458",
+      "npub": "npub1gwlk9ghldpdc9le88s7sl27vf99s4z6ca3hs5ux80vsdh9p2u3vqzdfm8j",
+      "pocketAddress": "0x942F4e02060823e8f04EB30afe20a723C0e1F29C"
+    },
+    {
+      "secretKeyHex": "fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364140",
+      "yParity": "odd",
+      "spendingKeyHex": "0000000000000000000000000000000000000000000000000000000000000001",
+      "spendingKeyIsNegated": true,
+      "xOnlyPubkeyHex": "79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
+      "npub": "npub10xlxvlhemja6c4dqv22uapctqupfhlxm9h8z3k2e72q4k9hcz7vqpkge6d",
+      "pocketAddress": "0x7E5F4552091A69125d5DfCb7b8C2659029395Bdf"
+    }
+  ]
+}
