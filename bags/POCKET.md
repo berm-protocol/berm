@@ -109,6 +109,62 @@ percentage and a confetti animation is not doing this.
 **"Make it permanent"** is the guard step: back up the key, or move to a bunker.
 Offered, never forced, and never with a modal that punishes closing it.
 
+## The backup is a standard, not a file we invented
+
+Amber does not need a proprietary file. What it needs is the key, and there is a
+standard portable form for it: **NIP-49 `ncryptsec`** — the secret key encrypted
+under a passphrase with scrypt and XChaCha20-Poly1305, bech32-encoded as
+`ncryptsec1…`.
+
+That matters here because it is the *exit*, and we can hand it over at the moment
+they enroll:
+
+```
+  Download your key                              berm-founder-12.ncryptsec
+
+  Encrypted with a passphrase only you know. Import it into Amber, Damus,
+  Alby, nsec.app — or any Nostr signer that exists later.
+
+  This file is also your pocket. The same key opens 0xeb88…
+```
+
+They do not need Amber installed. They do not need to have decided anything. They
+leave with a file that works with whatever they choose, whenever they choose it —
+including nothing, forever.
+
+Four things this design has to get right, and say:
+
+**The key-security byte must be honest.** NIP-49 carries a byte recording whether
+the key was ever handled insecurely: `0x00` insecure, `0x01` secure, `0x02`
+unknown. A key generated in a browser tab **was** handled insecurely, so it is
+`0x00`, and clients that warn the user about it are doing the right thing. Writing
+`0x01` because it looks better would be lying in a field that exists specifically
+to prevent that.
+
+**`log_n` is a real trade-off in a browser.** The parameter runs 16 to 22 — 64 MiB
+to 4 GiB of scrypt memory. A phone browser cannot do the high end. 16 is the
+practical floor and what a mobile tab will survive; anything more must be measured
+on real devices, not chosen because a bigger number reads as safer.
+
+**The passphrase is the entire security.** scrypt buys time against guessing; it
+does not rescue a weak passphrase. Say that on the screen, next to the field, not
+in a help page.
+
+**And never publish it.** NIP-49 says so explicitly, and it is worth repeating
+where a user could be tempted: an `ncryptsec` posted to a relay is a passphrase
+away from being someone else's key, forever, with no way to recall it.
+
+**This is also the escape hatch from tier 1.** A passkey-derived key is bound to
+the signer origin, which is the honest weakness of that tier. Exporting an
+`ncryptsec` is how a user *leaves* — takes the key somewhere we do not control and
+stops depending on one DNS name staying in honest hands. Offering the exit at
+enrollment, before anyone has a reason to distrust us, is the strongest version of
+the claim this project makes.
+
+One consequence to state plainly: because the pocket address derives from the same
+key, **that file is their money as well as their identity.** A passphrase good
+enough for a social identity may not be one they would choose for a wallet.
+
 ## Why they should care beyond the token
 
 The pocket is the hook. It should not be the only thing on the page.
