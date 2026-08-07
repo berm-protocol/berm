@@ -28,7 +28,7 @@ what must not be built. Where this disagrees with `POCKET.md`, this file wins.
 > buyback, the graduation gate, or the cumulative accounting.
 
 Companion artefacts:
-- `vectors/pocket-address.json` — frozen, 10 vectors, both y-parity branches
+- `vectors/pocket-address.json` — **v2**, frozen. 10 vectors, both parity branches at generation, no `nsec` field
 - `POCKET.md` — why the pocket works
 - `SOVEREIGNTY.md` — what may and may not be claimed
 
@@ -275,13 +275,32 @@ clothes, and someone will notice.
 
 ---
 
-## 9. Two things I do not accept from the R2 ruling
+## 9. Two objections, and how they were adjudicated
 
-Everything above adopts it. These two are filed as disagreements rather than
-silently dropped, because a governing document that absorbs objections without
-recording them stops being reviewable.
+> **RESOLVED.** Both were ruled on by `GPT_BERM_HANDOFF_R2_REVIEW_20260807_R1`.
+> Neither is an open instruction to an implementer. They are kept because the
+> reasoning is why the current design looks the way it does.
 
-### The buyback must not be the only exit
+Filed as disagreements rather than silently dropped, because a governing document
+that absorbs objections without recording them stops being reviewable.
+
+### The buyback must not be the only exit  →  **RULED: not V1 (D-10)**
+
+**Do not implement `claimQuote()` in this lane.** The observation below was
+accepted as valid; the mechanism was refused, and the refusal is better reasoned
+than the proposal. An escape needs a deterministic, non-gameable activation
+condition, and every obvious candidate introduces the authority this contract
+exists not to have: an oracle to attest a paused pool, a route-failure window a
+funded claimant can manufacture, a timeout that converts buyback economics into
+optional withdrawal, or an admin switch.
+
+What was conceded is the **disclosure**, and that IS binding: the promise must
+state that *conversion still depends on the committed market route being
+operational*, and that an unavailable route leaves the WETH entitlement preserved
+in the Distributor. Tracked as a separate, explicitly undecided market-failure
+resilience lane.
+
+The original argument follows.
 
 The ruling rejects "direct quote-asset payout replacing the buyback." Agreed as
 stated — replacing it would delete working functionality and change the product.
@@ -307,7 +326,14 @@ fire exit, and a building does not stop being a building because it has one.
 Not implementing it is a decision that can be made. Making it without noticing is
 not.
 
-### Solana case-folding is not stale architecture
+*(End of the original argument. The decision was made deliberately, with the open
+questions named — which is the outcome this section was asking for.)*
+
+### Solana case-folding is not stale architecture  →  **ACCEPTED as a dependency finding**
+
+Not an implementation instruction. **No Solana work in this lane.** The finding is
+a live defect in a third party's production API and belongs in a dependency
+register, which is where it now lives (`bags/README.md`).
 
 The ruling files it alongside superseded designs. It is not a design — it is a
 **live defect in a third party's production API**, verified against the real
