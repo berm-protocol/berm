@@ -3,6 +3,7 @@
 | File | What it is |
 |---|---|
 | [`v2.0-architecture.md`](v2.0-architecture.md) | The normative spec. Threat model, identity architecture, data layer, node boundary, conformance checklist, rejected alternatives. |
+| [`signer-broker.md`](signer-broker.md) | How a third-party application gets a signature from a Berm user without ever touching their key. The request protocol, what an API key does and does not buy, and why attestation is the product rather than a feature. |
 | [`v2.1-amendment.md`](v2.1-amendment.md) | Thirteen changes on top of v2.0 — key wrapping for multi-device, recovery, guardians, two node bug fixes, measured X paste behaviour. |
 
 **Read v2.0 §0 first.** It describes what v1 got catastrophically wrong and why
