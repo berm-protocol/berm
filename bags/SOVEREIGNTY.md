@@ -42,6 +42,59 @@ marketing copy may exceed them:
 If someone reads that and still wants in, they have consented to the real thing.
 If it costs us users, it costs us the users who were going to be angry later.
 
+## What the deal actually is
+
+The promise is not "trustless". It is narrower and it is real:
+
+> **The deal between the developer and the community is immutable.**
+>
+> Not the deal between the community and the launchpad. Not the deal between
+> anyone and the chain. **That one.**
+
+Four things stop being possible the moment the contract is deployed, and they are
+the four ways this is normally broken:
+
+| The usual move | Why it cannot happen |
+|---|---|
+| *"Subscribe and we'll airdrop you something"* — then nothing | The share is committed in the root at deployment. There is no promise to keep, only a payment to execute |
+| *"We've decided to change the allocation"* | No setter. No admin. No owner. The root is `immutable` and there is no function that writes it |
+| *"The campaign is cancelled"* | No pause, no sweep, no withdraw, no deadline. There is no instruction that ends it |
+| *"Your claim is under review"* | Claims are permissionless and pay the address inside the leaf. A stranger can execute your claim, and can only send it to you |
+
+**Not even we can change it.** There is no key we hold, no upgrade path we kept,
+and no argument anyone can make to us that would matter — the contract does not
+have a function that would let us act on it.
+
+What remains outside the deal is the launchpad's control of its own fee routing,
+disclosed in the table above, and that is a limit of the ground we are standing
+on rather than a reservation we made.
+
+## It ports to any EVM chain, and Solana does not come free
+
+The whole construction is chain-agnostic Solidity plus a secp256k1 derivation:
+
+```
+        one distributor contract  ─────────────┐
+        one pocket derivation (npub → address) │  identical on every EVM chain
+                                               │
+   ┌───────────────┬───────────────┬───────────┴──────┐
+   │               │               │                  │
+ Robinhood       BNB             Base              whatever is next
+   │               │               │                  │
+ per-chain ingress: how THAT launchpad is told to pay the contract
+```
+
+The distributor needs no CPI, no adapter and no cross-program call — it only needs
+to **be named as a fee recipient**. So per chain the only new work is that naming
+step, and it is configuration rather than cryptography. Robinhood already
+demonstrates it: `BagsFactory.create()` takes claimer addresses directly, so the
+contract can be the sole claimer from the first block.
+
+**Solana is the exception, and it is not a small one.** Nostr keys are secp256k1;
+Solana keys are ed25519. The pocket cannot be derived from an npub there, and a
+Solana campaign needs its own answer for where money lands. Nothing about the EVM
+elegance carries across, and the claim must not be written as though it does.
+
 ## Why the trust boundary is dev↔user, and why that is enough
 
 The distributor does not need to make Bags trustworthy. It needs to make **one
