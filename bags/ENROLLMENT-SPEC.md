@@ -192,23 +192,71 @@ else's key, permanently, with no recall.
 
 ---
 
-## 4. The subscription
+## 4. The signed enrollment — the wire contract
 
-Existing format in `src/subscribe.ts`, kind 30078, `d = berm:subscribe:v1:<campaign>`.
+**Implemented: [`src/enrollment.ts`](src/enrollment.ts). Tested:
+[`test/enrollment.test.ts`](test/enrollment.test.ts), 21 assertions.**
 
-**Change:** the `address` tag becomes optional. When absent, the pocket address is
-derived from the npub. `buildSubscription` and `parseSubscription` currently reject
-a missing address; both must accept it, and `Subscription.solanaAddress` becomes
-optional.
+The v1 subscription could not distinguish Path A from Path B. It carried an
+address tag, so the only way to tell them apart was to guess from what was
+present — and the dangerous guess is the quiet one: *"no address, so derive from
+the npub"*. For an existing Nostr user that names a plausible, fundable,
+unopenable address.
 
-Slot assignment is unchanged and stays npub-only — `assignBatches` reads
-`observed: string[]` and never touches an address. **Say so in the interface:** the
-slot is bound to the npub at signature time and nothing can take it.
+**The mode is now stated in the signed object**, and in the signed control
+message, so it can be neither inferred nor lifted between modes.
 
-Optional, and worth doing: a wallet signature over the npub when a user *does* name
-an explicit address, proving they control it. Today that tag is unverified.
+```
+kind    30078
+d       berm:enroll:v2:<campaign>
+tags    campaign · mode · chain=evm · address · evm_proof · alt · handle?
+mode    derived_v1 | bound_wallet_v1        ← versioned, no default
+```
 
----
+The EVM key signs one canonical preimage, which binds campaign AND mode:
+
+```
+berm.enroll.v2 ‖ campaign ‖ mode ‖ npub_hex ‖ evm_address_lowercase
+```
+
+### The invariant
+
+> **No cohort root may commit an EVM destination unless control of that exact
+> destination has been proven.**
+
+Both modes require `evm_proof`. Neither is exempt. In `derived_v1` it proves the
+parity normalisation happened — that the exported secret opens the committed
+address. In `bound_wallet_v1` it proves the wallet is the user's.
+
+### Validation
+
+`derived_v1` — recompute the canonical address from the npub, require the
+committed address to equal it, verify the proof recovers to that exact address.
+**A missing derivation is not a pass**: unvalidated is not valid.
+
+`bound_wallet_v1` — require an explicit address, verify the proof recovers to it,
+and **reject an address equal to the derived one** — that is Path A wearing Path
+B's label, and the two carry different promises about what the user was asked to
+understand.
+
+### Fail closed
+
+Rejected, every one: missing mode · unknown mode · missing address · missing or
+malformed proof · proof recovering to a different address · `derived_v1` with a
+non-canonical address · `bound_wallet_v1` naming the derived address · a proof
+made for another mode or another campaign · **duplicate tags**, because two
+`mode` tags means two readers can reach two conclusions about one signed object.
+
+There is **no rule anywhere** saying a missing address means derive from the npub.
+
+### Rebinding
+
+A later valid enrollment supersedes an earlier one **only before the cohort root
+containing the destination is finalised**. After finalisation the destination is
+inside the leaf and inside the root, so it is frozen.
+
+Slot assignment is unchanged and stays npub-only: `assignBatches` reads
+`observed: string[]` and never touches an address.
 
 ## 5. `nostrconnect://` QR
 

@@ -1,3 +1,13 @@
+<!-- STATUS: HISTORICAL_SPEC / SOLANA / HOLD / NOT_IMPLEMENTABLE_AS_WRITTEN -->
+
+> # ⚠ HISTORICAL — EVIDENCE ONLY, NOT CURRENT AUTHORITY
+>
+> `HISTORICAL_SPEC / SOLANA / HOLD / NOT_IMPLEMENTABLE_AS_WRITTEN`
+>
+> A Solana distributor design that returned HOLD from adversarial review with five open CRITICAL findings. No Solana work is in scope. Retained for the findings, not the design.
+>
+> Must not participate in current authority resolution.
+
 # Berm Distributor — specification for review
 
 > ## ⚠ R1 REVIEW: HOLD — DO NOT IMPLEMENT FROM THIS DOCUMENT

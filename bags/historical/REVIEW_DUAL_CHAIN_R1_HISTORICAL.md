@@ -1,3 +1,20 @@
+<!-- STATUS: HISTORICAL_REVIEW / SUPERSEDED_ROBINHOOD_OWNERSHIP_INFERENCE / LATER_FORK_EVIDENCE_CONTROLS -->
+
+> # ⚠ HISTORICAL — EVIDENCE ONLY, NOT CURRENT AUTHORITY
+>
+> `HISTORICAL_REVIEW / SUPERSEDED_ROBINHOOD_OWNERSHIP_INFERENCE / LATER_FORK_EVIDENCE_CONTROLS`
+>
+> **The specific inference that is dead:** this review reasoned that the Berm
+> launch controller could call `renounceOwnership()` on `BagsFeeShare` and thereby
+> make `setClaimers` permanently unreachable. It cannot.
+>
+> A fork test against the live chain at **block 28814524** showed
+> `BagsFeeShare.owner()` after `BagsFactory.create()` is the **factory owner**, so
+> the call reverts with `OwnableUnauthorizedAccount`. Later fork evidence controls.
+>
+> Discard the assumption; keep the receipt. Everything else here is retained
+> unedited as the reviewed artefact.
+
 # Review — `BERM_DUAL_CHAIN_SIMPLIFIED_MECHANICS_BUILD_SPEC_20260804_R1`
 
 Reviewed 2026-08-04 against the live Bags API (probed with a real key, GETs only),

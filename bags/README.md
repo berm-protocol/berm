@@ -5,7 +5,7 @@ identity fragility a Bags launch inherits.
 
 ```bash
 npm ci
-npm test          # 160 assertions, offline, no API key
+npm test          # 181 assertions, offline, no API key
 npm run build     # the dispute screen → dist/dispute.html
 npm run verify    # 26 browser checks, mostly about what it refuses to say
 npm run probe     # read-only; needs BAGS_API_KEY
@@ -420,7 +420,7 @@ that looked live would be the same overstatement in a nicer font.
 
 ## The distributor — specified, not built
 
-[`DISTRIBUTOR-SPEC.md`](DISTRIBUTOR-SPEC.md) is a Solana program written down
+[`historical/DISTRIBUTOR_SPEC_SOLANA_R1_HOLD.md`](historical/DISTRIBUTOR_SPEC_SOLANA_R1_HOLD.md) is a Solana program written down
 before any Rust exists, so it can be attacked while attacking it is still cheap.
 
 **The party it defends against is the launching developer.** That is unusual and
@@ -471,7 +471,7 @@ Which is the argument for publishing an unbuilt spec: intentions are cheap to
 correct, and an immutable program holding other people's money cannot be corrected
 at all.
 
-[`REVIEW-DUAL-CHAIN-R1.md`](REVIEW-DUAL-CHAIN-R1.md) reviews a two-chain build
+[`historical/REVIEW_DUAL_CHAIN_R1_HISTORICAL.md`](historical/REVIEW_DUAL_CHAIN_R1_HISTORICAL.md) reviews a two-chain build
 spec proposed on top of all this. Its cumulative range math is exact — verified
 over 3,000 revenue values at both nesting levels, zero dust. Its Solana half is
 blocked by the case-folding finding above. And two of its rules combine to strand
@@ -496,7 +496,7 @@ BIP-340 odd-y normalisation. Enrollment therefore asks for a signature and nothi
 else: no address field, no wallet, no way to lose a share by forgetting. And no new
 cryptography in the contract, because the leaf still commits an ordinary address.
 
-[`SOVEREIGNTY.md`](SOVEREIGNTY.md) is the disclosure that came out of it: every
+[`SOVEREIGNTY.md`](SOVEREIGNTY.md) — canonical R4 — is the disclosure that came out of it: every
 layer, who can break it, and the two sentences no marketing copy may exceed. It
 also specifies the **minimum shippable contract** — claim-only, no admin, no
 sweep, no upgrade, epochs are deployments — which removes five of the six CRITICAL
