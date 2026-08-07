@@ -114,7 +114,23 @@ That is a smaller promise than "trustless launchpad" and it is a real one. It is
 also the promise Bags cannot make for us, which is the argument for building it —
 and, if it works, the argument to bring to them.
 
-## The minimum shippable contract
+## ⚠ QUARANTINED — the minimum shippable contract
+
+> **Superseded for BermLaunch.** `GPT_BERM_HANDOFF_R2_REVIEW_20260807_R1` (D-09)
+> preserves the existing lifecycle: cumulative WETH pockets, verified graduation,
+> and a supporter-authorized full-pocket fixed-route buyback. The design below —
+> claim-only, manually funded, one root fixed at deployment, quote-asset payout —
+> is a **predecessor architecture**, not a correction to it.
+>
+> It is kept because the reasoning inside it is still sound and was arrived at
+> honestly, and because deleting a superseded design hides why the current one
+> looks the way it does. Do not build from it.
+>
+> **`claimQuote()` in particular is NOT approved for V1** (D-10). The liveness
+> observation behind it was accepted as valid; the mechanism was not, and the
+> reasons are good ones — see the note at the end of this file.
+
+### The predecessor design, retained for reference
 
 Everything in `DISTRIBUTOR-SPEC.md` that is HOLD comes from features v1 does not
 need. Cutting them removes five of six CRITICAL findings outright, because the
@@ -191,3 +207,43 @@ kind of bounty worth running.
 
 *This file is a disclosure, not a design document. If the design changes and this
 file does not, the design is wrong.*
+
+
+---
+
+## On `claimQuote()`, and why the ruling is right
+
+I argued that if the only exit is a swap, a paused or illiquid pool leaves a
+supporter unable to claim anything — and that this collides with the
+website-independent acceptance test, which ends *"receive launched tokens"* and
+therefore quietly assumes a working market.
+
+The observation was accepted (D-10). The mechanism was not, and on reflection the
+refusal is better reasoned than the proposal. An emergency quote withdrawal needs
+an activation condition that is **deterministic and non-gameable**, and every
+obvious candidate fails:
+
+| Condition | Why it fails |
+|---|---|
+| "the pool is paused" | who attests it? An oracle is a new authority |
+| "no route for N days" | a claimant with capital can manufacture a failing route |
+| a timeout | converts buyback economics into optional quote withdrawal for everyone |
+| an admin switch | is an admin, which is the thing this contract exists not to have |
+
+Getting `claimQuote()` built badly would have been worse than not having it — it
+would have introduced exactly the authority the whole design refuses.
+
+**What I actually wanted was the disclosure, and that was conceded.** The promise
+is now stated at the size it holds:
+
+- entitlement does not expire
+- website availability is not required
+- the user can construct the claim independently
+- **conversion still depends on the committed market route being operational**
+- if the route is unavailable, the WETH entitlement remains preserved in the
+  Distributor
+
+That fourth line is the one that was missing. It is now the difference between a
+claim that survives contact with a dead pool and one that does not.
+
+Tracked as an open market-failure resilience lane, undecided rather than closed.

@@ -1,5 +1,34 @@
 # The pocket — sign once, yours forever
 
+> ## ⚠ SUPERSEDED IN PART — read `ENROLLMENT-SPEC.md` first
+>
+> Adjudicated by `GPT_BERM_HANDOFF_R2_REVIEW_20260807_R1`, decisions D-01…D-10.
+>
+> **What still stands:** the derivation, the vectors, the NIP-49 backup, and the
+> reasoning about custody cost.
+>
+> **What changed:** this file describes the pocket as if every user gets one.
+> They do not. It is **Path A only** — users arriving with no Nostr identity.
+> A user with an existing npub (NIP-07, NIP-46, any signer) supplies an
+> **ordinary EVM wallet**, dual-signed against their npub. Never derived
+> silently. (D-02, D-03, D-04)
+>
+> **And "pocket" means something narrower than this file implies.** In
+> BermLaunch the pocket is the **cumulative virtual WETH entitlement inside the
+> immutable Distributor**. The EVM address is the *authority* that spends it and
+> the *destination* the launched token is delivered to — it is not somewhere the
+> WETH gets pushed to first. The lifecycle is preserved intact (D-09):
+>
+> ```
+> Bags fees → Distributor → cumulative WETH pocket → verified graduation
+>           → supporter-authorized full-pocket fixed-route buyback
+>           → launched token to the committed EVM destination
+> ```
+>
+> **And the parity handling here is out of date.** This file kept the raw key and
+> a separate spending key. The secret is now normalised **at generation**, so the
+> exported secret directly controls the displayed address. `vectors/` is v2.
+
 > **You sign. Your pocket is yours. Forever. Your share of the pool never moves,
 > and only your key can open it.**
 
@@ -76,10 +105,12 @@ never hide.
 | | Path | What the user does | Custody |
 |---|---|---|---|
 | Already equipped | NIP-07 extension — Alby, nos2x | one click | tier 0 — depends on the extension vendor |
-| Mobile | Bunker — Amber, Damus, nsec.app | scan a QR, approve | tier 2 — **key never leaves the device** |
+| Mobile | Bunker — Amber, Damus, nsec.app | scan a QR, approve | tier 2 — **depends on what that signer actually is**; Amber is a phone, nsec.app is a web service |
 | Nothing yet | Passkey at the signer origin | tap Face ID | tier 1 — depends on one DNS name |
 
-Order them by what the user already has, not by what we prefer. Someone arriving
+**Order superseded — see `ENROLLMENT-SPEC.md` §1.** Paths are now ranked by how
+little the user ends up depending on us, with create-and-download as the default.
+The principle below still holds and is why option 0 exists at all: Someone arriving
 with Alby installed has already made a custody decision, and overriding it to push
 our own signer would be the exact behaviour this project claims to be an
 alternative to.
