@@ -131,7 +131,7 @@ not deserve to exist.
 d      = raw if y(raw·G) is even else (n − raw)    ← AT GENERATION
 xonly  = x-coordinate of d·G, 32 bytes
 npub   = bech32('npub', xonly)
-nsec   = bech32('nsec', d)                          ← what the user exports
+                                                    (the user exports d, bech32 as nsec)
 addr   = keccak256(x ‖ y)[12:] of d·G, EIP-55
 ```
 

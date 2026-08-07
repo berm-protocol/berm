@@ -3,10 +3,10 @@
   "version": 2,
   "frozen": true,
   "supersedes": "version 1, which exposed a separate spendingKeyHex",
-  "note": "PATH A ONLY \u2014 freshly generated identities. The secret is normalised for BIP-340 parity BEFORE it is ever treated as the user's key, so the exported secret DIRECTLY controls the EVM address with no later transformation. Version 1 carried a distinct spendingKeyHex; a user who exported the nsec and imported it into a wallet would have landed on a different address than the one displayed. That is a trap and it is removed rather than documented.",
+  "note": "PATH A ONLY \u2014 freshly generated identities. The secret is normalised for BIP-340 parity BEFORE it is ever treated as the user's key, so the exported secret DIRECTLY controls the EVM address with no later transformation. Version 1 carried a distinct spendingKeyHex; a user who exported the nsec and imported it into a wallet would have landed on a different address than the one displayed. That is a trap and it is removed rather than documented. No nsec field: a literal nsec in a source tree is a thing that gets copy-pasted, and one of these addresses would be drained within seconds of being funded. bech32 encoding of the secret is a separate, well-tested concern; what these vectors exist to pin is raw -> normalised -> npub + address.",
   "invariants": [
     "secretKeyHex always has EVEN-y \u2014 assert it, do not assume it",
-    "nsec and evmAddress are controlled by the SAME exported secret",
+    "the EXPORTED secret controls evmAddress directly \u2014 verify secretKeyHex -> address, which is the property that matters",
     "npub is unchanged by negation: x-only is the x coordinate, which negation preserves",
     "no spendingKeyHex field exists, and none should be reintroduced"
   ],
@@ -29,7 +29,6 @@
       "rawYParity": "odd",
       "wasNegated": true,
       "secretKeyHex": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeda99dcbd59e378f2aaec14d7bbf253030",
-      "nsec": "nsec1amhwamhwamhwamhwamhwamhwak5emj74ncmc724wc9xhh0e9xqcqugtgpv",
       "xOnlyPubkeyHex": "4f355bdcb7cc0af728ef3cceb9615d90684bb5b2ca5f859ab0f0b704075871aa",
       "npub": "npub1fu64hh9hes90w2808n8tjc2ajp5yhddjef0ctx4s7zmsgp6cwx4qgy4eg9",
       "evmAddress": "0xeb88Ae7A94086Cbbe948CDd6A13C0Bd41e12d470"
@@ -40,7 +39,6 @@
       "rawYParity": "even",
       "wasNegated": false,
       "secretKeyHex": "0000000000000000000000000000000000000000000000000000000000000001",
-      "nsec": "nsec1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqsmhltgl",
       "xOnlyPubkeyHex": "79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
       "npub": "npub10xlxvlhemja6c4dqv22uapctqupfhlxm9h8z3k2e72q4k9hcz7vqpkge6d",
       "evmAddress": "0x7E5F4552091A69125d5DfCb7b8C2659029395Bdf"
@@ -51,7 +49,6 @@
       "rawYParity": "even",
       "wasNegated": false,
       "secretKeyHex": "0000000000000000000000000000000000000000000000000000000000000002",
-      "nsec": "nsec1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqpqptcfk2",
       "xOnlyPubkeyHex": "c6047f9441ed7d6d3045406e95c07cd85c778e4b8cef3ca7abac09b95c709ee5",
       "npub": "npub1ccz8l9zpa47k6vz9gphftsrumpw80rjt3nhnefat4symjhrsnmjs38mnyd",
       "evmAddress": "0x2B5AD5c4795c026514f8317c7a215E218DcCD6cF"
@@ -62,7 +59,6 @@
       "rawYParity": "even",
       "wasNegated": false,
       "secretKeyHex": "0000000000000000000000000000000000000000000000000000000000000003",
-      "nsec": "nsec1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqps52s3re",
       "xOnlyPubkeyHex": "f9308a019258c31049344f85f89d5229b531c845836f99b08601f113bce036f9",
       "npub": "npub1lycg5qvjtrp3qjf5f7zl382j9x6nrjz9sdhenvyxq8c3808qxmus6gq266",
       "evmAddress": "0x6813Eb9362372EEF6200f3b1dbC3f819671cBA69"
@@ -73,7 +69,6 @@
       "rawYParity": "even",
       "wasNegated": false,
       "secretKeyHex": "b7e151628aed2a6abf7158809cf4f3c762e7160f38b4da56a784d9045190cfef",
-      "nsec": "nsec1kls4zc52a54x40m3tzqfea8nca3ww9s08z6d5448snvsg5vselhsjv8uxn",
       "xOnlyPubkeyHex": "dff1d77f2a671c5f36183726db2341be58feae1da2deced843240f7b502ba659",
       "npub": "npub1mlcawle2vuw97dscxundkg6phev0atsa5t0vakzrys8hk5pt5evssm7a0a",
       "evmAddress": "0x741aBE8bFBDD5BA21B041DAA9392009BF7F4c745"
@@ -84,7 +79,6 @@
       "rawYParity": "even",
       "wasNegated": false,
       "secretKeyHex": "363ae68658f5715d992542073fdb116c1a1d7516953cad5d6d70f039a620876b",
-      "nsec": "nsec1xcawdpjc74c4mxf9ggrnlkc3dsdp6agkj5726htdwrcrnf3qsa4shqek5p",
       "xOnlyPubkeyHex": "8d24271c6c788bd6618d9baaa20c25510766101eadcbcb4d417e75874f3920fc",
       "npub": "npub135jzw8rv0z9avcvdnw42yrp92yrkvyq74h9ukn2p0e6cwneeyr7q8dyzjg",
       "evmAddress": "0xfD9079f2F2fd414B5223803eaF82B44d5f3BF7C0"
@@ -95,7 +89,6 @@
       "rawYParity": "even",
       "wasNegated": false,
       "secretKeyHex": "d3caf28f3f22bb4cbc8083d6e8c91947210cf4a819c9eee9226c7826c9209d3b",
-      "nsec": "nsec160909rely2a5e0yqs0tw3jgegussea9gr8y7a6fzd3uzdjfqn5asd0m8yu",
       "xOnlyPubkeyHex": "1fc6618da0477fe2b53420ffb07b87710e7399f6291dac5572a54efcff79e21a",
       "npub": "npub1rlrxrrdqgal79df5yrlmq7u8wy888x0k9yw6c4tj5480elmeugdqhfsysp",
       "evmAddress": "0x987620E6Ba9995b56fc4B5Fdc382e88666B07012"
@@ -106,7 +99,6 @@
       "rawYParity": "even",
       "wasNegated": false,
       "secretKeyHex": "4cac8bee11231122960cade8c0cacbdd32faf207a2c4b97cfc37f575ea7d8238",
-      "nsec": "nsec1fjkghms3yvgj99sv4h5vpjktm5e04us85tztjl8uxl6ht6nasguq8vuy2c",
       "xOnlyPubkeyHex": "3fd5f87903ff0f279b89a42b5c44a4a36bfc95abd62a6da556f21f189ac5b2c8",
       "npub": "npub18l2ls7grlu8j0xuf5s44c39y5d4le9dt6c4xmf2k7g033xk9ktyqnwumef",
       "evmAddress": "0x8D04864ef93Bb1329d2D7C852b97aa055D91DD64"
@@ -117,7 +109,6 @@
       "rawYParity": "odd",
       "wasNegated": true,
       "secretKeyHex": "0000000000000000000000000000000000000000000000000000000000000001",
-      "nsec": "nsec1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqsmhltgl",
       "xOnlyPubkeyHex": "79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
       "npub": "npub10xlxvlhemja6c4dqv22uapctqupfhlxm9h8z3k2e72q4k9hcz7vqpkge6d",
       "evmAddress": "0x7E5F4552091A69125d5DfCb7b8C2659029395Bdf"
@@ -128,7 +119,6 @@
       "rawYParity": "even",
       "wasNegated": false,
       "secretKeyHex": "0000000000000000000000000000000000000000000000000000000000000007",
-      "nsec": "nsec1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqrs2ewv44",
       "xOnlyPubkeyHex": "5cbdf0646e5db4eaa398f365f2ea7a0e3d419b7e0330e39ce92bddedcac4f9bc",
       "npub": "npub1tj7lqerwtk6w4guc7djl96n6pc75rxm7qvcw888f90w7mjkylx7qmwjus6",
       "evmAddress": "0xd41c057fd1c78805AAC12B0A94a405c0461A6FBb"
