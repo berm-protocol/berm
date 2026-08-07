@@ -1,109 +1,137 @@
 {
-  "name": "berm/pocket/npub-to-evm-address",
-  "version": 1,
+  "name": "berm/pocket/generated-identity",
+  "version": 2,
   "frozen": true,
-  "note": "A Nostr key is a secp256k1 keypair, so every npub has one canonical EVM address. BIP-340 x-only pubkeys are the EVEN-y point, so a secret key whose point has ODD y must be negated (n - d) to obtain the key that actually controls the derived address. spendingKeyIsNegated marks those cases. Any implementation that ignores it produces a plausible address that nobody can spend from.",
+  "supersedes": "version 1, which exposed a separate spendingKeyHex",
+  "note": "PATH A ONLY \u2014 freshly generated identities. The secret is normalised for BIP-340 parity BEFORE it is ever treated as the user's key, so the exported secret DIRECTLY controls the EVM address with no later transformation. Version 1 carried a distinct spendingKeyHex; a user who exported the nsec and imported it into a wallet would have landed on a different address than the one displayed. That is a trap and it is removed rather than documented.",
+  "invariants": [
+    "secretKeyHex always has EVEN-y \u2014 assert it, do not assume it",
+    "nsec and evmAddress are controlled by the SAME exported secret",
+    "npub is unchanged by negation: x-only is the x coordinate, which negation preserves",
+    "no spendingKeyHex field exists, and none should be reintroduced"
+  ],
   "derivation": [
-    "xonly = x-coordinate of d*G, 32 bytes",
-    "point = 0x02 || xonly            (BIP-340: even y)",
-    "addr  = keccak256(x || y)[12:]   (uncompressed point, 04 prefix removed)",
-    "spendingKey = d if y(d*G) is even else (n - d)"
+    "d = raw if y(raw*G) even else n - raw   <-- AT GENERATION",
+    "xonly = x(d*G)",
+    "npub = bech32('npub', xonly)",
+    "nsec = bech32('nsec', d)",
+    "evmAddress = keccak256(x || y)[12:] of d*G, EIP-55 checksummed"
   ],
   "coverage": {
     "total": 10,
-    "evenY": 8,
-    "oddY": 2
+    "rawEvenY": 8,
+    "rawOddY_negated": 2
   },
   "vectors": [
     {
-      "secretKeyHex": "1111111111111111111111111111111111111111111111111111111111111111",
-      "yParity": "odd",
-      "spendingKeyHex": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeda99dcbd59e378f2aaec14d7bbf253030",
-      "spendingKeyIsNegated": true,
+      "note": "odd-y raw: MUST be negated at generation",
+      "rawGeneratedHex": "1111111111111111111111111111111111111111111111111111111111111111",
+      "rawYParity": "odd",
+      "wasNegated": true,
+      "secretKeyHex": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeda99dcbd59e378f2aaec14d7bbf253030",
+      "nsec": "nsec1amhwamhwamhwamhwamhwamhwak5emj74ncmc724wc9xhh0e9xqcqugtgpv",
       "xOnlyPubkeyHex": "4f355bdcb7cc0af728ef3cceb9615d90684bb5b2ca5f859ab0f0b704075871aa",
       "npub": "npub1fu64hh9hes90w2808n8tjc2ajp5yhddjef0ctx4s7zmsgp6cwx4qgy4eg9",
-      "pocketAddress": "0xeb88Ae7A94086Cbbe948CDd6A13C0Bd41e12d470"
+      "evmAddress": "0xeb88Ae7A94086Cbbe948CDd6A13C0Bd41e12d470"
     },
     {
+      "note": "even-y raw. Canonical: key 1 -> the well-known address",
+      "rawGeneratedHex": "0000000000000000000000000000000000000000000000000000000000000001",
+      "rawYParity": "even",
+      "wasNegated": false,
       "secretKeyHex": "0000000000000000000000000000000000000000000000000000000000000001",
-      "yParity": "even",
-      "spendingKeyHex": "0000000000000000000000000000000000000000000000000000000000000001",
-      "spendingKeyIsNegated": false,
+      "nsec": "nsec1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqsmhltgl",
       "xOnlyPubkeyHex": "79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
       "npub": "npub10xlxvlhemja6c4dqv22uapctqupfhlxm9h8z3k2e72q4k9hcz7vqpkge6d",
-      "pocketAddress": "0x7E5F4552091A69125d5DfCb7b8C2659029395Bdf"
+      "evmAddress": "0x7E5F4552091A69125d5DfCb7b8C2659029395Bdf"
     },
     {
+      "note": "even-y raw",
+      "rawGeneratedHex": "0000000000000000000000000000000000000000000000000000000000000002",
+      "rawYParity": "even",
+      "wasNegated": false,
       "secretKeyHex": "0000000000000000000000000000000000000000000000000000000000000002",
-      "yParity": "even",
-      "spendingKeyHex": "0000000000000000000000000000000000000000000000000000000000000002",
-      "spendingKeyIsNegated": false,
+      "nsec": "nsec1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqpqptcfk2",
       "xOnlyPubkeyHex": "c6047f9441ed7d6d3045406e95c07cd85c778e4b8cef3ca7abac09b95c709ee5",
       "npub": "npub1ccz8l9zpa47k6vz9gphftsrumpw80rjt3nhnefat4symjhrsnmjs38mnyd",
-      "pocketAddress": "0x2B5AD5c4795c026514f8317c7a215E218DcCD6cF"
+      "evmAddress": "0x2B5AD5c4795c026514f8317c7a215E218DcCD6cF"
     },
     {
+      "note": "even-y raw",
+      "rawGeneratedHex": "0000000000000000000000000000000000000000000000000000000000000003",
+      "rawYParity": "even",
+      "wasNegated": false,
       "secretKeyHex": "0000000000000000000000000000000000000000000000000000000000000003",
-      "yParity": "even",
-      "spendingKeyHex": "0000000000000000000000000000000000000000000000000000000000000003",
-      "spendingKeyIsNegated": false,
+      "nsec": "nsec1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqps52s3re",
       "xOnlyPubkeyHex": "f9308a019258c31049344f85f89d5229b531c845836f99b08601f113bce036f9",
       "npub": "npub1lycg5qvjtrp3qjf5f7zl382j9x6nrjz9sdhenvyxq8c3808qxmus6gq266",
-      "pocketAddress": "0x6813Eb9362372EEF6200f3b1dbC3f819671cBA69"
+      "evmAddress": "0x6813Eb9362372EEF6200f3b1dbC3f819671cBA69"
     },
     {
+      "note": "BIP-340 test vector key",
+      "rawGeneratedHex": "b7e151628aed2a6abf7158809cf4f3c762e7160f38b4da56a784d9045190cfef",
+      "rawYParity": "even",
+      "wasNegated": false,
       "secretKeyHex": "b7e151628aed2a6abf7158809cf4f3c762e7160f38b4da56a784d9045190cfef",
-      "yParity": "even",
-      "spendingKeyHex": "b7e151628aed2a6abf7158809cf4f3c762e7160f38b4da56a784d9045190cfef",
-      "spendingKeyIsNegated": false,
+      "nsec": "nsec1kls4zc52a54x40m3tzqfea8nca3ww9s08z6d5448snvsg5vselhsjv8uxn",
       "xOnlyPubkeyHex": "dff1d77f2a671c5f36183726db2341be58feae1da2deced843240f7b502ba659",
       "npub": "npub1mlcawle2vuw97dscxundkg6phev0atsa5t0vakzrys8hk5pt5evssm7a0a",
-      "pocketAddress": "0x741aBE8bFBDD5BA21B041DAA9392009BF7F4c745"
+      "evmAddress": "0x741aBE8bFBDD5BA21B041DAA9392009BF7F4c745"
     },
     {
-      "secretKeyHex": "c90fdaa22168c234c4c6628b80dc1cd129024e088a67cc74020bbea63b14e5c9",
-      "yParity": "even",
-      "spendingKeyHex": "c90fdaa22168c234c4c6628b80dc1cd129024e088a67cc74020bbea63b14e5c9",
-      "spendingKeyIsNegated": false,
-      "xOnlyPubkeyHex": "dd308afec5777e13121fa72b9cc1b7cc0139715309b086c960e18fd969774eb8",
-      "npub": "npub1m5cg4lk9walpxysl5u4eesdhesqnju2npxcgdjtqux8aj6thf6uqgl8y4x",
-      "pocketAddress": "0x47689af7a3866FF2B81aE2cbA32d2C0bfC421f18"
+      "note": "derived from a label",
+      "rawGeneratedHex": "363ae68658f5715d992542073fdb116c1a1d7516953cad5d6d70f039a620876b",
+      "rawYParity": "even",
+      "wasNegated": false,
+      "secretKeyHex": "363ae68658f5715d992542073fdb116c1a1d7516953cad5d6d70f039a620876b",
+      "nsec": "nsec1xcawdpjc74c4mxf9ggrnlkc3dsdp6agkj5726htdwrcrnf3qsa4shqek5p",
+      "xOnlyPubkeyHex": "8d24271c6c788bd6618d9baaa20c25510766101eadcbcb4d417e75874f3920fc",
+      "npub": "npub135jzw8rv0z9avcvdnw42yrp92yrkvyq74h9ukn2p0e6cwneeyr7q8dyzjg",
+      "evmAddress": "0xfD9079f2F2fd414B5223803eaF82B44d5f3BF7C0"
     },
     {
-      "secretKeyHex": "16284faaf070d28ea3a14d725b25c35b14189040b55891659bf4747dd226de6d",
-      "yParity": "even",
-      "spendingKeyHex": "16284faaf070d28ea3a14d725b25c35b14189040b55891659bf4747dd226de6d",
-      "spendingKeyIsNegated": false,
-      "xOnlyPubkeyHex": "977c406a4dd40ac47a14434e5a90400fa4254b5e20d3e0b83d4cb3867a76da59",
-      "npub": "npub1ja7yq6jd6s9vg7s5gd894yzqp7jz2j67yrf7pwpafjecv7nkmfvsl95njk",
-      "pocketAddress": "0x9BeD466D3D70e3DFcfF7Db5D23a4495981c72a60"
+      "note": "derived from a label",
+      "rawGeneratedHex": "d3caf28f3f22bb4cbc8083d6e8c91947210cf4a819c9eee9226c7826c9209d3b",
+      "rawYParity": "even",
+      "wasNegated": false,
+      "secretKeyHex": "d3caf28f3f22bb4cbc8083d6e8c91947210cf4a819c9eee9226c7826c9209d3b",
+      "nsec": "nsec160909rely2a5e0yqs0tw3jgegussea9gr8y7a6fzd3uzdjfqn5asd0m8yu",
+      "xOnlyPubkeyHex": "1fc6618da0477fe2b53420ffb07b87710e7399f6291dac5572a54efcff79e21a",
+      "npub": "npub1rlrxrrdqgal79df5yrlmq7u8wy888x0k9yw6c4tj5480elmeugdqhfsysp",
+      "evmAddress": "0x987620E6Ba9995b56fc4B5Fdc382e88666B07012"
     },
     {
-      "secretKeyHex": "329b0c4ca9b757f9c960a391c07be4280d2d6b719fa780458e0870868339df78",
-      "yParity": "even",
-      "spendingKeyHex": "329b0c4ca9b757f9c960a391c07be4280d2d6b719fa780458e0870868339df78",
-      "spendingKeyIsNegated": false,
-      "xOnlyPubkeyHex": "5b7bdce63e9e192399ac63b0ff4253512d66e6fd305586508391c647a274aa6b",
-      "npub": "npub1tdaaee37ncvj8xdvvwc07sjn2ykkdehaxp2cv5yrj8ry0gn54f4s775dmk",
-      "pocketAddress": "0x1ea755e4bB7a2f71b63b61Ec542B100450EAe24C"
+      "note": "derived from a label",
+      "rawGeneratedHex": "4cac8bee11231122960cade8c0cacbdd32faf207a2c4b97cfc37f575ea7d8238",
+      "rawYParity": "even",
+      "wasNegated": false,
+      "secretKeyHex": "4cac8bee11231122960cade8c0cacbdd32faf207a2c4b97cfc37f575ea7d8238",
+      "nsec": "nsec1fjkghms3yvgj99sv4h5vpjktm5e04us85tztjl8uxl6ht6nasguq8vuy2c",
+      "xOnlyPubkeyHex": "3fd5f87903ff0f279b89a42b5c44a4a36bfc95abd62a6da556f21f189ac5b2c8",
+      "npub": "npub18l2ls7grlu8j0xuf5s44c39y5d4le9dt6c4xmf2k7g033xk9ktyqnwumef",
+      "evmAddress": "0x8D04864ef93Bb1329d2D7C852b97aa055D91DD64"
     },
     {
-      "secretKeyHex": "3f858fc790328cc1e6f573f46268aa3daed79cb65cd63a0c3e3ed12741b314fa",
-      "yParity": "even",
-      "spendingKeyHex": "3f858fc790328cc1e6f573f46268aa3daed79cb65cd63a0c3e3ed12741b314fa",
-      "spendingKeyIsNegated": false,
-      "xOnlyPubkeyHex": "43bf62a2ff685b82ff273c3d0fabcc494b0a8b58ec6f0a70c77b20db942ae458",
-      "npub": "npub1gwlk9ghldpdc9le88s7sl27vf99s4z6ca3hs5ux80vsdh9p2u3vqzdfm8j",
-      "pocketAddress": "0x942F4e02060823e8f04EB30afe20a723C0e1F29C"
-    },
-    {
-      "secretKeyHex": "fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364140",
-      "yParity": "odd",
-      "spendingKeyHex": "0000000000000000000000000000000000000000000000000000000000000001",
-      "spendingKeyIsNegated": true,
+      "note": "n-1: raw is odd-y, negation yields 1",
+      "rawGeneratedHex": "fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364140",
+      "rawYParity": "odd",
+      "wasNegated": true,
+      "secretKeyHex": "0000000000000000000000000000000000000000000000000000000000000001",
+      "nsec": "nsec1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqsmhltgl",
       "xOnlyPubkeyHex": "79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
       "npub": "npub10xlxvlhemja6c4dqv22uapctqupfhlxm9h8z3k2e72q4k9hcz7vqpkge6d",
-      "pocketAddress": "0x7E5F4552091A69125d5DfCb7b8C2659029395Bdf"
+      "evmAddress": "0x7E5F4552091A69125d5DfCb7b8C2659029395Bdf"
+    },
+    {
+      "note": "small key",
+      "rawGeneratedHex": "0000000000000000000000000000000000000000000000000000000000000007",
+      "rawYParity": "even",
+      "wasNegated": false,
+      "secretKeyHex": "0000000000000000000000000000000000000000000000000000000000000007",
+      "nsec": "nsec1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqrs2ewv44",
+      "xOnlyPubkeyHex": "5cbdf0646e5db4eaa398f365f2ea7a0e3d419b7e0330e39ce92bddedcac4f9bc",
+      "npub": "npub1tj7lqerwtk6w4guc7djl96n6pc75rxm7qvcw888f90w7mjkylx7qmwjus6",
+      "evmAddress": "0xd41c057fd1c78805AAC12B0A94a405c0461A6FBb"
     }
   ]
 }

@@ -15,14 +15,27 @@ ranking — a tier 2 user is not a better user than a tier 0 one.
 On exactly one axis it *is* a ranking, and that axis is the whole point of this
 project, so it gets [its own section](#what-tier-1-costs) rather than a footnote:
 **whether your key stays exclusively yours depends on nobody, or depends on
-somebody.** Tier 1 depends on somebody. Tiers 0 and 2 do not.
+somebody.** Every tier depends on somebody. They differ in *who*, and in whether
+the user gets to choose them.
 
 | Tier | Key lives in | Exclusivity depends on | Status |
 |---|---|---|---|
 | 0 | A NIP-07 browser extension | your extension vendor's next update | works today |
 | 1 | A passkey, at the Berm signer origin | **one DNS name staying in honest hands, indefinitely** | client complete, signer origin not yet deployed |
-| 2 | A NIP-46 remote signer ("bunker") | hardware you physically hold | works today |
+| 2 | A NIP-46 remote signer ("bunker") | **whatever that signer actually is** — see below | works today |
 | — | Development key in `localStorage` | nothing — it has no security | localhost only |
+
+**Correction, and it was ours.** This table used to say tier 2 depended on
+"hardware you physically hold", and that tiers 0 and 2 depended on nobody. Both
+were wrong. A NIP-46 signer is *remote*; what it runs on is a separate question
+the protocol does not answer. Amber on a phone in your pocket is hardware you
+hold. `nsec.app` is a web service. A self-hosted `nsecbunker` is a daemon on a
+VPS, which is a machine and a domain and a hosting provider.
+
+They are all tier 2 and their custody properties are not the same. So the
+interface must show **which signer**, and what is known about it — not a tier
+number that flatters the weakest member of the category. A label that overstates
+safety is worse than no label, because the user stops asking.
 
 Show the tier to the user. A single connect button that hides which of these
 they landed in is the version of this project that does not deserve to exist.
