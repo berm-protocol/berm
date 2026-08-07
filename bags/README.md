@@ -478,6 +478,13 @@ blocked by the case-folding finding above. And two of its rules combine to stran
 up to 40% of lifetime revenue permanently, which is the kind of thing that costs a
 paragraph now and cannot be fixed after deployment at all.
 
+[`POCKET.md`](POCKET.md) is the enrollment design: sign once, and your pocket is
+yours forever. A Nostr key is a secp256k1 keypair, so every npub has a canonical
+EVM address that only that key can spend — verified over 300 keys, including the
+BIP-340 odd-y normalisation. Enrollment therefore asks for a signature and nothing
+else: no address field, no wallet, no way to lose a share by forgetting. And no new
+cryptography in the contract, because the leaf still commits an ordinary address.
+
 [`SOVEREIGNTY.md`](SOVEREIGNTY.md) is the disclosure that came out of it: every
 layer, who can break it, and the two sentences no marketing copy may exceed. It
 also specifies the **minimum shippable contract** — claim-only, no admin, no
