@@ -1,0 +1,221 @@
+#cloud-config
+# ---------------------------------------------------------------------------
+# xonly.ai — Hetzner CX23 (Ubuntu 24.04). Box 2.
+#
+# THIRD VERSION OF THIS FILE, and every fix in it was paid for on box 1:
+#
+#   1. Do NOT write /etc/caddy/Caddyfile via write_files. dpkg finds a config
+#      file it did not ship, stops at a conffile prompt with no stdin, and the
+#      package stays UNCONFIGURED — installed but never started. That was the
+#      whole of the first failure. Caddy is installed FIRST, config written
+#      after, and --force-confold is set anyway.
+#   2. gpg --dearmor needs --batch --yes, or it tries to ask on /dev/tty about
+#      overwriting an existing keyring and dies on a re-run.
+#   3. `sudo -u berm` AUTHENTICATES as berm, and a cloud-init user has no
+#      password, so sudo demands one and fails. Use runuser, which only drops
+#      privileges.
+#   4. No package_upgrade at boot — it races unattended-upgrades for the dpkg
+#      lock and whichever loses fails silently.
+#   5. Serve /health over plain HTTP so provisioning is verifiable from
+#      anywhere without logging in. Box 1's first failure presented as a
+#      refused connection, which says nothing about why.
+#
+# Hosts:
+#   xonly.ai         apex + /.well-known/webauthn  (the ROR file)
+#   signer.xonly.ai  the signer origin. RP ID is xonly.ai, NOT this hostname
+#   editor.xonly.ai  the editor. Served here rather than GitHub Pages because
+#                    it signs, and anything that signs must not be a third
+#                    party's origin
+# ---------------------------------------------------------------------------
+
+users:
+  - name: berm
+    groups: [sudo]
+    shell: /bin/bash
+    sudo: ['ALL=(ALL) NOPASSWD:ALL']
+    ssh_authorized_keys:
+      # Dedicated key for THIS box. Not the bermlaunch key, not the DIP key.
+      # One box, one credential.
+      - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJEasZoPmhTJNgCU2e3nlfyviBd1qwpeLnJvqmwexa5e xonly
+
+package_update: false
+
+write_files:
+  - path: /usr/local/bin/xonly-provision.sh
+    permissions: '0755'
+    content: |
+      #!/usr/bin/env bash
+      set -euo pipefail
+      exec > >(tee -a /var/log/xonly-provision.log) 2>&1
+      echo "=== provision start $(date -Is) ==="
+
+      wait_apt() {
+        for i in $(seq 1 120); do
+          fuser /var/lib/dpkg/lock-frontend /var/lib/apt/lists/lock \
+                /var/cache/apt/archives/lock >/dev/null 2>&1 || return 0
+          echo "  apt locked, waiting ($i/120)"; sleep 5
+        done
+        echo "  apt still locked after 10 minutes"; return 1
+      }
+
+      apt_do() {
+        for a in 1 2 3; do
+          wait_apt || true
+          if DEBIAN_FRONTEND=noninteractive apt-get \
+               -o Dpkg::Options::=--force-confold \
+               -o Dpkg::Options::=--force-confdef "$@"; then return 0; fi
+          echo "  apt-get $* failed (attempt $a), retrying in 20s"; sleep 20
+        done
+        return 1
+      }
+
+      echo "--- base"
+      apt_do update
+      apt_do install -y ufw git curl debian-keyring debian-archive-keyring \
+                        apt-transport-https unattended-upgrades fail2ban
+
+      echo "--- caddy repo"
+      curl -1sLf https://dl.cloudsmith.io/public/caddy/stable/gpg.key \
+        | gpg --dearmor --batch --yes -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg
+      curl -1sLf https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt \
+        > /etc/apt/sources.list.d/caddy-stable.list
+      apt_do update
+      apt_do install -y caddy
+
+      # ONLY NOW is it safe to write the config: the package is installed and
+      # configured, so there is no conffile prompt left to hit.
+      echo "--- caddyfile"
+      cat > /etc/caddy/Caddyfile <<'CADDY'
+      {
+        email admin@xonly.ai
+      }
+
+      (hardened) {
+        header {
+          Strict-Transport-Security "max-age=31536000; includeSubDomains"
+          X-Content-Type-Options    "nosniff"
+          X-Frame-Options           "DENY"
+          Referrer-Policy           "no-referrer"
+          Permissions-Policy        "geolocation=(), microphone=(), camera=(), payment=()"
+          -Server
+        }
+      }
+
+      # Health over plain HTTP, so provisioning is checkable before any
+      # certificate exists and without an SSH session.
+      :80 {
+        respond /health "xonly-ok" 200
+        respond "xonly" 200
+      }
+
+      xonly.ai, www.xonly.ai {
+        import hardened
+        root * /srv/xonly/public
+        encode zstd gzip
+        file_server
+        handle /health { respond "xonly-ok" 200 }
+
+        # WebAuthn Related Origin Requests. Every entry here is a FULL GRANT of
+        # identity power to that origin — it may request prf_out for RP ID
+        # xonly.ai. Treat this file as more sensitive than the signer code.
+        handle /.well-known/webauthn {
+          header Content-Type application/json
+          respond `{"origins":[]}` 200
+        }
+
+        header Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"
+      }
+
+      # The signer. frame-ancestors 'none' is load-bearing, not hygiene: the
+      # approval UI must never be embeddable, because a client that can frame it
+      # can cover it.
+      signer.xonly.ai {
+        import hardened
+        root * /srv/xonly/signer
+        encode zstd gzip
+        file_server
+        handle /health { respond "signer-ok" 200 }
+        header Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'"
+      }
+
+      editor.xonly.ai {
+        import hardened
+        root * /srv/xonly/editor
+        encode zstd gzip
+        file_server
+        handle /health { respond "editor-ok" 200 }
+        header Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; connect-src 'self' wss:; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"
+      }
+      CADDY
+
+      caddy validate --config /etc/caddy/Caddyfile
+
+      echo "--- site dirs"
+      for d in public signer editor; do
+        mkdir -p /srv/xonly/$d
+        if [ ! -e /srv/xonly/$d/index.html ]; then
+          printf '<!doctype html><meta charset=utf-8><title>xonly</title><h1>%s</h1><p>Provisioned. Nothing deployed yet.</p>' "$d" \
+            > /srv/xonly/$d/index.html
+        fi
+      done
+      chown -R berm:berm /srv/xonly
+
+      echo "--- deploy key"
+      if [ ! -f /home/berm/.ssh/id_ed25519 ]; then
+        install -d -o berm -g berm -m 700 /home/berm/.ssh
+        runuser -u berm -- ssh-keygen -t ed25519 -N '' -C xonly-deploy -f /home/berm/.ssh/id_ed25519
+        runuser -u berm -- bash -c 'ssh-keyscan -t ed25519 github.com >> /home/berm/.ssh/known_hosts'
+        cp /home/berm/.ssh/id_ed25519.pub /home/berm/DEPLOY_KEY.pub
+        chown berm:berm /home/berm/DEPLOY_KEY.pub
+      fi
+
+      echo "--- firewall"
+      ufw --force reset >/dev/null
+      ufw default deny incoming
+      ufw default allow outgoing
+      ufw allow 22/tcp; ufw allow 80/tcp; ufw allow 443/tcp
+      ufw --force enable
+
+      echo "--- services"
+      systemctl enable --now fail2ban
+      systemctl restart ssh
+      systemctl enable --now caddy
+      systemctl restart caddy
+      sleep 3
+      systemctl is-active caddy
+      ss -lntp | grep -E ':(80|443)' || { echo "NOTHING BOUND"; exit 1; }
+
+      date -Is > /var/lib/xonly-provisioned
+      echo "=== provision OK $(date -Is) ==="
+
+  - path: /etc/apt/apt.conf.d/51unattended-upgrades-local
+    permissions: '0644'
+    content: |
+      Unattended-Upgrade::Automatic-Reboot "true";
+      Unattended-Upgrade::Automatic-Reboot-Time "04:40";
+      Unattended-Upgrade::Remove-Unused-Dependencies "true";
+
+  - path: /etc/ssh/sshd_config.d/99-berm.conf
+    permissions: '0644'
+    content: |
+      PermitRootLogin no
+      PasswordAuthentication no
+      KbdInteractiveAuthentication no
+      X11Forwarding no
+      MaxAuthTries 3
+
+runcmd:
+  - [ bash, /usr/local/bin/xonly-provision.sh ]
+
+final_message: |
+  ============================================================
+  xonly.ai provisioned.
+
+    curl http://<ip>/health   ->  xonly-ok
+
+  DNS needed:  xonly.ai, www, signer, editor  -> this box
+
+  The ROR origins list at /.well-known/webauthn is EMPTY on purpose.
+  Add bermlaunch.com only after the signer is deployed and verified —
+  every entry is a full grant of identity power to that origin.
+  ============================================================

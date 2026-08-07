@@ -31,6 +31,22 @@ const TEXT = /\.(ts|tsx|mjs|cjs|js|json|php|md|yml|yaml|html|css)$/;
  */
 const OWNERS = new Set(['scripts/chromium.mjs', 'scripts/check-no-machine-paths.mjs']);
 
+/**
+ * Provisioning files are the one legitimate exception, and the exemption is
+ * deliberately narrow.
+ *
+ * `infra/cloud-init.*.yaml` describes a machine that does not exist yet. Paths
+ * in it are not leaked developer paths — they are the file's entire content, and
+ * a cloud-init that could not name `/home/berm` would be useless.
+ *
+ * Scoped to that one home directory rather than waived wholesale, because an
+ * exemption is how a guard rots: `/home/claude`, `/Users/...` and every other
+ * pattern still fail in these files, which is what would actually indicate a
+ * leak.
+ */
+const PROVISIONING = /^infra\/cloud-init\.[a-z0-9-]+\.yaml$/;
+const PROVISIONING_ALLOWED = '/home/berm/';
+
 const PATTERNS = [
   { re: /\/opt\/pw-browsers/g,          what: 'a sandbox browser pool path' },
   { re: /\/home\/(?!runner\b)[a-z][a-z0-9_-]*\//g, what: "someone's home directory" },
@@ -58,6 +74,7 @@ for (const file of walk(ROOT)) {
   const body = readFileSync(file, 'utf8');
   for (const { re, what } of PATTERNS) {
     for (const m of body.matchAll(re)) {
+      if (PROVISIONING.test(rel) && m[0] === PROVISIONING_ALLOWED) continue;
       const line = body.slice(0, m.index).split('\n').length;
       console.error(`FAIL  ${rel}:${line}  ${what}: ${m[0]}`);
       bad++;

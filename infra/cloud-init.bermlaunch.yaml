@@ -1,0 +1,279 @@
+#cloud-config
+# ---------------------------------------------------------------------------
+# bermlaunch.com — Hetzner CX23 (Ubuntu 24.04)
+#
+# SECOND ATTEMPT. The first boot left nothing listening on port 80, and the
+# most likely reason is the ordinary one: cloud-init's own `package_upgrade`
+# runs apt at first boot, Ubuntu's unattended-upgrades timer fires at the same
+# moment, and whichever loses the dpkg lock fails silently. `apt-get install
+# caddy` was the loser, so Caddy never existed and the port was never bound.
+#
+# So this version:
+#   - does NOT run package_upgrade at boot (unattended-upgrades handles it
+#     afterwards, when nothing is racing it)
+#   - puts every install step in ONE script that waits for the lock and retries
+#   - logs that script to /var/log/bermlaunch-provision.log
+#   - writes /var/lib/bermlaunch-provisioned when it genuinely finishes
+#   - serves /health over PLAIN HTTP, so provisioning can be verified before
+#     any certificate exists and without needing to log in
+#
+# The last two matter more than they look. The first attempt failed silently
+# and the only symptom was a refused connection, which says nothing about why.
+# ---------------------------------------------------------------------------
+
+users:
+  - name: berm
+    groups: [sudo]
+    shell: /bin/bash
+    sudo: ['ALL=(ALL) NOPASSWD:ALL']
+    ssh_authorized_keys:
+      # Dedicated passphrase-free key for this host, generated on the Zenbook.
+      # Deliberately NOT the key that opens the DIP servers: one box, one
+      # credential, so a compromise here reaches nothing else.
+      - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEE2molY58RPCiT4EEfTh8j10cMb5c5Abz5peWGphSrf bermlaunch
+
+# No package_upgrade here — see the header. This is the whole fix.
+package_update: false
+
+write_files:
+  # -------------------------------------------------------------------------
+  # Everything that can fail, in one place, with logs.
+  # -------------------------------------------------------------------------
+  - path: /usr/local/bin/bermlaunch-provision.sh
+    permissions: '0755'
+    content: |
+      #!/usr/bin/env bash
+      set -euo pipefail
+      exec > >(tee -a /var/log/bermlaunch-provision.log) 2>&1
+      echo "=== provision start $(date -Is) ==="
+
+      # Wait for anyone else holding apt. Ubuntu runs unattended-upgrades on
+      # first boot; racing it is how the previous attempt died.
+      wait_apt() {
+        for i in $(seq 1 120); do
+          if ! fuser /var/lib/dpkg/lock-frontend /var/lib/apt/lists/lock \
+                     /var/cache/apt/archives/lock >/dev/null 2>&1; then
+            return 0
+          fi
+          echo "  apt is locked by another process, waiting ($i/120)"
+          sleep 5
+        done
+        echo "  apt still locked after 10 minutes — giving up"
+        return 1
+      }
+
+      apt_do() {
+        for attempt in 1 2 3; do
+          wait_apt || true
+          if DEBIAN_FRONTEND=noninteractive apt-get "$@"; then return 0; fi
+          echo "  apt-get $* failed (attempt $attempt), retrying in 20s"
+          sleep 20
+        done
+        echo "  apt-get $* failed three times"
+        return 1
+      }
+
+      echo "--- base packages"
+      apt_do update
+      apt_do install -y ufw git curl debian-keyring debian-archive-keyring \
+                        apt-transport-https unattended-upgrades fail2ban
+
+      echo "--- caddy repository"
+      curl -1sLf https://dl.cloudsmith.io/public/caddy/stable/gpg.key \
+        | gpg --dearmor -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg
+      curl -1sLf https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt \
+        > /etc/apt/sources.list.d/caddy-stable.list
+      # No sed here. The file Cloudsmith serves ALREADY carries
+      # [signed-by=/usr/share/keyrings/caddy-stable-archive-keyring.gpg].
+      # The previous version tried to insert it and silently matched nothing.
+
+      apt_do update
+      apt_do install -y caddy
+
+      echo "--- verify caddy is real before claiming success"
+      command -v caddy
+      caddy version
+      caddy validate --config /etc/caddy/Caddyfile
+
+      echo "--- site directory"
+      mkdir -p /srv/bermlaunch/public
+      if [ ! -e /srv/bermlaunch/public/index.html ]; then
+        cat > /srv/bermlaunch/public/index.html <<'HTML'
+      <!doctype html><meta charset="utf-8"><title>bermlaunch</title>
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      <style>body{font:16px/1.6 system-ui,-apple-system,sans-serif;max-width:34rem;margin:18vh auto;padding:0 1.5rem;color:#111}code{background:#f4f4f5;padding:.15em .4em;border-radius:3px;font-size:.9em}</style>
+      <h1>bermlaunch</h1>
+      <p>Server up, TLS working. Nothing deployed yet.</p>
+      <p>Set <code>GIT_REMOTE</code> in <code>/etc/bermlaunch.env</code>, then run
+      <code>sudo bermlaunch-deploy</code>.</p>
+      HTML
+      fi
+      chown -R berm:berm /srv/bermlaunch
+
+      echo "--- deploy key for github"
+      if [ ! -f /home/berm/.ssh/id_ed25519 ]; then
+        install -d -o berm -g berm -m 700 /home/berm/.ssh
+        sudo -u berm ssh-keygen -t ed25519 -N '' -C bermlaunch-deploy \
+             -f /home/berm/.ssh/id_ed25519
+        sudo -u berm bash -c 'ssh-keyscan -t ed25519 github.com >> /home/berm/.ssh/known_hosts'
+        cp /home/berm/.ssh/id_ed25519.pub /home/berm/DEPLOY_KEY.pub
+        chown berm:berm /home/berm/DEPLOY_KEY.pub
+      fi
+
+      echo "--- firewall"
+      ufw --force reset >/dev/null
+      ufw default deny incoming
+      ufw default allow outgoing
+      ufw allow 22/tcp
+      ufw allow 80/tcp
+      ufw allow 443/tcp
+      ufw --force enable
+
+      echo "--- services"
+      systemctl enable --now fail2ban
+      systemctl restart ssh
+      systemctl enable --now caddy
+      systemctl restart caddy
+      sleep 3
+      systemctl is-active caddy
+      ss -lntp | grep -E ':(80|443)' || { echo "NOTHING BOUND TO 80/443"; exit 1; }
+
+      date -Is > /var/lib/bermlaunch-provisioned
+      echo "=== provision OK $(date -Is) ==="
+
+  # -------------------------------------------------------------------------
+  # Caddy.
+  #
+  # The plain-HTTP block is declared EXPLICITLY rather than letting Caddy
+  # auto-redirect, so /health answers before any certificate exists. Silent
+  # provisioning failures are the reason this file is on its second version.
+  # -------------------------------------------------------------------------
+  - path: /etc/caddy/Caddyfile
+    permissions: '0644'
+    content: |
+      {
+        email admin@bermlaunch.com
+      }
+
+      # Health, over plain HTTP, on the hostname and on the bare IP.
+      http://bermlaunch.com, http://www.bermlaunch.com {
+        handle /health {
+          respond "berm-ok" 200
+        }
+        handle {
+          redir https://{host}{uri} permanent
+        }
+      }
+
+      :80 {
+        respond /health "berm-ok" 200
+        respond "bermlaunch" 200
+      }
+
+      bermlaunch.com, www.bermlaunch.com {
+        root * /srv/bermlaunch/public
+        encode zstd gzip
+        file_server
+
+        handle /health {
+          respond "berm-ok" 200
+        }
+
+        header {
+          Strict-Transport-Security "max-age=31536000; includeSubDomains"
+          X-Content-Type-Options    "nosniff"
+          X-Frame-Options           "DENY"
+          Referrer-Policy           "no-referrer"
+          Permissions-Policy        "geolocation=(), microphone=(), camera=(), payment=()"
+          Content-Security-Policy   "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"
+          -Server
+        }
+      }
+
+  - path: /etc/bermlaunch.env
+    permissions: '0644'
+    content: |
+      # e.g. git@github.com:berm-protocol/bermlaunch.git
+      GIT_REMOTE=
+      GIT_BRANCH=main
+      PUBLISH_DIR=public
+
+  - path: /usr/local/bin/bermlaunch-deploy
+    permissions: '0755'
+    content: |
+      #!/usr/bin/env bash
+      set -euo pipefail
+      . /etc/bermlaunch.env
+
+      if [ -z "${GIT_REMOTE:-}" ]; then
+        echo "GIT_REMOTE is not set. Edit /etc/bermlaunch.env first." >&2
+        exit 2
+      fi
+
+      SRC=/srv/bermlaunch/src
+      PUB=/srv/bermlaunch/public
+
+      if [ ! -d "$SRC/.git" ]; then
+        echo "==> first clone"
+        rm -rf "$SRC"
+        sudo -u berm git clone --branch "$GIT_BRANCH" "$GIT_REMOTE" "$SRC"
+      else
+        echo "==> fetch"
+        sudo -u berm git -C "$SRC" fetch --prune origin "$GIT_BRANCH"
+        sudo -u berm git -C "$SRC" reset --hard "origin/$GIT_BRANCH"
+        sudo -u berm git -C "$SRC" clean -fdx
+      fi
+
+      COMMIT=$(git -C "$SRC" rev-parse --short HEAD)
+
+      if [ ! -d "$SRC/$PUBLISH_DIR" ]; then
+        echo "no '$PUBLISH_DIR' at $COMMIT — refusing to publish an empty site" >&2
+        exit 1
+      fi
+
+      # Swap by rename so a visitor never sees a half-copied tree.
+      rm -rf "$PUB.new" "$PUB.old"
+      cp -a "$SRC/$PUBLISH_DIR" "$PUB.new"
+      [ -e "$PUB" ] && mv "$PUB" "$PUB.old"
+      mv "$PUB.new" "$PUB"
+      rm -rf "$PUB.old"
+
+      chown -R berm:berm /srv/bermlaunch
+      systemctl reload caddy
+      echo "==> live: $COMMIT"
+
+  - path: /etc/apt/apt.conf.d/51unattended-upgrades-local
+    permissions: '0644'
+    content: |
+      Unattended-Upgrade::Automatic-Reboot "true";
+      Unattended-Upgrade::Automatic-Reboot-Time "04:30";
+      Unattended-Upgrade::Remove-Unused-Dependencies "true";
+
+  - path: /etc/ssh/sshd_config.d/99-berm.conf
+    permissions: '0644'
+    content: |
+      PermitRootLogin no
+      PasswordAuthentication no
+      KbdInteractiveAuthentication no
+      X11Forwarding no
+      MaxAuthTries 3
+
+runcmd:
+  - [ bash, /usr/local/bin/bermlaunch-provision.sh ]
+
+final_message: |
+  ============================================================
+  bermlaunch provisioning finished.
+
+  Verify from anywhere, no login needed:
+      curl http://bermlaunch.com/health     ->  berm-ok
+
+  If that does not answer, read /var/log/bermlaunch-provision.log
+  — it records every step and why any of them failed.
+
+  Next:
+    ssh berm@<ip> ; cat DEPLOY_KEY.pub
+    add it to the repo as a read-only deploy key
+    set GIT_REMOTE in /etc/bermlaunch.env
+    sudo bermlaunch-deploy
+  ============================================================

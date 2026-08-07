@@ -1,0 +1,60 @@
+{
+	email admin@xonly.ai
+}
+
+(hardened) {
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options    "nosniff"
+		X-Frame-Options           "DENY"
+		Referrer-Policy           "no-referrer"
+		Permissions-Policy        "geolocation=(), microphone=(), camera=(), payment=()"
+		-Server
+	}
+}
+
+# Health over plain HTTP: verifiable before any certificate exists and
+# without an SSH session.
+:80 {
+	respond /health "xonly-ok" 200
+	respond "xonly" 200
+}
+
+xonly.ai, www.xonly.ai {
+	import hardened
+	root * /srv/xonly/public
+	encode zstd gzip
+	file_server
+	header Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"
+
+	handle /health {
+		respond "xonly-ok" 200
+	}
+}
+
+# The signer. frame-ancestors 'none' is load-bearing rather than hygiene:
+# the approval UI must never be embeddable, because a client that can frame
+# it can cover it.
+signer.xonly.ai {
+	import hardened
+	root * /srv/xonly/signer
+	encode zstd gzip
+	file_server
+	header Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'"
+
+	handle /health {
+		respond "signer-ok" 200
+	}
+}
+
+editor.xonly.ai {
+	import hardened
+	root * /srv/xonly/editor
+	encode zstd gzip
+	file_server
+	header Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; connect-src 'self' wss:; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"
+
+	handle /health {
+		respond "editor-ok" 200
+	}
+}

@@ -92,6 +92,7 @@ That is the whole integration. No registration, no key to obtain, no quota.
 | [`node-pages/`](node-pages) | A node publishes only what it verified, and refuses to truncate | 18 tests + 17 relay checks |
 | [`signer-log/`](signer-log) | Build attestations, so a swapped signer is detectable | 20 tests |
 | [`bags/`](bags) | Fee continuity for Bags launches, and the dispute screen that is the point of it | 160 tests + 26 browser checks |
+| [`infra/`](infra) | The two servers, the cloud-init that builds them, and the four mistakes that cost a morning | runbook + Caddyfile guard |
 | [`docs/`](docs) | Published as signed Nostr events, through the protocol it documents | conformance-checked |
 
 ## Verify it yourself
