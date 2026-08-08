@@ -243,17 +243,36 @@ understand.
 
 Rejected, every one: missing mode · unknown mode · missing address · missing or
 malformed proof · proof recovering to a different address · `derived_v1` with a
-non-canonical address · `bound_wallet_v1` naming the derived address · a proof
-made for another mode or another campaign · **duplicate tags**, because two
-`mode` tags means two readers can reach two conclusions about one signed object.
+non-canonical address · a proof made for another mode or another campaign ·
+**duplicate tags**, because two `mode` tags means two readers can reach two
+conclusions about one signed object.
 
 There is **no rule anywhere** saying a missing address means derive from the npub.
+
+**Not** rejected: a `bound_wallet_v1` whose address happens to equal
+`derive(npub)`. An earlier revision rejected it; G-02 overturned that and the
+code follows. The control proof carries the security. What the coincidence does
+create is a **disclosure duty** — a Path-B user was never told to back up a key,
+so the UI must say what they are standing on before they sign. Copy, not
+validator.
 
 ### Rebinding
 
 A later valid enrollment supersedes an earlier one **only before the cohort root
 containing the destination is finalised**. After finalisation the destination is
 inside the leaf and inside the root, so it is frozen.
+
+**OPEN — how "later" is determined is not yet specified, and the obvious answer
+is wrong.** `created_at` is self-asserted; any key can sign an event dated 2009,
+which is the whole reason `/who` ranks on an external anchor instead. An
+implementer reaching for `created_at` here would let a user reorder their own
+rebindings at will. Until this is closed, **no rebinding ordering may be
+implemented**, and a second valid enrollment for one npub is `INSUFFICIENT` — not
+a silently-picked winner. See `explorer/CAMPAIGN-EXPLORER-SPEC.md`; the two
+candidate resolutions are a hash-linked rebinding chain (each rebind names the
+event id it replaces, so ordering is structural and a gap announces itself) and
+an authenticated external observation receipt (which introduces a trusted
+sequencer and therefore a `SOVEREIGNTY.md` disclosure).
 
 Slot assignment is unchanged and stays npub-only: `assignBatches` reads
 `observed: string[]` and never touches an address.
@@ -316,7 +335,12 @@ clothes, and someone will notice.
 - [ ] Key-security byte is `0x00`, asserted by a test
 - [ ] "Continue" is unreachable until the backup is downloaded — asserted in a browser test
 - [ ] Custody tier is visible on every screen after connect — asserted in a browser test
-- [ ] A subscription with no address parses, and derives the pocket from the npub
+- [ ] A subscription with no address is **rejected** — asserted, and asserted to
+      reject rather than to derive. This item previously read "parses, and derives
+      the pocket from the npub", which contradicted the fail-closed rule two
+      sections above and would have had an implementer build the exact fallback
+      this spec forbids. An acceptance criterion that disagrees with its own spec
+      is worse than a missing one: it is a defect with a checkbox next to it
 - [ ] Slot assignment is identical with and without addresses present
 - [ ] The X intent path publishes nothing by itself — existing `post` tests cover the shape
 - [ ] No unencrypted secret key reaches `localStorage`, `sessionStorage` or any network request — asserted, not reviewed

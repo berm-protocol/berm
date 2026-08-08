@@ -306,19 +306,18 @@ export function checkMode(
     return { ok: true, reason: 'derived_v1: address derives from the npub and the same key signed it' };
   }
 
-  // bound_wallet_v1 — a wallet the user supplied. It MUST NOT be the derived
-  // address: that would mean the npub's own key is the payout key, which is
-  // Path A wearing Path B's label, and the two carry different promises about
-  // what the user was asked to understand.
-  const derived = deriveAddress(npubHex);
-  if (derived && derived.toLowerCase() === e.evmAddress.toLowerCase()) {
-    return {
-      ok: false,
-      reason:
-        'mode bound_wallet_v1 names the address this npub derives to. That is derived_v1 ' +
-        'under the wrong label — declare the mode that matches what happened',
-    };
-  }
+  // bound_wallet_v1 — a wallet the user supplied and proved control of.
+  //
+  // An earlier revision rejected this mode when the committed address happened
+  // to equal derive(npub). That rule is GONE, and deliberately (G-02): the
+  // control proof is what carries the security, and the mode label carries
+  // provenance. Refusing a proven binding because of a numeric coincidence is a
+  // false positive that locks out a legitimate user.
+  //
+  // The residue is real but it is not a validator's problem. A Path-B user is
+  // never told to back up a key, so a Path-B user standing on a derived address
+  // has not been told what they are holding. That is a DISCLOSURE duty, owed in
+  // the UI copy before signing — not a rejection owed here, after.
   return { ok: true, reason: 'bound_wallet_v1: the committed wallet signed for itself' };
 }
 

@@ -149,11 +149,15 @@ describe('T-03/T-04 — Path B, bound_wallet_v1', () => {
     expect(r.reason).toMatch(/DIFFERENT address/);
   });
 
-  it('a bound_wallet_v1 naming the DERIVED address is rejected — that is Path A mislabelled', () => {
+  it('a bound_wallet_v1 naming the DERIVED address is ACCEPTED — the proof carries the security', () => {
+    // G-02, and the inversion of an earlier rule. If the user proved control of
+    // the address, a numeric coincidence with derive(npub) is not a reason to
+    // reject them; the mode label is provenance, not a security boundary.
+    // What the coincidence DOES create is a disclosure duty in the UI, because a
+    // Path-B user was never told to back up a key. That belongs in copy, not here.
     const parsed = parseEnrollment(enrol(id, 'bound_wallet_v1', id.evm, id.d), 'npub-b');
     const r = checkMode(parsed, id.npubHex, () => id.evm, evmRecover);
-    expect(r.ok).toBe(false);
-    expect(r.reason).toMatch(/under the wrong label/);
+    expect(r.ok).toBe(true);
   });
 
   it('a bunker user is never assumed able to sign EVM — the proof is a separate key', () => {
