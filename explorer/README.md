@@ -74,6 +74,13 @@ kinds, authors, since/until, limit and `#<single-letter>` tags. A relay that
 ignored unknown filter keys would return everything and make a broken `#i` query
 look like a working one.
 
+## Next: campaigns
+
+[`CAMPAIGN-EXPLORER-SPEC.md`](CAMPAIGN-EXPLORER-SPEC.md) extends the same rule
+from identity to cohort rosters — every committed payout destination shown with
+whether control of it was actually proven, and the campaign root recomputed in
+the browser rather than asserted.
+
 ## Not built yet
 
 - Full OTS verification (needs a chain source; currently linked out)
