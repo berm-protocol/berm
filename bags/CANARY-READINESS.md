@@ -75,7 +75,7 @@ regenerated the full 50-member root from zero enrollments and zero proofs,
 | # | Item | Closed when |
 |---|---|---|
 | 1 | **`manager_waive_fee_config` called** | a tx signature, published. Until then *"the dev cannot redirect the split"* is false and the community is trusting you personally, not the structure |
-| 2 | **`rpIdFromOrigin` decision** | returns registrable domain, not `u.hostname` (`crypto/src/origin.ts:57`). Needs the Public Suffix List — last-two-labels breaks `foo.co.uk`. **Unfixable after the first passkey exists.** Collides with negative vector V5; V5 survives only if its two origins are on different registrable domains |
+| 2 | ~~**`rpIdFromOrigin` decision**~~ | **WITHDRAWN — I was wrong, and repeatedly.** `u.hostname` is *correct*. `spec/signer-broker.md:28` refuses RP-ID sharing outright: *"Clients sharing an RP ID share the credential… one compromised client would burn every user of every client."* Clients never call WebAuthn; the signer does, via popup. Broadening the RP ID to the registrable domain would have caused the exact failure the architecture is built to prevent. V5's guarantee — *"the same passkey cannot be used from a second origin"* — is deliberate. Federation is delivered by the broker, not by credential sharing. **No change required; nothing here is unfixable** |
 | 3 | **Bags API key + Hetzner token rotated** | both are in a chat transcript |
 | 4 | **Enrollment-time disclosure copy** | the sentence a Bermer reads *before* signing: share is fixed and verifiable, delivery depends on Bags. Disclosed after enrollment is the `legacy_roster_wallet_v0` pattern one level up |
 | 5 | **Canary scope decision** | claimers are set at `create_fee_config` and only Bags' admin can update. Whatever the canary launches with, it keeps. **Decide explicitly whether the canary carries real Founders** — if it does, their pockets depend on manual forwarding forever, with no upgrade path |
@@ -107,8 +107,9 @@ That is what makes the promise credible without irrevocability. It makes it
 
 ## 4. Ordering
 
-1, 2, 3 first — all cheap, all yours, and 2 is the only one on this page that
-cannot be repaired after launch.
+1 and 3 first — cheap, yours, no dependencies. (2 is withdrawn. With it goes the
+claim that anything on this page is unrepairable after launch: **nothing here is.**
+That is a better position than the one this document shipped with.)
 
 Then 4, 5, 6. Then Codex 9–11 on delivery. Then 7 and 8.
 
@@ -126,6 +127,10 @@ a green CI run                     → the checks that exist passed
 an independent review              → the R1 review missed the bypass entirely
 a spec saying it fails closed      → the spec said that; the compiler failed open
 my own prior statement             → I claimed the launch was blocked; it was not
+my own repeated statement          → I called rpIdFromOrigin an unfixable defect
+                                     across several turns and put it at the top of
+                                     this list. Repetition is not evidence. One
+                                     grep of the broker spec refuted it
 ```
 
 The pattern in every one: **a conclusion offered in place of the method that
