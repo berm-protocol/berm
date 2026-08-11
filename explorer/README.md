@@ -76,10 +76,12 @@ look like a working one.
 
 ## Next: campaigns
 
-[`CAMPAIGN-EXPLORER-SPEC.md`](CAMPAIGN-EXPLORER-SPEC.md) extends the same rule
-from identity to cohort rosters — every committed payout destination shown with
-whether control of it was actually proven, and the campaign root recomputed in
-the browser rather than asserted.
+[`CAMPAIGN-EXPLORER-SPEC-R2.md`](CAMPAIGN-EXPLORER-SPEC-R2.md) extends the same
+rule from identity to cohort rosters — every committed payout destination shown
+with whether control of it was actually proven, and the campaign root recomputed
+in the browser rather than asserted. Closure table for the R1 review in
+[`campaign-explorer-r2-closure.json`](campaign-explorer-r2-closure.json).
+[R1](CAMPAIGN-EXPLORER-SPEC.md) is superseded and kept only as a citation target.
 
 ## Not built yet
 

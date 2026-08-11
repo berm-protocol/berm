@@ -1,4 +1,11 @@
-# Campaign explorer — implementation specification
+# Campaign explorer — implementation specification (R1)
+
+> **STATUS: SUPERSEDED by [`CAMPAIGN-EXPLORER-SPEC-R2.md`](CAMPAIGN-EXPLORER-SPEC-R2.md).**
+> Reviewed as `GPT_BERM_CAMPAIGN_EXPLORER_SPEC_R1_REVIEW_20260808_R1`; nine
+> findings accepted, two contested. Kept because the R2 closure table cites it.
+> **Do not implement from this file.** Two things in it are known wrong: the
+> rebinding rule never defines "later" (E-01), and `CONFLICTED` treats normal
+> pre-finalization rebinding as a conflict (E-03).
 
 **For an implementer.** Extends the existing `/who` explorer from identity to
 campaigns. Same rule as `/who`: the claim is worthless without somewhere to check

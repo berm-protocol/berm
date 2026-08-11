@@ -1,0 +1,165 @@
+{
+  "artifact": "BERM_CAMPAIGN_EXPLORER_SPEC_R2_REBASED",
+  "supersedes": "CAMPAIGN-EXPLORER-SPEC.md (R1)",
+  "adjudication_target": {
+    "review_id": "GPT_BERM_CAMPAIGN_EXPLORER_SPEC_R1_REVIEW_20260808_R1",
+    "subject_sha256": "7ba1b5e1728a6f1c5336da2a2e6ab146601100c3542a0db6bb12fbfcbd63b0c8",
+    "subject_hash_independently_confirmed": true,
+    "review_manifest_verified": "4/4"
+  },
+  "classification": "SPECIFICATION_REBASE__TWO_FINDINGS_CONTESTED",
+  "scope": {
+    "is": ["specification"],
+    "is_not": ["implementation", "economics", "buyback", "claimQuote", "chain selection"]
+  },
+  "summary": {
+    "accepted": 8,
+    "accepted_and_already_closed_in_code": 1,
+    "contested": 2,
+    "note": "E-06 counts once, under accepted_and_already_closed_in_code"
+  },
+  "findings": [
+    {
+      "id": "E-01",
+      "title": "Relay enrollment events alone cannot yield the canonical roster",
+      "disposition": "PROBLEM_ACCEPTED__REMEDY_CONTESTED",
+      "problem_conceded": "R1 said a later enrollment supersedes an earlier one and never defined 'later'. created_at is self-asserted; bags/src/subscribe.ts:25-29 already states it MUST NOT order anybody.",
+      "objection_to_remedy": "An approved observer key with a sequence number places a trusted sequencer inside the one function the explorer exists to perform.",
+      "options": [
+        {
+          "rank": 1,
+          "id": "hash_linked_chain",
+          "summary": "Each rebind carries [\"prev\", <event_id>]. Canonical binding is the chain tip. Ordering is structural; equivocation is CONFLICTED and fails closed; a missing predecessor announces itself as INSUFFICIENT.",
+          "new_trusted_party": false
+        },
+        {
+          "rank": 2,
+          "id": "archived_snapshots",
+          "summary": "Published snapshots archived by a third party. Already this project's documented answer in subscribe.ts.",
+          "new_trusted_party": false
+        },
+        {
+          "rank": 3,
+          "id": "observation_receipts",
+          "summary": "As E-01 proposes. Works; most operationally convenient.",
+          "new_trusted_party": true,
+          "condition": "Requires a SOVEREIGNTY.md disclosure row at the same rank as the Bags rows, and the explorer must render 'ordering depends on observer <id>' as loudly as UNPROVEN_LEGACY."
+        }
+      ],
+      "interim_rule": "No rebinding ordering may be implemented until this is settled. A second valid enrollment for one npub is INSUFFICIENT, never a silently-picked winner.",
+      "spec_section": "3"
+    },
+    {
+      "id": "E-02",
+      "title": "Root equality and destination-proof coverage must be separate dimensions",
+      "disposition": "ACCEPTED",
+      "resolution": "Four orthogonal axes: rootVerdict, destinationProofCoverage, per-member binding status, finalizableUnderCurrentLaw. No single badge collapses them.",
+      "spec_section": "5"
+    },
+    {
+      "id": "E-03",
+      "title": "CONFLICTED semantics are stale under deterministic rebinding",
+      "disposition": "ACCEPTED_CONDITIONAL",
+      "condition": "Downstream of E-01; the deterministic selection law must exist before CONFLICTED can be defined against it.",
+      "resolution": "CONFLICTED means the governing evidence cannot resolve one deterministic binding — equivocation, unresolved tie, or committed root destination differing from the deterministic result. Multiple valid pre-finalization enrollments are normal and are not a conflict.",
+      "spec_section": "5.3"
+    },
+    {
+      "id": "E-04",
+      "title": "TASK.md reopens the closed legacy production decision",
+      "disposition": "ACCEPTED",
+      "note": "Stricter than the two options R1 offered, and in the direction R1's own review argued.",
+      "resolution": "Production finalization is fail-closed. The 50-member root is UNPROVEN_HISTORICAL: reproducible as forensic evidence, never finalizable, never a Trust & Verify PASS, never a migration exception.",
+      "spec_section": "5.4"
+    },
+    {
+      "id": "E-05",
+      "title": "Bundled merkle.ts is predecessor Solana/equal-share architecture",
+      "disposition": "ACCEPTED",
+      "confirmed_in_repo": ["bags/src/merkle.ts solanaAddress", "distributeEqually()"],
+      "resolution": "R2 ships no source files as reference. reconcile()'s omitted/extra/changed discipline is retained as prose vocabulary only.",
+      "spec_section": "7"
+    },
+    {
+      "id": "E-06",
+      "title": "Bundled enrollment references contain superseded execution details",
+      "disposition": "ACCEPTED__CLOSED_IN_CODE",
+      "commit": "7d661c2",
+      "sub_findings": [
+        {
+          "claim": "checkMode rejects bound_wallet_v1 equal to derive(npub)",
+          "verified": true,
+          "fix": "Rule removed; test inverted to assert acceptance. The coincidence creates a UI disclosure duty, not a validator rejection."
+        },
+        {
+          "claim": "ENROLLMENT-SPEC has a stale addressless acceptance item",
+          "verified": true,
+          "fix": "Item now reads rejected, and records why the previous text was dangerous."
+        }
+      ],
+      "evidence": "bags 181/181, crypto 119/119, sdk 34/34"
+    },
+    {
+      "id": "E-07",
+      "title": "Explorer data-source list is incomplete",
+      "disposition": "ACCEPTED_CONDITIONAL",
+      "condition": "The ordering-evidence entry takes its shape from whichever E-01 option is chosen.",
+      "spec_section": "6"
+    },
+    {
+      "id": "E-08",
+      "title": "Independent recomputation must not become a competing protocol implementation",
+      "disposition": "CONTESTED",
+      "agreed": "The explorer must not invent a second protocol law.",
+      "objection": "E-08 prefers importing the production verifier. An explorer sharing the production library reproduces production bugs perfectly and reports REPRODUCED — a checksum of the deployment, not a check of the law.",
+      "concrete_case": "A shared-library explorer pointed at the R1 roster would have called selectBindingForFinalization, received legacy_roster_wallet_v0 for all 50 members, rebuilt the identical root and shown green. The bug that justifies the explorer survives the shared-library explorer.",
+      "counter_proposal": "Independent implementation, cross-tested byte-for-byte against frozen public vectors, with protocol-version mismatch as its own visible state. The shared artifact is the vectors, not the code.",
+      "precedent_in_repo": "scripts/check-vectors-frozen.mjs already hash-checks bags/vectors/pocket-address.json and crypto/vectors/test-vectors.json.",
+      "spec_section": "4"
+    },
+    {
+      "id": "E-09",
+      "title": "Refine the standalone verifier portability requirement",
+      "disposition": "ACCEPTED",
+      "resolution": "No-external-origins governs bundled assets only. User-supplied relay and RPC endpoints are permitted and must be displayed. A failed source yields INSUFFICIENT, never silent fallback. No Berm API required for /verify.",
+      "spec_section": "8"
+    },
+    {
+      "id": "E-10",
+      "title": "Trust & Verify and Explorer must be complementary, not competing",
+      "disposition": "ACCEPTED_WITH_CARVEOUT",
+      "carveout": "Blocking is a founder decision; displaying is not. The explorer shows upstream authority as fact, including the beacon implementation address and the block of its last upgrade.",
+      "rationale": "Per the founder ruling on B-04: global upgrade is protocol-level, so severity is high, aimability low, detectability high. Displaying it converts an uncontrollable authority into a watchable one.",
+      "related_defect": "bags/SOVEREIGNTY.md:34 reads 'Stronger than any Solana admin power', contradicting that ruling. The file disagrees with the decision.",
+      "spec_section": "9"
+    },
+    {
+      "id": "E-11",
+      "title": "KOL/moderator agreements and ratings are roadmap, not R1/R2 scope",
+      "disposition": "ACCEPTED",
+      "note": "Independently reached the same conclusion in session before receiving this review: static creator sub-splits are cheap and fit existing weight-range math; time-expiring leaves are a second allocation dimension and belong to a later launch.",
+      "spec_section": null
+    }
+  ],
+  "open_items_outside_this_review": [
+    {
+      "id": "X-01",
+      "item": "The explorer does not close legacy_roster_wallet_v0. The roster-finalization fix lands first."
+    },
+    {
+      "id": "X-02",
+      "item": "Cohort finalization counts are inconsistent: campaign.ts enforces no size gate; the historical dual-chain spec required exactly 100/300."
+    },
+    {
+      "id": "X-03",
+      "item": "SOVEREIGNTY.md:34 must be corrected to match the B-04 ruling."
+    }
+  ],
+  "buildable_before_e01_settles": [
+    "verdict rendering for all four axes",
+    "relay and RPC coverage display",
+    "no-signing-code assertion",
+    "file:// portability",
+    "vector cross-test harness"
+  ]
+}
