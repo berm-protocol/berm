@@ -2,6 +2,7 @@
 
 | File | What it is |
 |---|---|
+| [`UNIFIED.md`](UNIFIED.md) | How the protocol, xonly.ai and bermlaunch.com are one system — the problem all three solve, what a launch looks like end to end, what is trusted, and what is actually built. **Not normative.** Start here if you want the shape before the rules. |
 | [`v2.0-architecture.md`](v2.0-architecture.md) | The normative spec. Threat model, identity architecture, data layer, node boundary, conformance checklist, rejected alternatives. |
 | [`signer-broker.md`](signer-broker.md) | How a third-party application gets a signature from a Berm user without ever touching their key. The request protocol, what an API key does and does not buy, and why attestation is the product rather than a feature. |
 | [`v2.1-amendment.md`](v2.1-amendment.md) | Thirteen changes on top of v2.0 — key wrapping for multi-device, recovery, guardians, two node bug fixes, measured X paste behaviour. |
