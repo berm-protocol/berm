@@ -1,0 +1,140 @@
+{
+  "schema": "berm.bermlaunch.fixpack.v1",
+  "artifact": "BERMLAUNCH_PRE_CANARY_FIXPACK_R1",
+  "reviewed_subjects": [
+    {
+      "name": "BERMLAUNCH_SUPPORTER_ENROLLMENT_R1_SEALED_20260807",
+      "outcome": "blocking finding raised, later closed and reproduced"
+    },
+    {
+      "name": "BERMLAUNCH_CURRENT_CONTINUITY_PACK",
+      "head": "b609354632510fa5d15856bbc411047fdbfe459d",
+      "manifest": "390/390 verified",
+      "outcome": "R1 finding closed; FIX-02 raised"
+    },
+    {
+      "name": "BERMLAUNCH_ROBINHOOD_BLOCKED_IMPLEMENTATION_VERIFICATION_20260812",
+      "manifest": "82/82 verified",
+      "hash_claims_checked": 5,
+      "hash_claims_true": 5,
+      "outcome": "honest blocked classification; FIX-01 raised"
+    }
+  ],
+  "governing_rule": "Every fix ships with the test that would have caught it. All three findings so far were fixed correctly at the point of discovery and reappeared one layer over, because the evidence exercised the bypass rather than the enforcement.",
+  "fixes": [
+    {
+      "id": "FIX-01",
+      "severity": "BLOCKING",
+      "title": "Trust screen renders PASS with no evidence",
+      "file": "apps/web/robinhood-beta/src/trustVerify.js",
+      "lines": { "defaults": "69-72", "consumers": "209-212" },
+      "defect": "Four status fields default to their affirmative verification strings; the receipt booleans are then derived by comparing against those same constants, so missing evidence produces the string meaning 'verified' and the check compares it to itself.",
+      "reproduction": {
+        "method": "enrollmentSummary lifted verbatim, called with protocol = null",
+        "result": {
+          "enrollmentObservationReceiptVerified": true,
+          "enrollmentBackupRoundTripVerified": true,
+          "enrollmentEip191WalletProof": true,
+          "committedDestination": "Loading",
+          "verifiedNostrIdentity": "Loading"
+        },
+        "note": "The page cannot name the destination while certifying the wallet proof recovered to it."
+      },
+      "required_change": {
+        "defaults": "?? \"UNVERIFIED\" for observationStatus, backupStatus, walletProofStatus, exportStatus",
+        "checks": "require positive evidence, e.g. protocol?.observation?.verified === true && status === \"SIGNED_OBSERVATION_RECEIPT_VERIFIED\"",
+        "pattern_to_copy": "creatorControlPassOnlyWhenProven: creator?.state === \"PASS\" && creator.proven === true",
+        "ui": "UNVERIFIED must render visibly differently — loud, as UNPROVEN_HISTORICAL is loud"
+      },
+      "acceptance": [
+        "enrollmentSummary(null,null,null,null) yields all four statuses UNVERIFIED",
+        "derived receipt booleans are false and the verdict is not PASS",
+        "browser test renders with protocol = null and asserts no affirmative verification string appears in the DOM",
+        "UNVERIFIED styling asserted in a browser test, not reviewed by eye"
+      ]
+    },
+    {
+      "id": "FIX-02",
+      "severity": "BLOCKING",
+      "title": "Roster compiler accepts a caller-supplied observation as verified",
+      "file": "packages/sdk/src/enrollmentRoster.js",
+      "line": 122,
+      "current_code": "const trustedObservation = record.trustedObservation ?? receipts.get(record.eventId);",
+      "required_code": "const trustedObservation = receipts.get(record.eventId);",
+      "defect": "The left branch never calls verifyObservationReceipt — no signature check, no observer allowlist, observerPolicy never consulted.",
+      "reproduction": {
+        "method": "compileEnrollmentRoster with observerPolicy: null and a hand-written observation receiptId 'self-made'",
+        "result": "classification = PRODUCTION_VERIFIED_ENROLLMENT"
+      },
+      "expected_consequence": {
+        "description": "Removing the passthrough breaks the current e2e at the first production compile. This is not a regression — it is the proof that every existing test exercised the bypass.",
+        "error": "trusted_observation_required:0x3073bb3f…1036",
+        "stack": [
+          "recordsWithTrustedObservations (enrollmentRoster.js:119)",
+          "compileEnrollmentRoster (enrollmentRoster.js:202)",
+          "main (supporter_enrollment_r2_closure.mjs:277)"
+        ]
+      },
+      "related": "packages/roster/verify_enrollment_evidence.mjs already enforces this correctly — mandatory policy, hash-bound to the constitution, real receipt verification. That enforcement sits beside the bypass rather than replacing it.",
+      "contradicted_claim": "INDEPENDENT_REVIEW_R2.md:10 — 'C-02: CLOSED. Ordering now uses signed receipts.' True of the design, not of the enforcement.",
+      "acceptance": [
+        "supporter_enrollment_r2_closure.mjs passes without pre-attaching trustedObservation to any record",
+        "every compileEnrollmentRoster call supplies real observationReceipts",
+        "negative test: receipt signed outside observerPolicy.observerPubkeys rejected AT COMPILE",
+        "negative test: observerPolicy null with receipts present fails closed",
+        "grep trustedObservation in packages/sdk/src shows no caller-supplied path"
+      ]
+    },
+    {
+      "id": "FIX-03",
+      "severity": "SYSTEMIC",
+      "title": "Make the fail-open pattern a build failure",
+      "pattern": [
+        { "instance": "legacy_roster_wallet_v0", "trigger": "missing enrollment", "behaviour": "pass the wallet through", "status": "FIXED" },
+        { "instance": "record.trustedObservation ??", "trigger": "missing receipt", "behaviour": "trust the caller's", "status": "FIX-02" },
+        { "instance": "?? \"…_VERIFIED\"", "trigger": "missing evidence", "behaviour": "render as verified", "status": "FIX-01" }
+      ],
+      "principle": "?? and || supply a harmless default in ordinary code. In a verification path they manufacture proof, silently, at exactly the moment evidence is absent.",
+      "required_change": {
+        "check": "fail the build on ?? or || fallbacks assigned to identifiers matching /status|verified|proven|proof|finalizable|allowed/i",
+        "scope": ["apps/web/**/trustVerify*", "packages/sdk/src/enrollment*", "packages/roster/**"],
+        "opt_out": "// TRUST-DEFAULT-OK: <reason> — visible in review rather than invisible in syntax"
+      },
+      "precedent": "scripts/check-supply-chain.mjs and scripts/check-caddyfile.mjs in the Berm repo",
+      "acceptance": [
+        "the check fails on the pre-FIX-01 trustVerify.js, verified against that exact revision",
+        "the check passes after FIX-01 and FIX-02",
+        "runs in CI on every push, not only locally"
+      ]
+    },
+    {
+      "id": "FIX-04",
+      "severity": "SMALL",
+      "title": "bindLaunch is not permissionless despite the governing spec",
+      "reference": "CBR2-004, still open",
+      "file": "evm/src/BermRobinhoodDistributorV01.sol",
+      "line": 162,
+      "defect": "requires msg.sender == launchBinder while the governing spec describes bind_launch as permissionless verification",
+      "why_it_matters_beyond_code": "'permissionless verification' is a claim in the public story. Either make it permissionless or change the sentence; do not ship the gap.",
+      "acceptance": [
+        "controller and non-controller binding paths tested, including negative cases for invalid Bags state",
+        "public copy matches whichever way it resolves"
+      ]
+    },
+    {
+      "id": "FIX-05",
+      "severity": "TRIVIAL",
+      "title": "Manifest format defeats sha256sum -c",
+      "defect": "FILE_MANIFEST_SHA256.txt uses three columns (sha256, bytes, path) with CRLF, so sha256sum -c reports 0 OK and all FAILED on an intact pack",
+      "required_change": "one header line giving a verification command that works",
+      "acceptance": ["a reviewer can verify the pack with a command copied from its own header"]
+    }
+  ],
+  "order": {
+    "before_deploying_anything_that_claims_to_verify": ["FIX-01", "FIX-02"],
+    "immediately_after": ["FIX-03"],
+    "before_canary": ["FIX-04"],
+    "whenever": ["FIX-05"]
+  },
+  "size_estimate": "FIX-01 and FIX-02 are a handful of lines each. The work is in the tests, which is where it should be."
+}
