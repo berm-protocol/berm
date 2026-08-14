@@ -2,6 +2,7 @@
 
 | File | What it is |
 |---|---|
+| [`WHAT-IT-DOES.md`](WHAT-IT-DOES.md) | The whole system in order — every step with the human reason for it, what happens, why it is built that way, and how you would know it broke. Plain language, technically exact. **Read this first if you are new, or if you have lost the thread.** |
 | [`LAW-OWNERSHIP.md`](LAW-OWNERSHIP.md) | Which repository owns which law, which vectors pin it, and which direction imports run. One law, one owner, one frozen vector set — everything else is a cross-check. Records one live divergence. |
 | [`UNIFIED.md`](UNIFIED.md) | How the protocol, xonly.ai and bermlaunch.com are one system — the problem all three solve, what a launch looks like end to end, what is trusted, and what is actually built. **Not normative.** Start here if you want the shape before the rules. |
 | [`v2.0-architecture.md`](v2.0-architecture.md) | The normative spec. Threat model, identity architecture, data layer, node boundary, conformance checklist, rejected alternatives. |
