@@ -49,7 +49,9 @@ There is **no `signer/` package in this repo.** What exists:
 | `crypto/src/origin.ts` | origin guard + RP ID derivation, V5-tested |
 | `signer-log/src/{attest,verify}.ts` | attestation log, 20 tests |
 | The signer origin as a deployable app | **does not exist** |
-| A NIP-46 backend | **no `nip46.ts` anywhere in this repo** — grep returns nothing |
+| A NIP-46 backend | **EXISTS** — `sdk/src/backends/nip46.ts`, built on `nostr-tools/nip46`, wired through `connect.ts`, `index.ts`, `types.ts`, `errors.ts`, covered by `sdk/test/sdk.test.ts` (34/34). **An earlier revision of this file claimed it did not exist. That was wrong** — the grep behind it ran from `editor/` after a stray `cd`, so it searched one subdirectory and reported the whole repo. Re-run from the root, it returns eight files |
+| `nostrconnect://` QR | **absent** — `nip46.ts` takes a pasted `bunker://` URI; the reverse QR flow in `ENROLLMENT-SPEC.md §5` is not built |
+| `ncryptsec` / NIP-49 export | **absent** — confirmed from the repo root, zero files. This one stands |
 
 So: every primitive the signer needs is built and tested. The thing that composes
 them into an origin a browser can visit is not started.
@@ -90,7 +92,7 @@ already solved; I was solving it twice and the second solution was harmful.
 
 | # | Item |
 |---|---|
-| 5 | **NIP-46 backend** — no `nip46.ts` in this repo. If enrollment copy says *"use Amber or nsec.app, it is more sovereign than our tier 1"*, that path must actually work |
+| 5 | **`ncryptsec` / NIP-49 export** — genuinely absent, and it is the load-bearing one. `ENROLLMENT-SPEC.md §1.1` makes the download **non-optional** and blocks "continue" until it exists. Without it, tier 1 has no exit and the default path cannot ship. (The NIP-46 backend itself is built and tested — see above) |
 | 6 | **`nostrconnect://` QR** — specced in `ENROLLMENT-SPEC.md §5`; pasting a `bunker://` URI on a phone is the friction that loses people |
 | 7 | **`ncryptsec` download before continue** — specced; acceptance is *"Continue is unreachable until the backup is downloaded"* |
 
