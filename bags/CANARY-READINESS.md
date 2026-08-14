@@ -1,144 +1,194 @@
-# Canary launch — readiness, anchored in evidence
+# Canary launch — readiness
 
-**What this is.** The go/no-go list for the canary token. Every line carries an
-anchor, and every anchor carries a **grade**. A claim without an anchor is not on
-this list — it is in §5, which is the part worth reading twice.
+**Rewritten from a corrected baseline at commit `7ce22bf`.** Earlier revisions of
+this file carried four claims that were false. They are listed in §6 rather than
+deleted, because how they got in matters more than that they are gone.
 
-**Why graded.** A `PASS` verdict once hid a third binding mode that committed 50
-EVM destinations with no control proof. It was not caught by scepticism about the
-claim; it was caught by asking *"what would I have to run to see this for
-myself?"* That question is this document's only real content.
+---
 
-## 0. The grades
+## 0. The evidence rule
 
-| Grade | Means |
-|---|---|
-| **VERIFIED** | I ran it, or it is `file:line` in this repo. Reproducible by anyone with the checkout |
-| **REPORTED** | Someone's pack says so. Plausible, manifest-clean, **not independently reproduced** |
-| **ASSERTED** | Claimed in prose with no artifact behind it |
-| **OPEN** | Not done, and known not done |
+> **No claim enters this file unless it was produced by running something.**
+> A test executed, a script reproduced, a live host fetched, or `file:line` read
+> from the repository **root**.
+
+Specifically, and because each of these produced a false claim in an earlier
+revision:
+
+- **No absence claim** unless the search ran from the repository root. A `grep`
+  after a stray `cd` reports on one subdirectory and reads like the whole repo.
+- **No deployment claim** unless the host was fetched. "Serving nothing" and
+  "does not exist" are different facts.
+- **No architectural claim** from a specification alone where a provisioning file,
+  config, or running system can be consulted instead. Documents describe
+  intentions; the deployed system is the intention that survived.
+
+Grades: **VERIFIED** (produced by execution) · **REPORTED** (someone's pack says
+so, unreproduced) · **OPEN** (known not done).
 
 **REPORTED is not VERIFIED.** The sealed R1 pack was manifest-clean, honestly
-classified, and still shipped an undisclosed bypass. Manifest integrity proves the
-bytes did not change in transit; it proves nothing about whether the claim is true.
+self-classified, and still shipped an undisclosed bypass.
 
 ---
 
-## 1. What we have — VERIFIED
+## 1. VERIFIED — test suites, run at `7ce22bf`
 
-| Item | Anchor |
+| Package | Result |
 |---|---|
-| npub → EVM derivation, both parity branches | `bags/vectors/pocket-address.json`, 10 vectors; `node scripts/check-vectors-frozen.mjs` → *"reproduce byte-identically"* |
-| Derivation anchor vector | key `1` → `0x7E5F4552091A69125d5DfCb7b8C2659029395Bdf`, externally checkable |
-| Enrollment wire contract | `bags/src/enrollment.ts`, 346 lines, 9 exported symbols |
-| Enrollment behaviour | `bags/test/enrollment.test.ts` — 21 assertions, part of **bags 181/181** |
-| Crypto suite | **119/119** |
-| SDK suite | **34/34** |
-| G-02 landed (Path-B ≠ derived rule removed) | commit `7d661c2` |
-| Rebinding-ordering gap flagged, ordering forbidden until closed | `bags/ENROLLMENT-SPEC.md` §Rebinding, marked OPEN |
-| Addressless-enrollment acceptance contradiction fixed | same commit |
-| `BagsFeeShare.owner()` is the factory owner; `renounceOwnership()` reverts | **proven on a fork at block 28814524** — `SOVEREIGNTY.md:35` |
-| Bags claimer ceiling | `MAX_CLAIMERS = 100`, `bags/src/bags.ts:102` |
-| Solana address case-mangling detector | `solanaAddressIsCaseMangled()`, `bags/src/bags.ts:96` |
-| Upstream authority disclosure exists | `bags/SOVEREIGNTY.md` §disclosure table, 12 rows |
-| `/who` identity explorer builds | `explorer/dist/who.html` |
-| Two hosts live, TLS, keys-only SSH, separate credentials | `infra/README.md` runbook |
+| `crypto/` | **119/119** |
+| `bags/` | **181/181** |
+| `landing/` | **89/89** + 31 browser checks |
+| `post/` | **68/68** |
+| `sdk/` | **34/34** |
+| `graph/` | **24/24** |
+| `signer-log/` | **20/20** |
+| `node-pages/` | **18/18** |
 
-Line 35 is the standard the rest of this list should meet: *a claim, a method, and
-a block number.* Aim there.
+**553 assertions.** Plus browser end-to-end suites in `editor/` and `recovery/`,
+both `errors: none`.
+
+### Guards, all passing
+
+`scripts/check-vectors-frozen.mjs` · `check-supply-chain.mjs` (311 files) ·
+`check-package-graph.mjs` · `check-ci.mjs` · `check-readme.mjs` ·
+`check-no-machine-paths.mjs` · `check-caddyfile.mjs` (takes a path argument;
+running it bare prints usage and exits non-zero — that is not a failure, and an
+earlier draft of this section recorded it as one).
 
 ---
 
-## 2. What we have — REPORTED (Codex R1 pack, not reproduced by me)
+## 2. VERIFIED — protocol facts, with anchors
 
-Manifest self-verified 7/7. Classification `IMPLEMENTED_PROOF_PARTIAL` was honest.
-
-| Item | Status |
+| Fact | Anchor |
 |---|---|
-| Mode + campaign bound into both signature preimages | REPORTED — read, not re-derived |
-| Duplicate critical tags rejected before signature check | REPORTED |
-| `derived_v1` recomputes rather than trusting supplied address | REPORTED |
-| EIP-191 control proof mandatory in both modes | REPORTED |
-| Parity normalised at generation, single scalar | REPORTED |
-| No compressed-pubkey trap in `recoverAddressFromDigest` | REPORTED — and notable, since this bug bit my own test helper |
-
-One item in that pack **I did reproduce**, and it failed: the roster compiler
-regenerated the full 50-member root from zero enrollments and zero proofs,
-`MATCH: YES`. That is the difference the grades exist to record.
+| npub → EVM derivation, both parity branches | `bags/vectors/pocket-address.json`, `crypto/vectors/test-vectors.json`; reproduce byte-identically |
+| Derivation anchor | key `1` → `0x7E5F4552091A69125d5DfCb7b8C2659029395Bdf` |
+| Bags claimer ceiling | `MAX_CLAIMERS = 100` — `bags/src/bags.ts:102` |
+| Solana case-mangling detector | `solanaAddressIsCaseMangled()` — `bags/src/bags.ts:96` |
+| `BagsFeeShare.owner()` is the **factory** owner; `renounceOwnership()` reverts | **proven on a fork at block 28814524** — `bags/SOVEREIGNTY.md:35` |
+| Upstream authority disclosure | `bags/SOVEREIGNTY.md`, 12-row table |
+| NIP-46 backend | `sdk/src/backends/nip46.ts`, wired through `connect.ts`/`index.ts`/`types.ts`/`errors.ts` |
+| Intended RP ID | *"RP ID is xonly.ai, NOT this hostname"* — `infra/cloud-init.xonly.yaml:25` |
 
 ---
 
-## 3. What we need before the canary
+## 3. VERIFIED — live infrastructure, fetched at review time
 
-### 3a. Ours — no external dependency
-
-| # | Item | Closed when |
+| Host | `/health` | `/` |
 |---|---|---|
-| 1 | **`manager_waive_fee_config` called** | a tx signature, published. Until then *"the dev cannot redirect the split"* is false and the community is trusting you personally, not the structure |
-| 2 | **`rpIdFromOrigin` — REINSTATED. Third position, and this one has evidence** | `crypto/src/origin.ts:57` returns `u.hostname`, so `webauthn.ts:68` passes `rp.id = "signer.xonly.ai"`. **The deployed infrastructure says that is wrong, in a comment written when it was provisioned** — `infra/cloud-init.xonly.yaml:25`: *"signer.xonly.ai — the signer origin. **RP ID is xonly.ai, NOT this hostname**"*, with the apex provisioned to serve `/.well-known/webauthn`, the Related Origin Requests file. My withdrawal misread `signer-broker.md`: it forbids handing the credential to **third-party clients**, not ROR across origins **we operate**. Those are different mechanisms and the infra runs both — ROR for apex/signer/editor, broker popup for everyone else. Fix is registrable domain via the Public Suffix List; V5 needs rewriting since its two origins share one registrable domain. **Still unfixable after the first passkey exists** |
-| 3 | **Bags API key + Hetzner token rotated** | both are in a chat transcript |
-| 4 | **Enrollment-time disclosure copy** | the sentence a Bermer reads *before* signing: share is fixed and verifiable, delivery depends on Bags. Disclosed after enrollment is the `legacy_roster_wallet_v0` pattern one level up |
-| 5 | **Canary scope decision** | claimers are set at `create_fee_config` and only Bags' admin can update. Whatever the canary launches with, it keeps. **Decide explicitly whether the canary carries real Founders** — if it does, their pockets depend on manual forwarding forever, with no upgrade path |
-| 6 | **B-04 ruling recorded** | `SOVEREIGNTY.md:34` currently reads *"Stronger than any Solana admin power"* — which the founder ruling contradicts (global upgrade is protocol-level, high severity, low aimability, high detectability). **The file disagrees with the decision. Fix the file** |
-| 7 | **Cohort finalization counts reconciled** | `campaign.ts` enforces no size gate; the historical dual-chain spec required *exactly* 100 / 300. Two laws, one campaign |
-| 8 | **Deadline anchoring** | pre-commit the rule, OTS-anchor the snapshot. Same anchor closes rebinding order and E-01 — one mechanism, three uses |
+| `bermlaunch.com` | `berm-ok` | *"Server up, TLS working. Nothing deployed yet."* |
+| `xonly.ai` | — | *"Provisioned. Nothing deployed yet."* |
+| `signer.xonly.ai` | `signer-ok` | *"Provisioned. Nothing deployed yet."* |
+| `editor.xonly.ai` | — | *"Provisioned. Nothing deployed yet."* |
+| `xonly.ai/.well-known/webauthn` | — | **404** — the ROR allowlist is not served |
 
-### 3b. Codex — verify on delivery, do not accept on report
+**All four hosts are provisioned, hardened placeholders.** TLS, HSTS, per-host CSP,
+`frame-ancestors 'none'` on the signer — `infra/Caddyfile.xonly`.
+
+### The deploy pipeline is built
+
+`infra/cloud-init.bermlaunch.yaml:201` — `/usr/local/bin/bermlaunch-deploy`:
+clones or fast-forwards `GIT_REMOTE`, **refuses to publish if `PUBLISH_DIR` is
+missing** (*"refusing to publish an empty site"*), swaps by rename so no visitor
+sees a half-copied tree, reloads Caddy, prints the live commit.
+
+`PUBLISH_DIR=public` — line 199. **No `public/` tree exists in this repo yet**, so
+deploying needs an assembly step, not new content: `landing/` verifies 89/89 + 31
+browser checks, `explorer/dist/who.html` is built.
+
+**Deploying is: generate a deploy key → add it to the repo → set `GIT_REMOTE` in
+`/etc/bermlaunch.env` → `sudo bermlaunch-deploy`.** Not a project.
+
+---
+
+## 4. REPORTED — Codex packs, and what I reproduced
+
+Manifests verified: continuity pack **390/390**, blocked pack **82/82**, replay
+envelope **6/6 inputs**, disposable reconstruction **55/55**.
+
+**Reproduced by execution — these are VERIFIED, not reported:**
+
+| Finding | Result |
+|---|---|
+| `legacy_roster_wallet_v0` **closed** | production compile with zero enrollments throws `missing_verified_enrollment` |
+| Historical root preserved, non-finalizable | `0x30b9a085…c1a2`, `UNPROVEN_HISTORICAL`, `finalizable: false`, portable bundle throws |
+| Observation passthrough — `enrollmentRoster.js:122` | C1–C6 compiled `PRODUCTION_VERIFIED_ENROLLMENT` with a fabricated receipt; **C4 compiled even with a correct outsider policy** |
+| Destination selection | **C9** — attacker-supplied sequence 99 put the attacker's wallet in the leaf |
+| Trust surface fail-open — `trustVerify.js:58-75` | **F1** `protocol = null` → **5/5** guards true, destination renders `Loading` |
+| Two guards are tautologies | `enrollmentPortableAfterFinalization`, `enrollmentBrokerDisclosureVisible` — match a hardcoded literal against a substring of itself |
+| Empty observer policy is permissive | rogue observer accepted under `null` **and** `{observerPubkeys: []}`; populated policy correctly throws |
+| FIX-03 regex unfit | **6 false negatives, 1 false positive** — misses `trustedObservation`, blocks `?? "UNVERIFIED"` |
+| Controller-only binding correct | one-shot, **zero** unbind/rebind paths; permissionless would permanently brick the Distributor |
+
+**Still REPORTED, never reproduced by me:** the enrollment protocol library's
+internals — mode/campaign in both preimages, duplicate-tag rejection, EIP-191
+mandatory, parity at generation, no compressed-pubkey trap. Read, not re-derived.
+
+---
+
+## 5. OPEN — what actually blocks the canary
+
+### 5a. Yours alone — no dependency on anyone
+
+| # | Item | Anchor | Closed when |
+|---|---|---|---|
+| 1 | **`manager_waive_fee_config`** | BDR-002; `bags/README.md:462` | a published tx signature. Until then *"the dev cannot redirect the split"* is false |
+| 2 | **`rpIdFromOrigin`** | `crypto/src/origin.ts:57` returns `u.hostname`; `webauthn.ts:68` passes it as `rp.id` | returns the registrable domain (needs the Public Suffix List). **Unrepairable after the first passkey exists** — see §7 |
+| 3 | **Rotate Bags API key + Hetzner token** | both in a chat transcript | rotated |
+| 4 | **Enrollment disclosure copy** | `spec/WHAT-IT-DOES.md` §13, §14 | the sentence a Bermer reads *before* signing |
+| 5 | **Canary scope decision** | claimers fixed at `create_fee_config` | explicit: does the canary carry real Founders? Recommended **no** |
+| 6 | **`SOVEREIGNTY.md:34`** | reads *"Stronger than any Solana admin power"* | corrected to match the B-04 ruling |
+| 7 | **Cohort finalization counts** | `bags/src/campaign.ts` has no size gate; historical spec required *exactly* 100/300 | one law, stated once |
+| 8 | **Deadline anchoring** | `bags/src/subscribe.ts:25-29` — `created_at` MUST NOT order anybody | pre-committed rule + anchored snapshot |
+
+### 5b. Build — verified absent from the repository root
+
+| # | Item | Evidence of absence |
+|---|---|---|
+| 9 | **`ncryptsec` / NIP-49 export** | `grep -rln "ncryptsec\|nip49\|scrypt"` from root → **zero files**. `ENROLLMENT-SPEC.md §1.1` makes the download non-optional, so **the default enrollment path cannot ship** |
+| 10 | **`nostrconnect://` QR** | `grep -rn "nostrconnect"` from root → **zero hits**. Specced in `ENROLLMENT-SPEC.md §5` |
+| 11 | **Signer application** | `signer.xonly.ai/` serves the placeholder. Origin is live; the page is missing |
+| 12 | **ROR allowlist** | `xonly.ai/.well-known/webauthn` → 404 |
+| 13 | **`public/` assembly** | deploy expects it; repo has none |
+
+### 5c. Codex — verify on delivery, never accept on report
 
 | # | Item | Evidence that closes it |
 |---|---|---|
-| 9 | `legacy_roster_wallet_v0` fails closed | a roster compile with zero enrollments **throws**. Re-run my repro; it must now fail |
-| 10 | Library wired to the app | an import of `enrollmentProtocol` in `apps/`. Currently `apps/web/robinhood-beta/src/browserApp.js:267` is a hardcoded `"derived_v1 mock enrollment"` string |
-| 11 | `REPORT.md` precision | "UI" claim matches what is actually integrated |
+| 14 | `enrollmentRoster.js:122` passthrough removed | closure e2e passes **without** pre-attaching `trustedObservation` |
+| 15 | Non-empty observer policy enforced **at the compiler** | rogue-observer fixture rejected with `observerPolicy: null` |
+| 16 | `trustVerify.js` defaults fail closed | `protocol = null` → no affirmative string in the DOM |
+| 17 | Library wired to the app | an import of `enrollmentProtocol` in `apps/` |
 
-### 3c. Bags — parallel, not gating
+### 5d. Bags — parallel, gates nothing
 
-| # | Item |
-|---|---|
-| 12 | Case-preserving route for naming a program address as claimer (Solana) |
-| 13 | Whether `BagsFeeShare` ownership can ever sit with the launcher (EVM) |
-
-Both are **disclosure items, not blockers** — the launch proceeds with them open,
-because the failure is shared: if the fee stream fails it fails for the dev too.
-That is what makes the promise credible without irrevocability. It makes it
-**honest, not safe** — and the copy in item 4 has to say which.
+Case-preserving claimer route (Solana) · whether `BagsFeeShare` ownership can sit
+with the launcher (EVM). Both **disclosure items**: the failure is shared, which
+makes the arrangement **honest, not safe** — and item 4 must say which.
 
 ---
 
-## 4. Ordering
+## 6. Claims this file previously carried that were false
 
-1, 2 and 3 first. **2 is back**, and it is again the only item on this page that
-cannot be repaired after launch — a passkey created under the wrong RP ID is
-orphaned by the fix. I have now argued all three positions on this; the reason to
-trust this one is that it does not rest on my reading of a spec. It rests on the
-provisioning file stating the intended RP ID outright, the apex being configured
-to serve the ROR allowlist, and that allowlist currently returning 404 because
-nothing has been deployed into it yet.
+| Was written | Actually | How it got in |
+|---|---|---|
+| *"no `nip46.ts` anywhere in this repo"* | 8 files, tested | `grep` ran from `editor/` after a stray `cd` |
+| *"the signer origin does not exist"* | live since provisioning | never fetched the host |
+| *"`u.hostname` is correct, finding withdrawn"* | wrong | reasoned from `signer-broker.md` instead of reading `cloud-init.xonly.yaml` |
+| *"you cannot launch the canary until Bags answers"* | wrong | the founder corrected it; `bags/README.md:462` already said so |
 
-Then 4, 5, 6. Then Codex 9–11 on delivery. Then 7 and 8.
-
-12 and 13 run alongside and gate nothing.
+Every one is the same shape: **a conclusion offered in place of the method that
+produced it** — the exact defect this file exists to catch in other people's work.
+Hence §0.
 
 ---
 
-## 5. What is not evidence
+## 7. Order
 
-```
-a manifest that self-verifies      → the bytes are intact, the claim is untested
-a PASS verdict                     → someone concluded; reproduce the conclusion
-a green CI run                     → the checks that exist passed
-"tests pass"                       → which tests, and what would fail if the bug were present?
-an independent review              → the R1 review missed the bypass entirely
-a spec saying it fails closed      → the spec said that; the compiler failed open
-my own prior statement             → I claimed the launch was blocked; it was not
-my own repeated statement          → I called rpIdFromOrigin an unfixable defect,
-                                     then withdrew it, then reinstated it. Two of
-                                     those three were reasoning from documents.
-                                     The one that settled it was reading the
-                                     deployed config and fetching the live host
-```
+**2 first.** It is the only item that cannot be repaired after launch: changing the
+RP ID orphans every passkey already created. Then **1 and 3** — cheap, yours,
+unblocked. Then **9** — without it the default enrollment path does not exist.
 
-The pattern in every one: **a conclusion offered in place of the method that
-produced it.** The question that catches all of them is the same — *what would I
-have to run to see this for myself?* If the answer is "nothing, it says so", the
-row is `ASSERTED` and belongs in §5, not §1.
+Then 4–8. Then 11–13. Then 14–17 on Codex delivery.
+
+5d runs alongside and blocks nothing.
