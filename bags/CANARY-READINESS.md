@@ -75,7 +75,7 @@ regenerated the full 50-member root from zero enrollments and zero proofs,
 | # | Item | Closed when |
 |---|---|---|
 | 1 | **`manager_waive_fee_config` called** | a tx signature, published. Until then *"the dev cannot redirect the split"* is false and the community is trusting you personally, not the structure |
-| 2 | ~~**`rpIdFromOrigin` decision**~~ | **WITHDRAWN — I was wrong, and repeatedly.** `u.hostname` is *correct*. `spec/signer-broker.md:28` refuses RP-ID sharing outright: *"Clients sharing an RP ID share the credential… one compromised client would burn every user of every client."* Clients never call WebAuthn; the signer does, via popup. Broadening the RP ID to the registrable domain would have caused the exact failure the architecture is built to prevent. V5's guarantee — *"the same passkey cannot be used from a second origin"* — is deliberate. Federation is delivered by the broker, not by credential sharing. **No change required; nothing here is unfixable** |
+| 2 | **`rpIdFromOrigin` — REINSTATED. Third position, and this one has evidence** | `crypto/src/origin.ts:57` returns `u.hostname`, so `webauthn.ts:68` passes `rp.id = "signer.xonly.ai"`. **The deployed infrastructure says that is wrong, in a comment written when it was provisioned** — `infra/cloud-init.xonly.yaml:25`: *"signer.xonly.ai — the signer origin. **RP ID is xonly.ai, NOT this hostname**"*, with the apex provisioned to serve `/.well-known/webauthn`, the Related Origin Requests file. My withdrawal misread `signer-broker.md`: it forbids handing the credential to **third-party clients**, not ROR across origins **we operate**. Those are different mechanisms and the infra runs both — ROR for apex/signer/editor, broker popup for everyone else. Fix is registrable domain via the Public Suffix List; V5 needs rewriting since its two origins share one registrable domain. **Still unfixable after the first passkey exists** |
 | 3 | **Bags API key + Hetzner token rotated** | both are in a chat transcript |
 | 4 | **Enrollment-time disclosure copy** | the sentence a Bermer reads *before* signing: share is fixed and verifiable, delivery depends on Bags. Disclosed after enrollment is the `legacy_roster_wallet_v0` pattern one level up |
 | 5 | **Canary scope decision** | claimers are set at `create_fee_config` and only Bags' admin can update. Whatever the canary launches with, it keeps. **Decide explicitly whether the canary carries real Founders** — if it does, their pockets depend on manual forwarding forever, with no upgrade path |
@@ -107,9 +107,13 @@ That is what makes the promise credible without irrevocability. It makes it
 
 ## 4. Ordering
 
-1 and 3 first — cheap, yours, no dependencies. (2 is withdrawn. With it goes the
-claim that anything on this page is unrepairable after launch: **nothing here is.**
-That is a better position than the one this document shipped with.)
+1, 2 and 3 first. **2 is back**, and it is again the only item on this page that
+cannot be repaired after launch — a passkey created under the wrong RP ID is
+orphaned by the fix. I have now argued all three positions on this; the reason to
+trust this one is that it does not rest on my reading of a spec. It rests on the
+provisioning file stating the intended RP ID outright, the apex being configured
+to serve the ROR allowlist, and that allowlist currently returning 404 because
+nothing has been deployed into it yet.
 
 Then 4, 5, 6. Then Codex 9–11 on delivery. Then 7 and 8.
 
@@ -127,10 +131,11 @@ a green CI run                     → the checks that exist passed
 an independent review              → the R1 review missed the bypass entirely
 a spec saying it fails closed      → the spec said that; the compiler failed open
 my own prior statement             → I claimed the launch was blocked; it was not
-my own repeated statement          → I called rpIdFromOrigin an unfixable defect
-                                     across several turns and put it at the top of
-                                     this list. Repetition is not evidence. One
-                                     grep of the broker spec refuted it
+my own repeated statement          → I called rpIdFromOrigin an unfixable defect,
+                                     then withdrew it, then reinstated it. Two of
+                                     those three were reasoning from documents.
+                                     The one that settled it was reading the
+                                     deployed config and fetching the live host
 ```
 
 The pattern in every one: **a conclusion offered in place of the method that

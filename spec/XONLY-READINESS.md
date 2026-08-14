@@ -4,9 +4,10 @@ Same grading as `bags/CANARY-READINESS.md`: **VERIFIED** (I ran it, or `file:lin
 here) · **REPORTED** (a pack says so, unreproduced) · **ASSERTED** (prose, no
 artifact) · **OPEN**.
 
-The headline: **the editor is real and the signer is not.** One is a working
-product with an end-to-end proof; the other is an excellent document. Do not let
-the quality of the document disguise which is which.
+The headline: **the editor is real, the signer origin is real, the signer
+application is not.** `signer.xonly.ai` is live, hardened and answering
+`signer-ok` — it just serves *"Provisioned. Nothing deployed yet."* The remaining
+job is deploying an app into a correctly configured origin, not building one.
 
 ---
 
@@ -38,9 +39,10 @@ loss scenario to a stated outcome including `[NOT RECOVERABLE]`, `errors: none`.
 
 ---
 
-## 2. The signer — spec only
+## 2. The signer — origin live, application absent
 
-There is **no `signer/` package in this repo.** What exists:
+There is **no `signer/` package in this repo**, but the origin it would deploy
+into is provisioned and serving. What exists:
 
 | Piece | State |
 |---|---|
@@ -48,42 +50,68 @@ There is **no `signer/` package in this repo.** What exists:
 | `crypto/src/webauthn.ts` | the passkey primitive |
 | `crypto/src/origin.ts` | origin guard + RP ID derivation, V5-tested |
 | `signer-log/src/{attest,verify}.ts` | attestation log, 20 tests |
-| The signer origin as a deployable app | **does not exist** |
+| The signer **origin** | **LIVE.** `signer.xonly.ai/health` → `signer-ok`, TLS, hardened headers, `frame-ancestors 'none'`, its own CSP. Provisioned and correct |
+| The signer **application** | **absent.** `signer.xonly.ai/` serves *"Provisioned. Nothing deployed yet."* |
+| ROR allowlist at `xonly.ai/.well-known/webauthn` | **404.** Empty on purpose per the provisioning note — *"every entry is a full grant of identity power to that origin"* — but nothing serves it yet |
 | A NIP-46 backend | **EXISTS** — `sdk/src/backends/nip46.ts`, built on `nostr-tools/nip46`, wired through `connect.ts`, `index.ts`, `types.ts`, `errors.ts`, covered by `sdk/test/sdk.test.ts` (34/34). **An earlier revision of this file claimed it did not exist. That was wrong** — the grep behind it ran from `editor/` after a stray `cd`, so it searched one subdirectory and reported the whole repo. Re-run from the root, it returns eight files |
 | `nostrconnect://` QR | **absent** — `nip46.ts` takes a pasted `bunker://` URI; the reverse QR flow in `ENROLLMENT-SPEC.md §5` is not built |
 | `ncryptsec` / NIP-49 export | **absent** — confirmed from the repo root, zero files. This one stands |
 
-So: every primitive the signer needs is built and tested. The thing that composes
-them into an origin a browser can visit is not started.
+So: every primitive is built and tested, and the origin is live and hardened.
+What is missing is the page that composes them — plus the ROR allowlist that makes
+the credential usable across our own surfaces.
 
-### Correction — one I had wrong for several turns
+### `rpIdFromOrigin` — I argued three positions. Here is the settled one and why
 
-I said repeatedly that `rpIdFromOrigin` must return `xonly.ai` rather than
-`signer.xonly.ai`, and called it unfixable after the first enrollment. **That was
-wrong.** `spec/signer-broker.md:24-30`:
+**Position 1:** RP ID must be `xonly.ai`, not `signer.xonly.ai`. **Position 2:**
+withdrawn — `spec/signer-broker.md:28` forbids RP-ID sharing, so `u.hostname` is
+right. **Position 3, and this one stands:** position 1 was correct.
 
-> The tempting design is to let every client share the RP ID … **it is
-> unshippable.** Clients sharing an RP ID share the **credential**. Client B's
-> JavaScript would receive the same `prf_out` … and sign as any of A's users.
+The withdrawal conflated two different mechanisms. The broker spec forbids handing
+the credential to **third-party clients** — *"Client B's JavaScript would receive
+the same `prf_out`"*. It says nothing against **Related Origin Requests across
+origins we operate ourselves**, which is a curated allowlist, not an open grant.
 
-Clients never call WebAuthn. The signer does, in a top-level popup where the user
-sees the real URL bar. So `u.hostname` is correct, V5's *"the same passkey cannot
-be used from a second origin"* is the intended property, and my proposed fix would
-have broadened the credential to every `*.xonly.ai` origin — causing precisely the
-failure the architecture refuses.
+The deployed infrastructure runs both, and says so plainly.
+`infra/cloud-init.xonly.yaml:25`:
 
-Federation comes from **the broker**, not from credential sharing. That was
-already solved; I was solving it twice and the second solution was harmful.
+> `signer.xonly.ai` — the signer origin. **RP ID is `xonly.ai`, NOT this hostname**
+
+with the apex provisioned to serve `/.well-known/webauthn`, and the final
+provisioning message:
+
+> The ROR origins list is **EMPTY on purpose.** Add `bermlaunch.com` only after
+> the signer is deployed and verified — **every entry is a full grant of identity
+> power to that origin.**
+
+So the architecture is two-layer: **ROR** for apex / signer / editor, empty by
+default and expanded only deliberately; **broker popup** for everyone else, who
+receive signatures and never credentials. `bermlaunch.com` is a broker client, not
+a ROR entry, unless explicitly granted.
+
+`crypto/src/origin.ts:57` returning `u.hostname` is therefore inconsistent with the
+deployed intent, and `webauthn.ts:68` passes the wrong `rp.id` today.
+
+**Why trust this position over the previous two:** both of those were reasoning
+from documents. This one is the provisioning file declaring the intended RP ID,
+plus a live fetch showing the ROR path returns 404 because nothing has been
+deployed into it yet.
 
 ---
 
 ## 3. What we need, for canary day
 
-### 3a. Blocking — the canary cannot use a signer that does not exist
+### 3a. Blocking — the origin is live, the application is not
+
+Correction to an earlier revision of this file: I wrote that the signer origin did
+not exist. It does, and it has since provisioning. What is missing is the app
+inside it. That is a materially smaller job — deploying into a hardened, correctly
+configured origin rather than standing one up.
 
 | # | Item | Closed when |
 |---|---|---|
-| 1 | **The signer origin app** | `signer.xonly.ai` serves a page that creates a passkey, derives the identity key, and signs an event. Built from the existing `crypto/` primitives — this is composition, not new cryptography |
+| 1 | **The signer application** | `signer.xonly.ai/` serves a page that creates a passkey, derives the identity key, and signs an event — replacing *"Provisioned. Nothing deployed yet."* Built from existing `crypto/` primitives: composition, not new cryptography |
+| 1b | **The ROR allowlist** | `xonly.ai/.well-known/webauthn` returns a document instead of 404, and `rpIdFromOrigin` returns the registrable domain so the credential is actually scoped to it |
 | 2 | **`postMessage` request/response channel** | a client at another origin obtains a signature and never sees `prf_out`. Asserted in a browser test, cross-origin, not same-page |
 | 3 | **Origin allowlist** | the signer refuses to sign for an unregistered client origin. The allowlist is the product; `assertSignerOrigin` already exists to enforce it |
 | 4 | **Deploy to the box** | `xonly.ai` is live with TLS and serving nothing. Two paid hosts, zero content |
@@ -108,8 +136,9 @@ already solved; I was solving it twice and the second solution was harmful.
 
 ## 4. The honest shape of it
 
-For the canary you need **the editor** (done), **a signer origin** (not started,
-but composition of tested parts), and **a deploy** (not started, trivial).
+For the canary you need **the editor** (done), **a signer application** (not
+started, but composition of tested parts, deploying into an origin that is already
+live and hardened), and **content on the apex** (not started).
 
 The risk is not difficulty. It is that `spec/signer-broker.md` reads like a
 finished thing — precise, opinionated, correct — and specs do not serve HTTP.
