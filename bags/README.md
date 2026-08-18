@@ -11,6 +11,17 @@ npm run verify    # 26 browser checks, mostly about what it refuses to say
 npm run probe     # read-only; needs BAGS_API_KEY
 ```
 
+## Scope
+
+[`BERMLAUNCH-SCOPE.md`](BERMLAUNCH-SCOPE.md) — **frozen, founder authority.** What
+BermLaunch is required to do and required not to do, in 14 components with stable
+IDs, plus 16 explicitly out-of-scope items and 4 invariants. Machine-readable
+companion: [`bermlaunch-scope.json`](bermlaunch-scope.json).
+
+A finding about an out-of-scope item is closed by citation, not debate. A
+capability that appears in code but not there is out of scope until the document
+says otherwise.
+
 ## The problem
 
 Bags lets a token launch assign fee shares to a **social handle** rather than a

@@ -1,0 +1,352 @@
+{
+ "schema": "berm.bermlaunch.functional_scope.v1",
+ "status": "FROZEN",
+ "version": 1,
+ "authority": "FOUNDER",
+ "authority_note": "Scope is not owned by an implementation. LAW-OWNERSHIP.md assigns the laws to the BermLaunch lane; this document assigns what the product must and must not do, and constrains both repositories.",
+ "purpose": [
+  "A finding about an out_of_scope item is not a blocker; close it by citation.",
+  "A capability not listed here is absent by decision, not missing by oversight."
+ ],
+ "frozen_anchors": {
+  "constitution_file": "campaign-constitution.v2.canonical.json",
+  "constitution_bytes": 1862,
+  "constitution_sha256": "0xbaef1dbfcc212379f9e66addf474c5cba1f48547783c64db97be66bb44e4995a",
+  "protocol_version": "supporter_enrollment_r2_campaign_authority_lifecycle_r1",
+  "economics": {
+   "preset": "BERM_STANDARD",
+   "community_bps": 6000,
+   "creator_bps": 4000,
+   "mutable_after_launch": "NO"
+  },
+  "cohorts": [
+   {
+    "id": 0,
+    "contract_id": "PRELAUNCH",
+    "public_name": "Founding Supporters",
+    "members": 50,
+    "bps_start": 0,
+    "bps_end": 2000
+   },
+   {
+    "id": 1,
+    "contract_id": "GRADUATION",
+    "public_name": "Graduation Supporters",
+    "members": 100,
+    "bps_start": 2000,
+    "bps_end": 4000
+   },
+   {
+    "id": 2,
+    "contract_id": "FOMO",
+    "public_name": "Momentum Supporters",
+    "members": 300,
+    "bps_start": 4000,
+    "bps_end": 6000
+   }
+  ],
+  "chain": "robinhood",
+  "deployment_binding": {
+   "mode": "DISTRIBUTOR_SELF_ANCHOR",
+   "version": 1
+  }
+ },
+ "components": [
+  {
+   "id": "BL-01",
+   "name": "Campaign constitution",
+   "part": "creator",
+   "does": "Fixes cohort sizes and cumulative bps ranges, economic preset, observer policy and its hash, chain and domain, enrollment verifier path, roster and receipt schemas \u2014 before anything launches.",
+   "authority": "Founder at authoring time; immutable thereafter, hash committed by the Distributor at deployment",
+   "must_fail": [
+    "zero constitution hash at deployment",
+    "declared observer_policy_hash disagreeing with contents",
+    "local registry overriding the on-chain commitment",
+    "wrong-campaign constitution"
+   ],
+   "not_in_scope": [
+    "editing a constitution after deployment"
+   ]
+  },
+  {
+   "id": "BL-02",
+   "name": "Token launch",
+   "part": "creator",
+   "does": "Creates the Bags token and binds the Distributor in the same transaction, so any failed invariant reverts the whole launch.",
+   "authority": "Atomic Launch Controller only, by ruling",
+   "authority_rationale": "permissionless binding would let an attacker pre-bind the Distributor to their own otherwise-valid token and permanently brick it with AlreadyBound",
+   "not_in_scope": [
+    "launching without Bags",
+    "multi-chain launch",
+    "re-launching a campaign"
+   ]
+  },
+  {
+   "id": "BL-03",
+   "name": "Distributor binding",
+   "operation": "bindLaunch(token, feeShare)",
+   "part": "creator",
+   "does": "Verifies sole-claimer at 10000 bps, token/curve/pool existence, WETH/hook/pool/curve match, no authority collision, non-zero beacon and implementation; snapshots Bags authority; sets launchBound.",
+   "authority": "launchBinder only; one-shot, zero unbind or rebind paths (verified)",
+   "must_fail": [
+    "Unauthorized",
+    "AlreadyBound",
+    "ZeroAddress",
+    "InvalidLaunchBinding: unrelated fee-share owner",
+    "InvalidLaunchBinding: wrong or multiple claimers",
+    "InvalidLaunchBinding: wrong bps",
+    "InvalidLaunchBinding: wrong WETH/hook/pool/curve",
+    "adapter rejecting the pool"
+   ],
+   "not_in_scope": [
+    "changing the bound token later",
+    "binding a token not created by the Controller"
+   ]
+  },
+  {
+   "id": "BL-04",
+   "name": "Creator residual",
+   "operation": "claimResidual()",
+   "part": "creator",
+   "does": "Creator draws their 4000 bps share.",
+   "not_in_scope": [
+    "drawing against the community 6000 bps under any condition, including an unfilled cohort"
+   ]
+  },
+  {
+   "id": "BL-05",
+   "name": "Enrollment",
+   "part": "supporter",
+   "does": "Supporter signs one event binding campaign, mode, npub, EVM destination and proof of control. Two doors: existing signer short-circuits; otherwise generate a key and take the portable encrypted file.",
+   "authority": "the supporter, exclusively",
+   "reference": "ENROLLMENT-SPEC.md Revision 3",
+   "must_fail": [
+    "missing or unknown mode",
+    "missing address",
+    "missing or malformed proof",
+    "proof recovering to a different address",
+    "proof made for another mode or campaign",
+    "duplicate critical tags",
+    "any address entering a roster without proof of control"
+   ],
+   "not_in_scope": [
+    "enrolling on someone's behalf",
+    "importing an address list",
+    "admin-assigned membership"
+   ],
+   "note": "the legacy_roster_wallet_v0 class is permanently out of scope, not merely fixed"
+  },
+  {
+   "id": "BL-06",
+   "name": "Observation and ordering",
+   "part": "supporter",
+   "does": "Establishes the canonical enrollment on rebinding, using signed observation receipts from a constitution-named observer, with a per-cohort finalization cutoff.",
+   "must_fail": [
+    "caller-supplied observation accepted without receipt verification",
+    "empty or absent observer policy treated as permissive",
+    "receipt signed outside the policy",
+    "receipt id accepted rather than recomputed",
+    "observation after the cutoff",
+    "ordering by any self-reported timestamp"
+   ],
+   "disclosed_cost": "the observer is a trusted party and belongs in SOVEREIGNTY.md at the same rank as the Bags rows",
+   "not_in_scope": [
+    "rebinding after finalization"
+   ]
+  },
+  {
+   "id": "BL-07",
+   "name": "Cohort snapshot and roster",
+   "part": "supporter",
+   "does": "Membership from published snapshot differences; compiles verified enrollments into a canonical roster with cumulative weight ranges summing to exactly the whole.",
+   "must_fail": [
+    "a member with no verified enrollment reaching a production roster",
+    "a roster compiled from normalized caller objects rather than raw evidence",
+    "dust or rounding remainder"
+   ],
+   "not_in_scope": [
+    "backdating membership",
+    "manual roster edits",
+    "guaranteed cohort fill"
+   ]
+  },
+  {
+   "id": "BL-08",
+   "name": "Finalization and seal",
+   "operation": "finalizeCohortRoot(cohortId, root, evidenceManifestHash) / sealRoots()",
+   "part": "supporter",
+   "does": "Publishes one root per cohort with non-zero evidence hashes; sealRoots permanently retires the finalizer.",
+   "authority": "rootFinalizer \u2014 temporary and disclosed, existing because GRADUATION and FOMO members cannot exist before they do; cannot move money, change economics, or alter a root already set",
+   "must_fail": [
+    "RootAlreadySet",
+    "RootsAlreadySealed",
+    "InvalidCohort",
+    "zero evidence hash",
+    "evidence manifest not binding the constitution hash"
+   ],
+   "not_in_scope": [
+    "replacing a finalized root",
+    "unsealing"
+   ]
+  },
+  {
+   "id": "BL-09",
+   "name": "Fee intake",
+   "operation": "harvest() / syncExternalDeposit()",
+   "part": "supporter",
+   "does": "Pulls fees from the Bags fee share and accounts for direct transfers so value arriving outside the expected path is credited rather than stranded.",
+   "authority": "permissionless; no privileged caller",
+   "not_in_scope": [
+    "withdrawing on a supporter's behalf",
+    "any sweep",
+    "any expiry",
+    "any admin path to value that has reached the contract"
+   ]
+  },
+  {
+   "id": "BL-10",
+   "name": "Graduation",
+   "operation": "activateGraduation()",
+   "part": "supporter",
+   "does": "Verifies graduation against on-chain state and opens the buyback gate.",
+   "must_fail": [
+    "NotGraduated when verified state does not support it"
+   ]
+  },
+  {
+   "id": "BL-11",
+   "name": "Buyback claim",
+   "operation": "claimBuyback(...)",
+   "part": "supporter",
+   "does": "Supporter proves membership by Merkle proof and converts accumulated entitlement into the launched token via a fixed route, with slippage and deadline protection.",
+   "authority": "the supporter with their own EVM key; no account, no approval, no requirement that our website is reachable",
+   "must_fail": [
+    "InvalidProof",
+    "RootNotSet",
+    "RootsNotSealed",
+    "IdentityCollision",
+    "NothingToClaim",
+    "BelowMinimumClaim",
+    "DeadlineExpired",
+    "SlippageExceeded",
+    "ReentrantCall",
+    "failed swap must roll back atomically"
+   ],
+   "not_in_scope": [
+    "a claim window",
+    "a deadline on entitlement",
+    "any route other than the committed one"
+   ]
+  },
+  {
+   "id": "BL-12",
+   "name": "Trust and Verify",
+   "part": "public",
+   "does": "Publishes constitution hash, roots, evidence manifests, cutoffs, economics, Bags upstream authority snapshot and per-member evidence status.",
+   "authority_boundary": "PUBLISHER_AND_DISCLOSURE_ONLY \u2014 does not emit an independent recomputation verdict; only BL-13 may",
+   "must_fail": [
+    "any affirmative status rendered from missing, partial, mock or asserted evidence"
+   ],
+   "rule": "absence renders as UNVERIFIED, visibly and loudly"
+  },
+  {
+   "id": "BL-13",
+   "name": "Campaign explorer",
+   "part": "public",
+   "does": "Independently rebuilds roster and root from published evidence; reports four orthogonal verdicts: root recomputation, destination-proof coverage, per-member binding status, finalizable-under-current-law.",
+   "must_fail": [
+    "a reproduced root implying proven destination control",
+    "INSUFFICIENT rendered as a pass",
+    "importing the production verifier as its engine rather than cross-testing against frozen vectors"
+   ],
+   "not_in_scope": [
+    "any write path",
+    "any key",
+    "being a source of truth"
+   ]
+  },
+  {
+   "id": "BL-14",
+   "name": "The supporter's post",
+   "part": "public",
+   "does": "A signed card showing cohort, slot, share and a verify link. Publishing to Nostr is a signature; opening the X composer is an intent; the two are never conflated.",
+   "not_in_scope": [
+    "claiming X delivery",
+    "posting on the user's behalf"
+   ]
+  }
+ ],
+ "out_of_scope_v1": [
+  {
+   "item": "Solana implementation",
+   "reason": "Robinhood only in v1"
+  },
+  {
+   "item": "multi-chain campaigns",
+   "reason": "one chain per campaign"
+  },
+  {
+   "item": "editing a constitution after deployment",
+   "reason": "no such operation exists"
+  },
+  {
+   "item": "replacing or unsealing a root",
+   "reason": "no such operation exists"
+  },
+  {
+   "item": "changing the bound token",
+   "reason": "one-shot by design"
+  },
+  {
+   "item": "admin-assigned or imported membership",
+   "reason": "every address needs a control proof"
+  },
+  {
+   "item": "creator drawing community bps",
+   "reason": "shortfall is not creator upside"
+  },
+  {
+   "item": "a claim window, sweep, or expiry",
+   "reason": "entitlement is permanent"
+  },
+  {
+   "item": "KOL, moderator or time-expiring leaves",
+   "reason": "roadmap, ruled at E-11"
+  },
+  {
+   "item": "creator-discretionary sub-splits",
+   "reason": "roadmap"
+  },
+  {
+   "item": "ratings, reviews, subjective attestation",
+   "reason": "roadmap"
+  },
+  {
+   "item": "guaranteed cohort fill",
+   "reason": "an unfilled cohort is a smaller cohort"
+  },
+  {
+   "item": "reach, distribution or promotion",
+   "reason": "X decides who sees what"
+  },
+  {
+   "item": "recovering a lost key",
+   "reason": "stated plainly in recovery/"
+  },
+  {
+   "item": "passkey tier at launch",
+   "reason": "deferred, ENROLLMENT-SPEC section 1.3"
+  },
+  {
+   "item": "third-party API key issuance",
+   "reason": "broker commercial layer, post-launch"
+  }
+ ],
+ "invariants": [
+  "No address enters a payout list without proof of control.",
+  "Nothing renders as verified that was not verified. Absence is UNVERIFIED.",
+  "Entitlement does not expire and cannot be swept.",
+  "Claiming never requires our website, our account, or our permission."
+ ],
+ "revision_rule": "Scope changes by editing this document and incrementing the version, with the reason recorded. It does not change by an implementation adding a capability, a review finding an omission, or a conversation reaching a conclusion. A capability that appears in code but not here is out of scope and must be removed or added here first."
+}
