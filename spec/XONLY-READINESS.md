@@ -149,11 +149,11 @@ and never written down until now.
 
 | # | Item | Evidence of absence | Why it matters |
 |---|---|---|---|
-| 1 | **`ncryptsec` / NIP-49 export** | `grep -rln "ncryptsec\|nip49\|scrypt"` from root → **zero files** | `ENROLLMENT-SPEC.md §1.1` makes the download **non-optional** and blocks "continue" until it exists. **Tier 1 has no exit, so the default enrollment path cannot ship** |
-| 2 | **Signer application** | `signer.xonly.ai/` serves the placeholder | no tier 1 at all |
-| 3 | **ROR allowlist** | `xonly.ai/.well-known/webauthn` → 404 | one passkey cannot serve apex, signer and editor |
-| 4 | **`rpIdFromOrigin` fix** | `crypto/src/origin.ts:57` | **unrepairable after the first passkey exists** |
-| 5 | **`postMessage` channel** | not implemented | no third-party signing |
+| 1 | **`ncryptsec` — generate, download, unlock** | `grep -rln "ncryptsec\|nip49\|scrypt"` from root → **zero files** | **Revision 3 makes this tier 1**, so it is no longer only the exit from tier 2 — it is the entire default custody path. `ENROLLMENT-SPEC.md §3` now specifies generation, the passphrase step, backup guidance and the signer-origin unlock |
+| 2 | **Signer application — the unlock page** | `signer.xonly.ai/` serves the placeholder | Under Revision 3 this is no longer a passkey page. It is where a user **uploads their `ncryptsec` and enters the passphrase**, decrypts in memory, signs, and discards — `ENROLLMENT-SPEC.md §3.4`. Without it the file is a souvenir |
+| 3 | **ROR allowlist** | `xonly.ai/.well-known/webauthn` → 404 | **Deferred with tier 2.** Only WebAuthn credentials need it, and none are created at launch |
+| 4 | **`rpIdFromOrigin` fix** | `crypto/src/origin.ts:57` | **No longer on the critical path.** `ENROLLMENT-SPEC.md §1.3` defers tier 2, so no passkey is created and no RP ID is committed. Owed before tier 2 ships; a build-time check asserts no WebAuthn ceremony is in the launch build (§8) |
+| 5 | **`postMessage` channel** | not implemented | **Now blocking**: it is how `bermlaunch.com` receives a signature from the unlock popup without ever seeing the key or the passphrase — `ENROLLMENT-SPEC.md §3.4` |
 | 6 | **`nostrconnect://` QR** | `grep -rn "nostrconnect"` from root → **zero hits** | pasting a `bunker://` URI on a phone is the friction that loses people — `ENROLLMENT-SPEC.md §5` |
 | 7 | **Content on the apex** | `xonly.ai/` placeholder | nothing to read |
 

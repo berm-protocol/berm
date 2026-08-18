@@ -133,7 +133,7 @@ mandatory, parity at generation, no compressed-pubkey trap. Read, not re-derived
 | # | Item | Anchor | Closed when |
 |---|---|---|---|
 | 1 | **`manager_waive_fee_config`** | BDR-002; `bags/README.md:462` | a published tx signature. Until then *"the dev cannot redirect the split"* is false |
-| 2 | **`rpIdFromOrigin`** | `crypto/src/origin.ts:57` returns `u.hostname`; `webauthn.ts:68` passes it as `rp.id` | returns the registrable domain (needs the Public Suffix List). **Unrepairable after the first passkey exists** — see §7 |
+| 2 | ~~**`rpIdFromOrigin`**~~ **— off the critical path at Revision 3** | `crypto/src/origin.ts:57` returns `u.hostname`; `webauthn.ts:68` passes it as `rp.id` | `ENROLLMENT-SPEC.md §1.3` defers the passkey tier, so **no credential is created and no RP ID is committed.** Still a real inconsistency with `infra/cloud-init.xonly.yaml:25`, still owed before tier 2 — but no longer a now-or-never decision. §8 adds a build-time check so tier 2 cannot ship accidentally first |
 | 3 | **Rotate Bags API key + Hetzner token** | both in a chat transcript | rotated |
 | 4 | **Enrollment disclosure copy** | `spec/WHAT-IT-DOES.md` §13, §14 | the sentence a Bermer reads *before* signing |
 | 5 | **Canary scope decision** | claimers fixed at `create_fee_config` | explicit: does the canary carry real Founders? Recommended **no** |
@@ -185,9 +185,13 @@ Hence §0.
 
 ## 7. Order
 
-**2 first.** It is the only item that cannot be repaired after launch: changing the
-RP ID orphans every passkey already created. Then **1 and 3** — cheap, yours,
-unblocked. Then **9** — without it the default enrollment path does not exist.
+**9 first.** `ncryptsec` is now tier 1 — Revision 3 promoted the portable file from
+the exit-hatch to the front door — so without it there is no default custody path
+at all. Then **1 and 3**, cheap and yours and unblocked.
+
+**2 is no longer urgent**, and that is the point of the reordering: deferring the
+passkey tier means no RP ID is ever committed, which converts the only
+unrepairable item on this page into ordinary work owed before tier 2.
 
 Then 4–8. Then 11–13. Then 14–17 on Codex delivery.
 

@@ -34,31 +34,54 @@ Companion artefacts:
 
 ---
 
-## 1. The ladder, in this order
+## 1. The two doors
 
-The old order ranked paths by what the user already had. **The order is now by how
-little the user ends up depending on us.** That is the project's whole argument, so
-the enrollment screen should be the first place it is visible.
+> ### Revision 3 — the file is the front door
+>
+> Revision 2 ordered four paths *by how little the user ends up depending on us*.
+> The ordering was right and the shape was wrong: the path that depends on us
+> least was third in a list nobody finishes reading, and the path that depends on
+> us most was the one that looked easiest.
+>
+> **The portable encrypted key is now tier 1.** The passkey at our signer origin
+> is demoted to an optional convenience, deferred, and not required for launch.
+>
+> Three reasons, in order of weight:
+>
+> 1. **It is the only tier that depends on nobody.** Tier 2's own copy admitted
+>    *"that is a real dependency and you should not accept it permanently."* A
+>    project whose argument is sovereignty should not make the sovereign option
+>    the advanced option.
+> 2. **There is no gap to explain.** The file **is** the key **is** the pocket.
+>    With a passkey the user holds a gesture and the key is derived at an origin
+>    they must trust — true, disclosed, and awkward to say out loud.
+> 3. **It removes the only unrepairable decision from the critical path.**
+>    `rpIdFromOrigin` is irreversible solely because changing the RP ID orphans
+>    passkeys that already exist. If no passkey is ever created, nothing is baked
+>    in, and that fix becomes ordinary work owed before tier 2 ships. See §1.4.
 
-### 0. If a signer is already present — offer it first
+Two doors, and nothing else on the screen.
+
+### 1.0 Door zero — a signer is already present. Short-circuit.
 
 `window.nostr` detected, or a bunker session already established: **use it, and say
-so.** A user with an extension already made a custody decision, and overriding it to
-push our own signer is precisely the behaviour this project claims to be an
-alternative to. The SDK's `connect()` already prefers NIP-07 when present; do not
-fight it.
+so.** A user with an extension already made a custody decision, and overriding it
+to push our own is precisely the behaviour this project claims to be an
+alternative to. `sdk/src/connect.ts` — `detect()` then `setup()` — already prefers
+NIP-07 when present. Do not fight it.
 
-This is not an option in the list. It is a short-circuit above the list.
+This is not an option in a list. It is a branch taken before the list is drawn,
+and it is the door savvy users take. **They will not upload a raw key to a web
+page and should not be asked to.**
 
-### 1. Create a key and download it — the default, PATH A ONLY
+### 1.1 Door one — the file. The default, PATH A ONLY.
 
 Generate a fresh secp256k1 key in the browser. **Immediately** offer the NIP-49
 `ncryptsec` download, passphrase chosen by the user.
 
-Why first: the user walks away with a portable, standard-format key that works in
-Amber, Damus, Alby, nsec.app or anything that comes later. **They depend on us for
-nothing from the first second.** They can decide what signer they want a week from
-now, having lost nothing.
+They walk away with a portable, standard-format key that works in Amber, Damus,
+Alby, nsec.app, or anything invented later. **They depend on us for nothing from
+the first second**, and can choose a signer a week from now having lost nothing.
 
 Copy must state, without softening:
 
@@ -67,28 +90,19 @@ Copy must state, without softening:
 > passphrase only you know. Then it works in any Nostr app, forever, with or
 > without us.
 
-**The download is not optional.** Do not allow "continue" until the file has been
-generated and the passphrase confirmed. This is the only step in the whole product
-where blocking is justified: a user who leaves without it has an identity and a
-pocket that exist only in a browser tab.
+**The download is not optional.** "Continue" stays unreachable until the file has
+been generated and the passphrase confirmed. This is the only place in the product
+where blocking a user is justified: someone who leaves without it has an identity
+and a pocket that exist only in a browser tab.
 
-### 2. Passkey at our signer origin — convenience, with the exit signposted
+Everything about the file — parameters, the passphrase screen, backup guidance,
+and how it is later unlocked — is §3, which is now the longest section in this
+document for a reason.
 
-Face ID / Touch ID, no download, no app. Offer it **second**, and label it plainly:
-
-> Fastest, and it depends on us. Your key is derived at `signer.xonly.ai`, so it
-> stays exclusively yours for as long as that one domain stays in honest hands.
-> **That is a real dependency and you should not accept it permanently.**
-> Export your key whenever you like — the button is always there.
-
-`ncryptsec` export must be reachable from the account screen at all times, not
-buried. That export *is* the exit from tier 1, and offering it before anyone has a
-reason to distrust us is the strongest form of the claim we make.
-
-### 3. Bring your own — extension or bunker  →  PATH B
+### 1.2 Bring your own → PATH B
 
 A user arriving with an existing npub takes **Path B**, and Path B does not use a
-derived pocket. Require an explicit EVM wallet, and bind it from both sides:
+derived pocket. Require an explicit EVM wallet, bound from both sides:
 
 ```
 npub signs        "<evm address> is my destination for campaign <id>"
@@ -100,25 +114,42 @@ two-sided claim.
 
 The binding is replaceable — by a **new, valid, dual-signed binding** — up until
 the cohort root is finalised. **After finalisation the destination committed in
-the root is frozen**, because it is inside the leaf. Do not carry forward any
-wording suggesting the payout wallet stays freely replaceable; that was true of an
-earlier design and is not true of this one.
+the root is frozen**, because it is inside the leaf.
 
 Why not derive for these users: they would have to export an established identity
 key, work out BIP-340 parity, and import it into MetaMask — coupling an identity
-they already use elsewhere to a wallet, to use one launchpad. They already have an
+they already use elsewhere to a wallet, for one launchpad. They already have an
 EVM wallet. Ask for it.
 
-Amber and Damus connect via `nostrconnect://` QR (see §5); Alby and nos2x via
-NIP-07.
+Amber and Damus connect via `nostrconnect://` QR (§5); Alby and nos2x via NIP-07.
+
+### 1.3 Deferred — passkey at our signer origin
+
+Face ID / Touch ID, no download, no app. **Not built for launch, and not
+required.** When it ships it is offered *after* the file, labelled as a real
+dependency, with `ncryptsec` export reachable from the account screen at all times.
+That export *is* the exit from the tier, and offering it before anyone has a reason
+to distrust us is the strongest form of the claim we make.
+
+### 1.4 What deferring tier 2 buys, stated so it is not lost
+
+No passkey means no WebAuthn ceremony, which means **no RP ID is committed**.
+`crypto/src/origin.ts:57` currently returns `u.hostname` while
+`infra/cloud-init.xonly.yaml:25` declares the intended RP ID to be `xonly.ai` —
+a genuine inconsistency, and one that is *only* irreversible once credentials
+exist. Shipping the file first converts it from a now-or-never decision into work
+owed before tier 2, alongside the ROR allowlist at
+`xonly.ai/.well-known/webauthn`.
+
+### 1.5 Custody display, unchanged and non-negotiable
 
 **Every path shows the custody tier at all times — and for tier 2, WHICH signer.**
 "Bunker" is not a custody property. Amber on a phone in a pocket, `nsec.app` as a
 web service, and a self-hosted daemon on a VPS are all NIP-46 and their properties
 are not the same. Show what is known about the actual signer rather than a tier
-number that flatters the weakest member of the category. A single connect button that
-hides which of these the user landed in is the version of this product that does
-not deserve to exist.
+number that flatters the weakest member of the category. A single connect button
+that hides which of these the user landed in is the version of this product that
+does not deserve to exist.
 
 ---
 
@@ -165,9 +196,12 @@ An address that appears without explanation reads as one we chose for the user.
 
 ---
 
-## 3. The ncryptsec download
+## 3. The file — generation, passphrase, backup, unlock
 
-NIP-49. Non-negotiable parameters:
+This is tier 1. It is the whole custody story for most users, so it is specified
+here rather than left to an implementer's judgement.
+
+### 3.1 Format — NIP-49, non-negotiable parameters
 
 | | |
 |---|---|
@@ -181,14 +215,102 @@ NIP-49. Non-negotiable parameters:
 Writing `0x01` because it reads better is lying in a field that exists to prevent
 exactly that lie. Clients that warn the user are doing their job.
 
-Next to the passphrase field, not in a help page:
+### 3.2 The passphrase screen is a screen, not a field
+
+**Now that the file is tier 1, the passphrase is the entire security boundary.**
+A passkey delegates that work to a secure enclave. A file delegates it to whatever
+the user typed. Build it accordingly:
+
+- a dedicated step, not an input beside a button
+- strength enforced, with the check run locally and the reason shown
+- no "skip", no "remind me later", no default
+- confirmed by re-entry before the file is issued
+- **never transmitted, never stored, never recoverable.** There is no reset
+
+Next to the field, not in a help page:
 
 > This passphrase is the only thing protecting the file. scrypt buys time against
 > guessing; it cannot rescue a weak passphrase. **This file is also your pocket** —
 > the same key opens your money.
 
-And: **never publish an `ncryptsec` to a relay.** One passphrase from being someone
-else's key, permanently, with no recall.
+### 3.3 Backup guidance at the moment of download, not later
+
+`recovery/` already tells users the truth that a lost key is `NOT RECOVERABLE`.
+The moment to prevent that is while the file is being created:
+
+- **two copies, one of them offline.** A password manager plus a USB stick, or a
+  printed `ncryptsec1…` string in a drawer
+- not only `~/Downloads`, which is the folder that does not survive a new laptop
+- the passphrase stored somewhere different from the file, because a single
+  compromised location should not yield both
+
+### 3.4 The unlock — and where it may happen
+
+A file the user cannot use is a souvenir. To sign — to enroll, to claim, to prove
+a slot — the key must be decrypted somewhere. **That somewhere is the signer
+origin, and never the launchpad.**
+
+```
+   bermlaunch.com                            signer.xonly.ai
+        │
+        │  window.open() on a user gesture
+        │─────────────────────────────────────▶  real URL bar, visible
+        │                                        ┌──────────────────────────┐
+        │                                        │ upload your key file     │
+        │                                        │ passphrase: ________     │
+        │                                        │ bermlaunch asks you to   │
+        │                                        │ sign: "Claim slot 12"    │
+        │                                        │ [ Approve ]  [ Decline ] │
+        │  postMessage: signed event             └──────────────────────────┘
+        │◀─────────────────────────────────────   decrypt → sign → discard
+        │
+   never sees the passphrase, never sees the decrypted key
+```
+
+**Why not decrypt at bermlaunch.** `spec/signer-broker.md` states the rule the
+whole design serves: *"Only the signer origin ever sees a key. Clients receive
+signatures."* And the file is not a login credential — §3.2 says it plainly, the
+same key opens the money. A launchpad page is a large surface: token UI, charts,
+third-party scripts, frequent deploys. A compromise there would take the identity
+**and** the funds in one step. The signer origin exists to be small, boring, and
+hard to change, and `infra/Caddyfile.xonly` already serves it with
+`frame-ancestors 'none'` so the approval cannot be covered.
+
+Rules for the unlock:
+
+- decrypted key held **in memory only**, for the duration of the session
+- **never** written to `localStorage`, `sessionStorage`, IndexedDB, or a cookie
+- discarded on tab close, on timeout, and on explicit lock
+- the passphrase never leaves the signer origin and is never sent anywhere
+- the same origin guard as every other signer path — `assertSignerOrigin`
+
+### 3.5 Phishing — the cost of this design, and the mitigation
+
+A file model trains a reflex that attackers want: *upload your key here*. Passkeys
+resist phishing because the browser binds a credential to an origin; a file has no
+such protection, and anyone can stand up a convincing copy.
+
+This is the real price of choosing the file, and it is paid in copy and habit
+rather than in cryptography:
+
+- **one sentence, repeated everywhere the file appears**, including in the
+  downloaded file's own accompanying text:
+
+  > We will never ask for this file anywhere except **signer.xonly.ai**. Check the
+  > address bar every time. Nobody from Berm or BermLaunch will ever ask you to
+  > send it — not in a DM, not by email, not in a support chat.
+
+- the unlock is **always a top-level popup**, never an iframe, so the address bar
+  is visible — the same reasoning as the broker approval
+- **never publish an `ncryptsec` to a relay.** One passphrase away from being
+  someone else's key, permanently, with no recall
+
+### 3.6 Export is always available
+
+Wherever a key exists in our custody — a future tier 2, or a live unlock session —
+`ncryptsec` export is reachable from the account screen at all times, never buried.
+That export is the exit, and offering it before anyone has a reason to distrust us
+is the strongest form of the claim this project makes.
 
 ---
 
@@ -344,6 +466,26 @@ clothes, and someone will notice.
 - [ ] Slot assignment is identical with and without addresses present
 - [ ] The X intent path publishes nothing by itself — existing `post` tests cover the shape
 - [ ] No unencrypted secret key reaches `localStorage`, `sessionStorage` or any network request — asserted, not reviewed
+
+**Added at Revision 3, because the file is now tier 1:**
+
+- [ ] A weak passphrase is **rejected** at the passphrase step — asserted, and the
+      step cannot be skipped or defaulted
+- [ ] The passphrase is never transmitted — asserted by inspecting every network
+      request made during generation and during unlock
+- [ ] Unlock succeeds **only** at the signer origin. A page at any other origin
+      attempting to decrypt an `ncryptsec` throws — asserted, cross-origin, not
+      same-page
+- [ ] The decrypted key is discarded on tab close, on timeout and on explicit
+      lock, and never reaches any storage API — asserted, not reviewed
+- [ ] `bermlaunch.com` receives a **signature** and never key material — asserted
+      in a browser test that inspects the `postMessage` payload
+- [ ] The unlock renders as a **top-level popup**, never an iframe — asserted
+- [ ] The anti-phishing sentence appears wherever the file appears, including in
+      the text accompanying the downloaded file — asserted
+- [ ] **No WebAuthn ceremony runs anywhere in the launch build.** No credential is
+      created, so no RP ID is committed — asserted by a build-time check, so tier 2
+      cannot ship accidentally before `rpIdFromOrigin` is fixed
 
 ---
 
