@@ -1,7 +1,7 @@
 {
  "schema": "berm.bermlaunch.functional_scope.v1",
  "status": "FROZEN",
- "version": 1,
+ "version": 2,
  "authority": "FOUNDER",
  "authority_note": "Scope is not owned by an implementation. LAW-OWNERSHIP.md assigns the laws to the BermLaunch lane; this document assigns what the product must and must not do, and constrains both repositories.",
  "purpose": [
@@ -340,6 +340,13 @@
   {
    "item": "third-party API key issuance",
    "reason": "broker commercial layer, post-launch"
+  },
+  {
+   "item": "tradeable pocket / NFT-wrapped claim",
+   "reason": "a purchasable pocket separates the payout from the person by design, turning a supporter cohort into a pre-sale; also the property that changes the legal shape",
+   "roadmap_shape": "credit (who was there \u2014 in the sealed root, never transferable) separated from claim (who collects \u2014 a layer above, optionally transferable)",
+   "reference": "UC-12 in bermlaunch.json / BERMLAUNCH.md section 17",
+   "precondition": "legal advice before build, because transferability is the specific feature that moves it"
   }
  ],
  "invariants": [
@@ -348,5 +355,15 @@
   "Entitlement does not expire and cannot be swept.",
   "Claiming never requires our website, our account, or our permission."
  ],
- "revision_rule": "Scope changes by editing this document and incrementing the version, with the reason recorded. It does not change by an implementation adding a capability, a review finding an omission, or a conversation reaching a conclusion. A capability that appears in code but not here is out of scope and must be removed or added here first."
+ "revision_rule": "Scope changes by editing this document and incrementing the version, with the reason recorded. It does not change by an implementation adding a capability, a review finding an omission, or a conversation reaching a conclusion. A capability that appears in code but not here is out of scope and must be removed or added here first.",
+ "revision_history": [
+  {
+   "version": 1,
+   "change": "initial freeze"
+  },
+  {
+   "version": 2,
+   "change": "added tradeable-pocket / NFT to out_of_scope_v1 with the credit-claim split recorded as the proposed shape. Scope unchanged in substance \u2014 the item was already absent; this records the decision and its reasoning so it is not re-litigated."
+  }
+ ]
 }

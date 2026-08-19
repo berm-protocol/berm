@@ -242,6 +242,56 @@ incentives are literally shared.
 None of these need new contract mechanics. They need constitution configuration and
 a decision that they are in scope.
 
+## 17. A tradeable pocket — the credit / claim split **[roadmap]**
+
+*The question:* could a pocket be an NFT, so it can be sold?
+
+**Mechanically, yes, and it need not disturb anything already sealed.** A wrapper
+contract accepts a deposit of the claim right and mints an ERC-721; trading the
+token trades the position. No leaf-schema change, no new constitution, no
+migration. (The cleaner form — the leaf binding `slot → tokenId` — changes root
+law, so it would be a v2 campaign and never a retrofit.)
+
+**The naive version breaks the product.** A pocket that can be bought
+**separates the payout from the person, permanently and by design.** The buyer has
+no audience, made no noise and brought nobody. Fifty Founding slots that can be
+purchased are a pre-sale rather than a supporter cohort — and the ladder exists
+precisely so that conviction outranks capital. It is the anonymous-wallet failure
+mode again, except deliberate.
+
+It also weakens the sentence the product is built on. *"Your pocket is yours,
+forever"* becomes *"yours until you sell it, and then theirs"* — still true, but
+conditional, and the buyer's expectations are not the earner's.
+
+### The split that resolves it
+
+Separate what is currently one object:
+
+| | Lives | Transferable |
+|---|---|---|
+| **The credit** — who was there | inside the sealed root, bound to the npub | **never** |
+| **The claim** — who collects | a layer above the root | optionally yes |
+
+*"These fifty people launched this"* then stays true forever, whatever happens to
+the cash flow afterwards. The exposure already happened and is recorded. The
+community graph on Nostr is untouched, because it is keyed to npubs rather than to
+whoever currently holds the money.
+
+And it closes a real gap. Today a supporter needing liquidity has only the buyback
+— convert and sell, which exits the token entirely. A transferable claim lets them
+exit **the stream** while the stream continues. It would also produce price
+discovery: *"a Founding slot trades at X"* is a legible signal about the mechanism
+that no amount of documentation generates.
+
+### Before it is built
+
+**Transferability is the property that changes the legal shape.** A
+non-transferable claim received for participating is one thing; a transferable
+instrument paying a proportional share of revenue from a common enterprise is
+another. That is not an engineering judgement and this document should not pretend
+otherwise — take advice **before**, because transferability is the specific feature
+that moves it.
+
 ---
 
 # Part IV — How a creator uses it

@@ -1,6 +1,11 @@
 # BermLaunch — frozen functional scope
 
-**Status: FROZEN at v1. Founder authority.**
+**Status: FROZEN at v2. Founder authority.**
+
+| Version | Change |
+|---|---|
+| v1 | initial freeze |
+| v2 | added the tradeable-pocket / NFT item to §16 with the credit-claim split recorded as its proposed shape. **Scope is unchanged in substance** — the item was already absent. This records the decision and its reasoning so it is not re-litigated. |
 
 Scope is not owned by an implementation. `spec/LAW-OWNERSHIP.md` assigns the
 *laws* — the enrollment wire contract, the roster law, the contracts — to the
@@ -252,7 +257,15 @@ reach, distribution, or promotion        X decides who sees what
 recovering a lost key                    stated plainly in recovery/
 passkey tier at launch                   deferred, ENROLLMENT-SPEC §1.3
 third-party API key issuance             broker commercial layer, post-launch
+tradeable pocket / NFT-wrapped claim     separates payout from person by design
 ```
+
+**On the tradeable pocket specifically**, because it will be asked again: a
+purchasable pocket turns a supporter cohort into a pre-sale, and transferability is
+the property that changes the legal shape. The roadmap form that resolves it is the
+**credit / claim split** — the credit for having been there stays in the sealed
+root, bound to the npub, never transferable; only the right to collect could move.
+Recorded as **UC-12** in `BERMLAUNCH.md` §17. Legal advice before build, not after.
 
 ---
 

@@ -202,6 +202,35 @@
    "name": "Reciprocal pocket",
    "status": "roadmap",
    "holder": "two projects each holding a slice of the other"
+  },
+  {
+   "id": "UC-12",
+   "name": "Tradeable pocket \u2014 the credit / claim split",
+   "status": "roadmap",
+   "question": "could a pocket be an NFT, so it can be sold",
+   "mechanism_safe": "a wrapper contract accepts a deposit of the claim right and mints an ERC-721; no leaf-schema change, no new constitution, no migration",
+   "mechanism_clean": "leaf binds slot -> tokenId; changes root law, so a v2 campaign and never a retrofit",
+   "why_naive_version_breaks_the_product": "a purchasable pocket separates the payout from the person permanently and by design; the buyer has no audience, made no noise and brought nobody, so fifty purchasable Founding slots are a pre-sale rather than a supporter cohort",
+   "proposed_shape": {
+    "credit": {
+     "what": "who was there",
+     "lives": "inside the sealed root, bound to the npub",
+     "transferable": false
+    },
+    "claim": {
+     "what": "who collects",
+     "lives": "a layer above the root",
+     "transferable": true
+    }
+   },
+   "what_the_split_preserves": [
+    "the honour roll stays true forever whatever happens to the cash flow",
+    "the exposure already happened and is recorded",
+    "the Nostr community graph is untouched because it is keyed to npubs"
+   ],
+   "gap_it_closes": "today a supporter needing liquidity can only convert and sell through the buyback, exiting the token; a transferable claim lets them exit the stream while the stream continues",
+   "secondary_benefit": "price discovery \u2014 a Founding slot trading at X is a legible signal about the mechanism",
+   "before_it_is_built": "transferability is the specific property that changes the legal shape; a non-transferable claim received for participating differs from a transferable instrument paying a proportional share of revenue from a common enterprise. Take advice before, not after. This is not an engineering judgement."
   }
  ],
  "creator_flow": [
