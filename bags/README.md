@@ -11,6 +11,14 @@ npm run verify    # 26 browser checks, mostly about what it refuses to say
 npm run probe     # read-only; needs BAGS_API_KEY
 ```
 
+## What this is
+
+[`BERMLAUNCH.md`](BERMLAUNCH.md) — **the full functional description.** What
+BermLaunch is, the single primitive it is built on, the eleven use cases it
+unlocks (five in v1, six roadmap), how a creator and a supporter each use it, and
+five concrete on-chain checks anyone can run without asking us anything. Machine
+readable: [`bermlaunch.json`](bermlaunch.json).
+
 ## Scope
 
 [`BERMLAUNCH-SCOPE.md`](BERMLAUNCH-SCOPE.md) — **frozen, founder authority.** What

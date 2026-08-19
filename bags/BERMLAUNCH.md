@@ -1,0 +1,401 @@
+# BermLaunch — what it is, what it unlocks, and how anyone checks it
+
+A token launchpad where a creator can hand a share of their own trading fees to
+named people — **before the token exists, at graduation, or years later** — and
+nobody, including the creator, can take it back.
+
+This document describes the whole product. `BERMLAUNCH-SCOPE.md` says which parts
+v1 builds; everything here marked **[roadmap]** is mechanism the contract already
+supports but the v1 constitution does not configure.
+
+---
+
+# Part I — The idea
+
+## 1. There is only one primitive, and it is called a pocket
+
+**A pocket is a permanent, proportional claim on a fee stream, owned by a key.**
+
+That is the entire invention. Everything else in this document is configuration:
+*who* owns a pocket, *when* it was created, *how large* a slice it holds.
+
+A pocket is not an address, and it is not a balance someone credits you. It is a
+**range** inside a fee stream. When value arrives, every pocket's entitlement grows
+by its own proportion, automatically, without anyone processing anything. When you
+claim, the contract computes what your range is owed and pays it.
+
+Nobody can move your pocket. There is no admin who can adjust it, no window in
+which you have to be present, no form to fill in, and no way to be too late.
+
+## 2. Why this is not an airdrop
+
+An airdrop is a **one-time gift, decided afterwards, by the person giving it.** You
+hope you qualify. Someone decides a snapshot. Someone runs a script. If they change
+their mind, or the criteria, or the amount, you have no recourse, because nothing
+was ever promised in a form that binds.
+
+A pocket is a **continuous claim, decided beforehand, enforced by arithmetic.** The
+share is fixed when the campaign is committed. It keeps paying for as long as the
+token trades. The creator cannot revise it, and neither can we.
+
+The difference is not generosity. It is *whether the promise exists as a fact or as
+an intention.*
+
+## 3. The three moments
+
+The thing no other launchpad can say is **when** you can make that commitment.
+
+**Before the token exists.** People who backed you when there was nothing to back.
+The hardest supporters to reward, because at that point you have no token, no
+liquidity, and no way to pay anyone. A pocket costs nothing to create and pays out
+for years.
+
+**At graduation.** The moment the bonding curve completes and a real pool exists.
+Historically the moment everything gets chaotic and early people get diluted by
+whoever is fastest.
+
+**Any time after.** Someone joins the community in month eight and matters. There
+is no reason their commitment should be less real than a day-one supporter's, and
+in the current design it is not — the same machinery, the same immutability.
+
+The v1 campaign encodes exactly these three as `PRELAUNCH`, `GRADUATION` and
+`FOMO`, shown to users as **Founding**, **Graduation** and **Momentum Supporters**.
+
+---
+
+# Part II — The machine
+
+## 4. How fees arrive
+
+The token launches on Bags. Bags routes trading fees to a **fee share** contract,
+and the fee share names exactly one claimer: **the Distributor**, at 10000 bps —
+all of it.
+
+That is checked, not assumed. `bindLaunch` refuses unless the fee share names this
+exact Distributor as sole claimer at exactly 10000 bps, the token exists with a
+curve and a pool, WETH, hook, pool and curve all match, the beacon and
+implementation are non-zero, and there is no authority collision. Any one of those
+wrong and **the whole launch reverts** — the token, the binding, everything, in one
+transaction.
+
+Once bound, `launchBound` is true forever. There is no unbind, no rebind, and no
+path to point the fees somewhere else. Verified: zero such functions exist.
+
+Fees are pulled in by `harvest()`, which **anyone** may call. Value that arrives by
+some other route is picked up by `syncExternalDeposit()`, so nothing gets stranded
+because it took an unexpected path.
+
+## 5. How the split works, and why there is never any dust
+
+Every pocket owns a **range** of basis points. The share is:
+
+```solidity
+rangeAllocation(total, start, end, denominator)
+    = mulDiv(total, end,   denominator)
+    - mulDiv(total, start, denominator)
+```
+
+Adjacent ranges telescope. `0→2000` plus `2000→4000` plus `4000→6000` sums to
+exactly `0→6000` of the total — not approximately, exactly, for any amount. No
+rounding remainder, no leftover wei that somebody has to decide the fate of, no
+"treasury" that quietly accumulates the difference.
+
+`rangeAllocation` is **public and pure**. Anyone can call it with their own numbers
+and check their own share without asking us anything.
+
+The v1 preset — `BERM_STANDARD`, `mutable_after_launch: NO`:
+
+```
+0    –  2000 bps   Founding Supporters      50 slots
+2000 –  4000 bps   Graduation Supporters   100 slots
+4000 –  6000 bps   Momentum Supporters     300 slots
+6000 – 10000 bps   the creator's residual
+```
+
+**60% of all trading fees to 450 people, permanently. 40% to the creator.**
+
+## 6. The operating fee — a pocket for whoever keeps the lights on
+
+The contract has an immutable `operatingFeeRecipient` and an immutable
+`operatingFeeBps`, **capped at 1000 bps — exactly 10%** — enforced at construction:
+
+```solidity
+if (operatingFeeBps_ > 1_000 || minimumClaimGross_ == 0) revert InvalidConfiguration();
+```
+
+Taken at claim time, transferred directly. This is the mechanism for **paying a
+service out of the stream rather than out of pocket** — a DEX listing, a market
+maker, an audit, an infrastructure bill. It is set once, disclosed, and cannot be
+raised afterwards. There is also an immutable `partnerRecipient` for a co-launch
+counterparty.
+
+The cap is the point. A fee that can be raised later is not a fee, it is an option
+on your revenue.
+
+## 7. Graduation and the buyback
+
+`activateGraduation()` verifies against on-chain state that the curve has completed
+and a real pool exists. It fails with `NotGraduated` otherwise.
+
+After that, a supporter calls `claimBuyback(...)`: proves membership with a Merkle
+proof, and their accumulated WETH entitlement is converted into the launched token
+through a **committed fixed route**, with slippage and deadline protection. A failed
+swap rolls the whole thing back rather than leaving anyone half-paid.
+
+The creator draws their residual with `claimResidual()` — **against their 4000 bps
+and never against the community's 6000**, under any condition, including a cohort
+that never filled.
+
+## 8. What becomes immutable, and exactly when
+
+| Moment | What freezes |
+|---|---|
+| Distributor deployment | economics, cohort ranges, operating fee and cap, recipients, campaign constitution hash |
+| `bindLaunch` | the token, the fee share, the pool, the Bags authority snapshot |
+| `finalizeCohortRoot` | that cohort's membership and every destination in it |
+| `sealRoots()` | the finalizer authority itself, **permanently retired** |
+
+After sealing there is no privileged actor left. Not us, not the creator, not a
+multisig. The only remaining operations are the ones anybody can call.
+
+---
+
+# Part III — What it unlocks
+
+Each of these is the same primitive with different configuration.
+
+## 9. Community, before the token exists **[v1]**
+
+*Who:* people who showed up early. *When:* before launch.
+
+The pocket exists before there is anything to pay it with. When trading starts, it
+starts paying, and it does not stop. **This is the case that has no alternative
+today** — you cannot pay someone from a token that does not exist, so historically
+you promise, and the promise is worth what the promiser's word is worth.
+
+## 10. Community, at graduation **[v1]**
+
+*Who:* people who carried it through the curve. *When:* the moment the pool opens.
+
+Graduation is when early supporters historically get flattened. A pocket committed
+at graduation is exactly as permanent as a day-one one.
+
+## 11. Community, any time after **[v1]**
+
+*Who:* people who arrive later and matter anyway. *When:* whenever.
+
+Most communities have no way to reward a good arrival at month eight. This is the
+answer, and it is the same machinery.
+
+## 12. Paying a service from the stream **[v1 — the operating fee]**
+
+*Who:* a DEX, a market maker, an auditor, an infrastructure provider.
+*How:* `operatingFeeRecipient` at up to 1000 bps, immutable.
+
+A service provider who is paid from the stream is aligned with the stream. And
+because the fee is capped and immutable, they can verify the deal before agreeing
+to it — and so can everyone else. Your ~10% DEX-pay pocket, mechanically.
+
+## 13. A co-launch partner **[v1 — `partnerRecipient`]**
+
+*Who:* another project, a launch partner, a syndicate.
+
+An immutable recipient set at deployment. Two projects launching together can bind
+the relationship into the contract rather than into a Telegram message.
+
+## 14. A KOL, paid from the creator's own slice **[roadmap]**
+
+*Who:* one named promoter. *From:* the creator's 4000 bps, never the community's.
+
+Mechanically trivial — subdividing `6000→10000` telescopes exactly the same way
+and produces zero dust. The KOL can verify the deal before promoting, which is a
+better arrangement for both sides than a private agreement.
+
+*Roadmap because:* the v1 constitution does not encode creator sub-splits.
+
+## 15. Moderators, on a recurring basis **[roadmap — needs one new mechanism]**
+
+*Who:* people doing ongoing work. *Shape:* weekly or monthly, and it should stop
+when the work stops.
+
+This is the one use case that needs something genuinely new. Every other pocket is
+**permanent by design**, and a moderator pocket needs to **end**. That means either
+epochs or versioned roots with an activation point — a second allocation dimension —
+plus a decision about what happens when nobody rolls the epoch: does the moderator
+keep earning, or does everything halt?
+
+That unanswered fallback is the same shape as the worst bug this project has
+found, which is why it is roadmap rather than a small addition.
+
+*Also worth naming honestly:* recurring payment for ongoing work is
+compensation-shaped rather than fee-share-shaped, and deserves a look from someone
+qualified before it ships.
+
+## 16. Further shapes the primitive already supports **[roadmap]**
+
+**A treasury pocket** — a slice to a community-controlled key rather than a person.
+**A contributor pocket** — a developer paid from the stream instead of a grant.
+**A public-goods pocket** — a permanent slice to something outside the project.
+**A reciprocal pocket** — two projects each holding a slice of the other, so their
+incentives are literally shared.
+
+None of these need new contract mechanics. They need constitution configuration and
+a decision that they are in scope.
+
+---
+
+# Part IV — How a creator uses it
+
+1. **Decide the shape.** Cohort sizes, the moments, the operating fee and who
+   receives it, any partner. This becomes the **campaign constitution**, and its
+   hash is committed on-chain at deployment.
+2. **Deploy the Distributor** with those parameters. They are immutable from this
+   instant. A zero constitution hash is rejected.
+3. **Launch atomically.** The Controller creates the Bags token and binds the
+   Distributor in one transaction. Any invariant failure reverts everything.
+4. **Waive the manager role.** Until this is done, Bags lets the creator rewrite the
+   fee configuration — so *"the dev cannot redirect the split"* is not yet true.
+   Publish the transaction.
+5. **Let people enroll.** Each supporter signs their own binding. The creator never
+   assigns membership, cannot add anyone, and cannot remove anyone.
+6. **Finalize each cohort** as it closes, then **seal**. After sealing the creator
+   has no privileged operation left except drawing their own residual.
+
+## What a creator cannot do, ever
+
+Change the split · redirect the fees after binding · add or remove a member ·
+replace a finalized root · draw against the community's share · introduce a
+deadline or expiry on anyone's entitlement.
+
+---
+
+# Part V — How a supporter uses it
+
+1. **Get an identity.** Either an existing Nostr signer, or the default: a key
+   generated in the browser and downloaded as an encrypted file. The download is
+   **not optional** — you cannot continue without it.
+2. **Enroll.** One signature binding campaign, mode, your identity, your payout
+   address, and proof you control that address.
+3. **Get a slot.** Membership comes from published snapshots, so you are in the
+   batch where you were *seen* — backdating buys nothing.
+4. **Wait, or don't.** Your entitlement accrues whether or not you are watching.
+   There is no window, no deadline, no requirement to be online.
+5. **Claim when you want.** Prove membership, convert to the token through the
+   committed route. **No account, no approval, and our website does not need to be
+   reachable.**
+
+## What a supporter is trusting
+
+Bags, who can rewrite the fee configuration upstream — disclosed at the top of
+`SOVEREIGNTY.md`, not buried. And the observer key that orders rebindings before
+finalization. **That is the complete list**, and if the fee stream fails it fails
+for the creator too. That makes the arrangement **honest, not safe**, and the
+enrollment copy says so in those words.
+
+---
+
+# Part VI — How anyone verifies
+
+Nothing below requires our permission, our website, or an account.
+
+## On-chain, directly
+
+**Immutables** — read them from the contract:
+
+```
+campaignId                  campaignConstitutionHash
+weth                        bagsFactory / bagsLens
+launchBinder                launcherAuthority
+partnerRecipient            operatingFeeRecipient / operatingFeeBps
+rootFinalizer               launchBound
+```
+
+**Events** — the whole lifecycle is a public log:
+
+```
+LaunchBound(token, feeShare, curve, poolId)
+CohortRootFinalized(cohortId, root, evidenceManifestHash)
+RootsSealed()
+FeesHarvested(amount, totalReceived)
+ExternalDepositSynchronized(amount, totalReceived)
+GraduationActivated(token, poolId)
+PocketConverted(...)
+ResidualClaimed(amount, residualSpent)
+```
+
+**Pure functions** — check the arithmetic yourself:
+
+```
+rangeAllocation(total, start, end, denominator)   your exact share of any amount
+leafHash(cohortId, slotIndex, count, npubRaw, wallet)   your exact leaf
+```
+
+### Five checks, and what each one actually proves
+
+| Check | Proves |
+|---|---|
+| `RootsSealed` emitted | membership can never be changed again |
+| `campaignConstitutionHash` equals the published constitution | the rules on chain are the rules published |
+| fee share `getClaimers()` is `[Distributor]` at 10000 | fees cannot reach anyone else *from Bags' side* |
+| `operatingFeeBps` ≤ 1000 and immutable | the service cut cannot be raised on you |
+| your leaf verifies against a sealed root | your share is committed and computable |
+
+## Off-chain — the evidence chain
+
+Every step is reproducible from public signed events:
+
+```
+signed enrollment events → deterministic snapshot and cutoff → cohort selection law
+  → canonical roster → wallet binding → evidence manifest → Merkle root
+  → finalization → seal
+```
+
+## In a browser — the explorer
+
+Rebuilds the roster from published evidence and reports **four independent
+verdicts**, because collapsing them is how a false assurance gets manufactured:
+
+- **root recomputation** — reproduced, divergent, or insufficient
+- **destination-proof coverage** — how many payout addresses were actually proven
+- **per-member binding status**
+- **finalizable under current law**
+
+A reproduced root **does not** mean every destination was proven. Those are
+different questions and the explorer refuses to merge them.
+
+It runs from a domain we do not control, and from a file on your own machine.
+
+## What verification cannot tell you
+
+That Bags will not rewrite the fee configuration. That the token will be worth
+anything. That a market route will be available when you claim — your entitlement
+is preserved, not your exit price.
+
+---
+
+# Part VII — Fixed, chosen, and never changeable
+
+| Frozen when the campaign is authored | Chosen at deployment | Never changeable by anyone |
+|---|---|---|
+| cohort sizes and bps ranges | the Distributor's parameters | the split, once deployed |
+| the economic preset | operating fee and recipient | the bound token, once bound |
+| the observer policy and its hash | partner recipient | a finalized root |
+| chain and domain | root finalizer | the finalizer, once sealed |
+| verifier and schema versions | minimum claim | anyone's entitlement, ever |
+
+---
+
+# Part VIII — The v1 boundary
+
+`BERMLAUNCH-SCOPE.md` is the frozen scope: 14 components, 16 explicitly
+out-of-scope items, 4 invariants. Everything marked **[roadmap]** here is
+mechanism the contract supports and the v1 constitution does not configure.
+
+The four invariants, because they outrank every use case above:
+
+1. **No address enters a payout list without proof of control.**
+2. **Nothing renders as verified that was not verified.**
+3. **Entitlement does not expire and cannot be swept.**
+4. **Claiming never requires our website, our account, or our permission.**
+
+A feature that would break one of those does not ship, however good it is.

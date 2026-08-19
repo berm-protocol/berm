@@ -1,0 +1,307 @@
+{
+ "schema": "berm.bermlaunch.functional_description.v1",
+ "title": "BermLaunch \u2014 what it is, what it unlocks, and how anyone checks it",
+ "companion_md": "bags/BERMLAUNCH.md",
+ "scope_boundary": "bags/BERMLAUNCH-SCOPE.md",
+ "one_line": "A token launchpad where a creator hands a share of their own trading fees to named people \u2014 before the token exists, at graduation, or years later \u2014 and nobody, including the creator, can take it back.",
+ "core_primitive": {
+  "name": "pocket",
+  "definition": "A permanent, proportional claim on a fee stream, owned by a key.",
+  "not": [
+   "an address",
+   "a balance someone credits you",
+   "a one-time gift"
+  ],
+  "is": "a range inside a fee stream that grows automatically as value arrives",
+  "configuration_axes": [
+   "who owns it",
+   "when it was created",
+   "how large a slice"
+  ]
+ },
+ "vs_airdrop": {
+  "airdrop": "one-time gift, decided afterwards, by the giver; you hope you qualify",
+  "pocket": "continuous claim, decided beforehand, enforced by arithmetic",
+  "difference": "whether the promise exists as a fact or as an intention"
+ },
+ "three_moments": [
+  {
+   "id": "PRELAUNCH",
+   "public_name": "Founding Supporters",
+   "when": "before the token exists",
+   "slots": 50,
+   "bps_start": 0,
+   "bps_end": 2000,
+   "why": "the hardest supporters to reward \u2014 at that point there is no token and no way to pay anyone, so historically you promise"
+  },
+  {
+   "id": "GRADUATION",
+   "public_name": "Graduation Supporters",
+   "when": "when the bonding curve completes and a real pool exists",
+   "slots": 100,
+   "bps_start": 2000,
+   "bps_end": 4000,
+   "why": "the moment early supporters historically get flattened"
+  },
+  {
+   "id": "FOMO",
+   "public_name": "Momentum Supporters",
+   "when": "any time after launch",
+   "slots": 300,
+   "bps_start": 4000,
+   "bps_end": 6000,
+   "why": "a good arrival at month eight has no reason to be less real than a day-one supporter"
+  }
+ ],
+ "economics": {
+  "preset": "BERM_STANDARD",
+  "community_bps": 6000,
+  "creator_residual_bps": 4000,
+  "mutable_after_launch": "NO",
+  "headline": "60% of all trading fees to 450 people, permanently; 40% to the creator"
+ },
+ "allocation_formula": {
+  "function": "rangeAllocation(total, start, end, denominator)",
+  "body": "mulDiv(total, end, denominator) - mulDiv(total, start, denominator)",
+  "visibility": "public pure \u2014 anyone can call it and check their own share",
+  "property": "adjacent ranges telescope exactly; no dust, no rounding remainder, no residual pool"
+ },
+ "fee_intake": {
+  "route": "Bags trading fees -> fee share -> Distributor as SOLE claimer at 10000 bps",
+  "verified_at_bind": [
+   "sole claimer is this Distributor",
+   "exactly 10000 bps",
+   "token exists with curve and pool",
+   "WETH/hook/pool/curve match",
+   "beacon and implementation non-zero",
+   "no authority collision"
+  ],
+  "on_failure": "the entire atomic launch reverts",
+  "harvest": "harvest() is permissionless; syncExternalDeposit() picks up value arriving by other routes",
+  "irreversibility": "launchBound is one-shot; zero unbind or rebind paths exist (verified)"
+ },
+ "operating_fee": {
+  "purpose": "pay a service out of the stream rather than out of pocket",
+  "recipient": "operatingFeeRecipient, immutable",
+  "bps": "operatingFeeBps, immutable",
+  "cap_bps": 1000,
+  "cap_enforcement": "if (operatingFeeBps_ > 1_000 || minimumClaimGross_ == 0) revert InvalidConfiguration();",
+  "taken": "at claim time, transferred directly",
+  "rationale": "a fee that can be raised later is not a fee, it is an option on your revenue"
+ },
+ "immutability_timeline": [
+  {
+   "moment": "Distributor deployment",
+   "freezes": [
+    "economics",
+    "cohort ranges",
+    "operating fee and cap",
+    "recipients",
+    "campaign constitution hash"
+   ]
+  },
+  {
+   "moment": "bindLaunch",
+   "freezes": [
+    "the token",
+    "the fee share",
+    "the pool",
+    "the Bags authority snapshot"
+   ]
+  },
+  {
+   "moment": "finalizeCohortRoot",
+   "freezes": [
+    "that cohort's membership",
+    "every destination in it"
+   ]
+  },
+  {
+   "moment": "sealRoots",
+   "freezes": [
+    "the finalizer authority itself, permanently retired"
+   ]
+  }
+ ],
+ "use_cases": [
+  {
+   "id": "UC-01",
+   "name": "Community before the token exists",
+   "status": "v1",
+   "holder": "early supporters",
+   "when": "pre-launch",
+   "why": "no alternative exists today \u2014 you cannot pay from a token that does not exist"
+  },
+  {
+   "id": "UC-02",
+   "name": "Community at graduation",
+   "status": "v1",
+   "holder": "supporters through the curve",
+   "when": "graduation"
+  },
+  {
+   "id": "UC-03",
+   "name": "Community after launch",
+   "status": "v1",
+   "holder": "later arrivals",
+   "when": "any time"
+  },
+  {
+   "id": "UC-04",
+   "name": "Paying a service from the stream",
+   "status": "v1",
+   "mechanism": "operatingFeeRecipient up to 1000 bps, immutable",
+   "holder": "DEX, market maker, auditor, infrastructure provider",
+   "why": "paid from the stream means aligned with the stream; capped and immutable means both sides can verify the deal"
+  },
+  {
+   "id": "UC-05",
+   "name": "Co-launch partner",
+   "status": "v1",
+   "mechanism": "partnerRecipient immutable",
+   "why": "binds the relationship into the contract rather than into a Telegram message"
+  },
+  {
+   "id": "UC-06",
+   "name": "KOL paid from the creator's own slice",
+   "status": "roadmap",
+   "from": "creator 6000-10000 bps, never the community's",
+   "mechanically": "subdividing the creator range telescopes identically, zero dust",
+   "blocked_by": "the v1 constitution does not encode creator sub-splits"
+  },
+  {
+   "id": "UC-07",
+   "name": "Moderators on a recurring basis",
+   "status": "roadmap",
+   "shape": "weekly or monthly, must stop when the work stops",
+   "needs": "a second allocation dimension \u2014 epochs or versioned roots with an activation point",
+   "open_question": "what happens when nobody rolls the epoch: does the moderator keep earning, or does everything halt",
+   "risk_note": "that unanswered fallback is the same shape as the worst bug this project has found",
+   "legal_note": "recurring payment for ongoing work is compensation-shaped rather than fee-share-shaped and deserves qualified review"
+  },
+  {
+   "id": "UC-08",
+   "name": "Treasury pocket",
+   "status": "roadmap",
+   "holder": "a community-controlled key"
+  },
+  {
+   "id": "UC-09",
+   "name": "Contributor pocket",
+   "status": "roadmap",
+   "holder": "a developer paid from the stream instead of a grant"
+  },
+  {
+   "id": "UC-10",
+   "name": "Public-goods pocket",
+   "status": "roadmap",
+   "holder": "something outside the project"
+  },
+  {
+   "id": "UC-11",
+   "name": "Reciprocal pocket",
+   "status": "roadmap",
+   "holder": "two projects each holding a slice of the other"
+  }
+ ],
+ "creator_flow": [
+  "decide the shape (constitution)",
+  "deploy the Distributor \u2014 parameters immutable from this instant",
+  "launch atomically \u2014 any invariant failure reverts everything",
+  "waive the manager role and publish the transaction",
+  "let people enroll \u2014 never assign membership",
+  "finalize each cohort, then seal"
+ ],
+ "creator_cannot_ever": [
+  "change the split",
+  "redirect fees after binding",
+  "add or remove a member",
+  "replace a finalized root",
+  "draw against the community share",
+  "introduce a deadline or expiry on anyone's entitlement"
+ ],
+ "supporter_flow": [
+  "get an identity \u2014 existing signer, or generate and download the encrypted file (not optional)",
+  "enroll with one signature including proof of address control",
+  "get a slot from published snapshots \u2014 you are in the batch where you were seen",
+  "wait or don't \u2014 entitlement accrues with no window and no deadline",
+  "claim when you want, with no account, no approval, and no requirement that our website is reachable"
+ ],
+ "supporter_trusts": [
+  "Bags, who can rewrite the fee configuration upstream",
+  "the observer key that orders rebindings before finalization"
+ ],
+ "supporter_trust_note": "That is the complete list. If the fee stream fails it fails for the creator too, which makes the arrangement honest, not safe.",
+ "verification": {
+  "immutables": [
+   "campaignId",
+   "campaignConstitutionHash",
+   "weth",
+   "bagsFactory",
+   "bagsLens",
+   "launchBinder",
+   "launcherAuthority",
+   "partnerRecipient",
+   "operatingFeeRecipient",
+   "operatingFeeBps",
+   "rootFinalizer",
+   "launchBound"
+  ],
+  "events": [
+   "LaunchBound(token, feeShare, curve, poolId)",
+   "CohortRootFinalized(cohortId, root, evidenceManifestHash)",
+   "RootsSealed()",
+   "FeesHarvested(amount, totalReceived)",
+   "ExternalDepositSynchronized(amount, totalReceived)",
+   "GraduationActivated(token, poolId)",
+   "PocketConverted(...)",
+   "ResidualClaimed(amount, residualSpent)"
+  ],
+  "pure_functions": [
+   "rangeAllocation(total, start, end, denominator)",
+   "leafHash(cohortId, slotIndex, count, npubRaw, wallet)"
+  ],
+  "five_checks": [
+   {
+    "check": "RootsSealed emitted",
+    "proves": "membership can never be changed again"
+   },
+   {
+    "check": "campaignConstitutionHash equals the published constitution",
+    "proves": "the rules on chain are the rules published"
+   },
+   {
+    "check": "fee share getClaimers() is [Distributor] at 10000",
+    "proves": "fees cannot reach anyone else from Bags' side"
+   },
+   {
+    "check": "operatingFeeBps <= 1000 and immutable",
+    "proves": "the service cut cannot be raised on you"
+   },
+   {
+    "check": "your leaf verifies against a sealed root",
+    "proves": "your share is committed and computable"
+   }
+  ],
+  "evidence_chain": "signed enrollment events -> deterministic snapshot and cutoff -> cohort selection law -> canonical roster -> wallet binding -> evidence manifest -> Merkle root -> finalization -> seal",
+  "explorer_verdicts": [
+   "root recomputation",
+   "destination-proof coverage",
+   "per-member binding status",
+   "finalizable under current law"
+  ],
+  "explorer_rule": "a reproduced root does not mean every destination was proven; the explorer refuses to merge those questions",
+  "cannot_tell_you": [
+   "that Bags will not rewrite the fee configuration",
+   "that the token will be worth anything",
+   "that a market route will be available when you claim \u2014 entitlement is preserved, not exit price"
+  ]
+ },
+ "invariants": [
+  "No address enters a payout list without proof of control.",
+  "Nothing renders as verified that was not verified.",
+  "Entitlement does not expire and cannot be swept.",
+  "Claiming never requires our website, our account, or our permission."
+ ],
+ "invariant_rule": "A feature that would break one of these does not ship, however good it is."
+}
