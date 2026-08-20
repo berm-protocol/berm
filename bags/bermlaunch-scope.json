@@ -1,7 +1,7 @@
 {
  "schema": "berm.bermlaunch.functional_scope.v1",
  "status": "FROZEN",
- "version": 3,
+ "version": 4,
  "authority": "FOUNDER",
  "authority_note": "Scope is not owned by an implementation. LAW-OWNERSHIP.md assigns the laws to the BermLaunch lane; this document assigns what the product must and must not do, and constrains both repositories.",
  "purpose": [
@@ -367,6 +367,12 @@
    "item": "paying for anything from community bps",
    "reason": "the split is the supporters', full stop",
    "restates": "BL-04, so it cannot be re-argued as an exception for a good cause"
+  },
+  {
+   "item": "creator-chosen cohort threshold",
+   "reason": "roadmap — memberCount is public pure with hardcoded 50/100/300; a per-campaign immutable is a contract change",
+   "recorded_as": "UC-14, BERMLAUNCH.md §20",
+   "forbidden_variant": "divisor derived from actual enrollment — reintroduces the recruiting counter-incentive and can invert the conviction ladder"
   }
  ],
  "invariants": [
@@ -390,6 +396,12 @@
    "change": "added the DEX visibility pocket (listing then boosts) to out_of_scope, ruled roadmap/nice-to-have because Bags already ships it; added the explicit community-bps funding prohibition",
    "substance_changed": false,
    "note": "both items were already absent. This records the ruling and the funding-source constraint so neither is re-litigated."
+  },
+  {
+   "version": 4,
+   "change": "recorded the fixed-divisor rationale (BERMLAUNCH.md §19) and creator-chosen thresholds as UC-14 roadmap",
+   "substance_changed": false,
+   "note": "the fixed divisor was already the law; §19 records WHY, and UC-14 records the roadmap form together with the forbidden variant so it cannot be built backwards."
   }
  ]
 }

@@ -300,6 +300,26 @@
     "website_fallback": "where a creator has no website, the dex website link points to their BermLaunch token page, which carries the same metadata AND the Nostr-signed messages from their supporters; the dex surface then points back at the community that funded it",
     "status_rule": "signing the metadata is not the metadata being live — the same rule as BL-14's X composer. Until a fetch of the token page confirms it, the status is 'submitted', never 'listed'"
    }
+  },
+  {
+   "id": "UC-14",
+   "name": "Creator-chosen cohort thresholds",
+   "status": "roadmap",
+   "shape": "cohort size is a number the creator picks BEFORE anyone enrolls, immutable from that moment: ten, fifty, five hundred",
+   "rule": "the threshold must be reached for the cohort to fill; it is a target fixed in advance, not a cap that the enrollment count quietly redefines",
+   "why_it_is_a_commitment": "choosing 100 and reaching it is expensive and public; choosing 10 is an honest statement about scale; choosing 500 and filling 40 is legible too",
+   "why_it_matters_for_a_launchpad": "if a campaign could launch with whatever turned up and divide the pot among them, the cost of firing off a token with three supporters would be zero, and a launchpad where that is free fills with tokens nobody worked for; a threshold that must be achieved puts a price on launching, paid in people who showed up",
+   "roadmap_because": "memberCount(uint8) is currently public pure returning 50/100/300 as hardcoded constants; making it a per-campaign immutable is small but is a CONTRACT change, so it lands in a future Distributor",
+   "critical_warning": {
+    "statement": "the same change can be built two opposite ways and only one is correct",
+    "correct": "the threshold sets the divisor BEFORE enrollment opens, chosen in advance, immutable, never derived from the outcome",
+    "forbidden": "the divisor equals however many actually enrolled",
+    "why_forbidden": [
+     "it reintroduces the counter-incentive: every new supporter shrinks every existing supporter's share, so recruiting costs the recruiter money",
+     "it lets a later cohort out-earn an earlier one whenever it happens to be smaller, inverting the conviction ladder"
+    ]
+   },
+   "founder_reasoning": "fixed capacity means early signers cannot increase their share by keeping others out; they need to recruit to reach the threshold so that there is something to hold a share OF. Launching with whatever turned up increases spam tokens from other creators."
   }
  ],
  "creator_flow": [

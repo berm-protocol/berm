@@ -371,6 +371,115 @@ One rule, and it is the same rule as the X composer in BL-14: **signing the
 metadata is not the metadata being live.** Until a fetch of the token page confirms
 it, the status is *submitted*, never *listed*.
 
+## 19. Why the divisor is fixed — and why an unfilled cohort strands value
+
+A Founding slot is `2000 bps ÷ 50` whether fifty people enroll or twenty. A
+supporter who reads that carefully will ask the obvious question: *if only twenty
+of us showed up, why isn't my share bigger?*
+
+**Because if it were, you would be paid to keep people out.**
+
+### The counter-incentive we removed
+
+Divide the cohort pot by the number who actually enrolled, and every existing
+supporter's share shrinks each time someone new joins:
+
+| Founders | Each would get |
+|---|---|
+| 20 | 1.00% |
+| 30 | 0.67% |
+| 47 | 0.43% |
+
+A supporter who brings ten friends would cut their own share by a third. **We would
+be charging people for the exact behaviour the product exists to encourage.**
+
+The whole argument for binding a pocket to a Nostr identity rather than a bare
+wallet is that a supporter is a person with an audience. A wallet can hold a pocket;
+it cannot post, be followed, vouch, or bring anyone. Designing the economics so that
+bringing someone is expensive would quietly undo that.
+
+**With a fixed divisor, recruiting costs you nothing.** Your slot is your slot. Ten
+more Founders do not touch it.
+
+### And it gives you a reason to recruit
+
+A fixed divisor does more than remove a penalty. It means the only way your slot
+becomes worth anything is if the token itself is worth something — and a token with
+fifty real supporters who each brought an audience is worth more than one with five.
+
+**0.40% of something beats 2% of nothing.** That is the entire incentive, and it
+points outward.
+
+### What happens to the unfilled slots — stated plainly
+
+If twenty Founders enroll against a fifty-slot cohort, thirty slots are never
+claimed. **That value is stranded permanently.**
+
+It does not go to the creator. `creatorTotal` is
+`rangeAllocation(received, communityBps, BPS, BPS)` — the creator's range begins
+*above* the community share, so unclaimed community value is unreachable from the
+residual by construction, not by promise. It does not go to us. There is no sweep,
+no expiry, and no admin path to it — that is the same rule that makes your own
+entitlement unsweepable.
+
+It stays in the contract, unclaimable by anyone, forever.
+
+| Enrolled | Paid to Founders | Stranded permanently |
+|---|---|---|
+| 20 | 8% of fees | **12% of fees** |
+| 30 | 12% | 8% |
+| 40 | 16% | 4% |
+| 50 | 20% | 0% |
+
+**That is a real cost and we are not going to hide it.** It is the price of making
+recruitment free, and we think it is the right trade — but you should be able to see
+it and disagree.
+
+### The fill ratio is public
+
+Because the cohort size is fixed before anyone enrolls, **how full it got is a
+number.** A token that filled 50/50 and a token that filled 12/50 are different
+objects, and the difference is visible on the campaign page before you buy anything.
+
+A cohort that filled is evidence that someone did the work. A cohort that did not is
+evidence of the opposite. Neither is hidden, and the market can price both.
+
+## 20. Creator-chosen thresholds **[roadmap]**
+
+*The shape:* the cohort size is not 50 by law — it is a number the **creator picks
+before anyone enrolls**, and it is immutable from that moment. Ten. Fifty. Five
+hundred.
+
+**The threshold must be reached for the cohort to fill.** It is not a cap that the
+enrollment count quietly redefines — it is a target fixed in advance, and falling
+short is visible rather than erased.
+
+That makes the number a **commitment**, not a description. Choosing 100 and reaching
+it is expensive and public. Choosing 10 is an honest statement about scale. Choosing
+500 and filling 40 is legible too, and the page will say so.
+
+**Why this matters for a launchpad rather than for one token.** If a campaign could
+simply launch with whatever turned up and divide the pot among them, the cost of
+firing off a token with three supporters would be zero — and a launchpad where that
+is free fills up with tokens nobody worked for. A threshold that must actually be
+achieved puts a price on launching, paid in the only currency that matters here:
+people who showed up.
+
+Then BermLaunch carries tokens with a hundred Founders and tokens with ten, side by
+side, with the number stated — and the market judges.
+
+*Roadmap because:* `memberCount(uint8)` is currently `public pure` and returns
+50/100/300 as hardcoded constants. Making it a per-campaign immutable is a small
+change, but it is a **contract** change, so it lands in a future Distributor rather
+than this one.
+
+**One warning, recorded because the same change can be built two opposite ways.**
+The creator-chosen threshold sets the divisor **before enrollment opens**. It must
+never be implemented as "the divisor equals however many actually enrolled" — that
+is the counter-incentive in §19, reintroduced through the back door, plus it lets a
+later cohort out-earn an earlier one whenever it happens to be smaller. **The number
+is chosen in advance and is immutable. It is never derived from the outcome.**
+
 ---
 
 # Part IV — How a creator uses it
@@ -516,7 +625,7 @@ is preserved, not your exit price.
 
 # Part VIII — The v1 boundary
 
-`BERMLAUNCH-SCOPE.md` is the frozen scope: 14 components, 19 explicitly
+`BERMLAUNCH-SCOPE.md` is the frozen scope: 14 components, 20 explicitly
 out-of-scope items, 4 invariants. Everything marked **[roadmap]** here is
 mechanism the contract supports and the v1 constitution does not configure.
 

@@ -1,12 +1,13 @@
 # BermLaunch — frozen functional scope
 
-**Status: FROZEN at v3. Founder authority.**
+**Status: FROZEN at v4. Founder authority.**
 
 | Version | Change |
 |---|---|
 | v1 | initial freeze |
 | v2 | added the tradeable-pocket / NFT item to §16 with the credit-claim split recorded as its proposed shape. **Scope is unchanged in substance** — the item was already absent. This records the decision and its reasoning so it is not re-litigated. |
 | v3 | added the DEX visibility pocket (listing then boosts) to §16, ruled **roadmap, nice-to-have** because Bags already ships it. **Scope is unchanged in substance** — the item was already absent. Also records the funding-source constraint, which is not new law but was not written down. |
+| v4 | recorded the fixed-divisor rationale (`BERMLAUNCH.md` §19) and creator-chosen thresholds as **UC-14 roadmap**. **Scope is unchanged in substance** — the fixed divisor was already law. This records *why*, and records the forbidden variant so the roadmap item cannot be built backwards. |
 
 Scope is not owned by an implementation. `spec/LAW-OWNERSHIP.md` assigns the
 *laws* — the enrollment wire contract, the roster law, the contracts — to the
@@ -261,7 +262,19 @@ third-party API key issuance             broker commercial layer, post-launch
 tradeable pocket / NFT-wrapped claim     separates payout from person by design
 DEX listing / boost pocket               roadmap, nice-to-have — Bags ships it
 paying for anything from community bps   the split is the supporters', full stop
+creator-chosen cohort threshold          roadmap — memberCount is pure 50/100/300
+divisor derived from actual enrollment   FORBIDDEN — see below, not merely absent
 ```
+
+**On the divisor, because this one must never be built backwards.** The cohort
+divisor is **fixed before enrollment opens** and is never derived from how many
+actually enrolled. Deriving it from the outcome would mean every new supporter
+shrinks every existing supporter's share — **charging people for recruiting, which
+is the exact behaviour the identity layer exists to encourage** — and would let a
+smaller later cohort out-earn an earlier one, inverting the conviction ladder. An
+unfilled cohort therefore strands value permanently, reachable by nobody, and that
+cost is disclosed rather than engineered away. Rationale in `BERMLAUNCH.md` §19;
+the roadmap form is **UC-14**.
 
 **On the DEX visibility pocket**, recorded as **UC-13** in `BERMLAUNCH.md` §18:
 Bags already partnered with DexScreener to buy boosts from fees automatically, so
