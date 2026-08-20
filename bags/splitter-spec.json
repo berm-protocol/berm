@@ -1,0 +1,427 @@
+{
+ "schema": "berm.bermlaunch.residual_splitter_spec.r1",
+ "status": "PROPOSAL_FOR_COSTING",
+ "authorized": false,
+ "in_frozen_scope": false,
+ "scope_note": "adding it requires a BERMLAUNCH-SCOPE.md revision under §18",
+ "companion_md": "bags/SPLITTER-SPEC.md",
+ "vectors_file": "bags/vectors/residual-splitter.json",
+ "problem": {
+  "distributor_residual_payout": "BermRobinhoodDistributorV01.sol:378 _safeTransfer(weth, residualRecipient, amount)",
+  "fact": "claimResidual sends 100% of the residual to ONE immutable address; there is no sub-split",
+  "partner_recipient_receives_nothing": {
+   "anchors": [
+    "BermRobinhoodDistributorV01.sol:107",
+    "BermRobinhoodDistributorV01.sol:194",
+    "BermRobinhoodDistributorV01.sol:494"
+   ],
+   "role": "authority-collision check in _isControlledRole only",
+   "is_payee": false
+  },
+  "why_time_boxed": "residualRecipient is immutable at construction, so the creator's share is capable only of what its destination is capable of, from the first block",
+  "without_it": "the creator can still pay people later, but only as a revocable off-protocol promise"
+ },
+ "blast_radius": {
+  "sits": "entirely downstream of the community share",
+  "supporter_pockets_touch_it": false,
+  "supporter_payment_path": "claimBuyback pays directly from the Distributor",
+  "worst_case": "a defect strands the creator's own money and cannot reach a single supporter",
+  "consequence": "a different risk category from modifying the claim path"
+ },
+ "model": {
+  "kind": "per-commitment baseline, not a cumulative range",
+  "baseline": "totalReceived at the moment the commitment is made",
+  "property": "a commitment pays only on value arriving after it exists; retroactive grants are impossible",
+  "formulas": {
+   "entitlement_i": "mulDiv(totalReceived - baseline_i, bps_i, 10000)",
+   "claimable_i": "entitlement_i - withdrawn_i",
+   "creatorEntitlement": "totalReceived - sum(entitlement_i)",
+   "creatorClaimable": "creatorEntitlement - creatorWithdrawn"
+  },
+  "solvency": "structural: sum(entitlement_i) + creatorEntitlement == totalReceived by definition; each entitlement floors so the remainder always lands with the creator, never against a payee"
+ },
+ "immutables": {
+  "weth": "fee asset",
+  "creatorRecipient": "where the unallocated remainder goes",
+  "committer": "the only address that may commit",
+  "maxAllocatedBps": {
+   "purpose": "bounds the damage of a compromised committer key",
+   "at_10000": "a stolen key can permanently zero the creator's stream",
+   "at_5000": "a stolen key cannot take more than half",
+   "note": "immutable — choose deliberately"
+  }
+ },
+ "interface": {
+  "sync": {
+   "permissionless": true,
+   "why": "the Distributor PUSHES weth here, so arrival emits no callback; sync measures balanceOf(this) against totalReceived - sum(withdrawn) and books the delta, same shape as syncExternalDeposit()"
+  },
+  "commit": {
+   "permissionless": false,
+   "caller": "committer only",
+   "power": "may only reduce the committer's own future share; can never touch an existing commitment"
+  },
+  "withdraw": {
+   "permissionless": true,
+   "why": "destination is immutable and no price is involved — same reasoning that makes harvest() and claimResidual() permissionless",
+   "consequence": "nobody needs gas to be PAID, only to pay"
+  },
+  "withdrawCreator": {
+   "permissionless": true
+  },
+  "views": [
+   "entitlementOf",
+   "claimableOf",
+   "creatorEntitlement",
+   "creatorClaimable",
+   "commitmentCount",
+   "unallocatedBps"
+  ]
+ },
+ "invariants": [
+  {
+   "id": "I-1",
+   "statement": "allocatedBps never decreases"
+  },
+  {
+   "id": "I-2",
+   "statement": "no function modifies or removes an existing Commitment except its withdrawn field"
+  },
+  {
+   "id": "I-3",
+   "statement": "a commitment pays zero on value received before its baseline"
+  },
+  {
+   "id": "I-4",
+   "statement": "committing does not change any existing commitment's entitlement"
+  },
+  {
+   "id": "I-5",
+   "statement": "committing does not reduce creatorEntitlement at the moment of commit"
+  },
+  {
+   "id": "I-6",
+   "statement": "sum(entitlement_i) + creatorEntitlement == totalReceived, exactly, always"
+  },
+  {
+   "id": "I-7",
+   "statement": "withdrawn_i <= entitlement_i and creatorWithdrawn <= creatorEntitlement"
+  },
+  {
+   "id": "I-8",
+   "statement": "rounding remainder always accrues to the creator, never against a payee"
+  },
+  {
+   "id": "I-9",
+   "statement": "there is NO function that revokes, reduces, reassigns, pauses or sweeps",
+   "proof_method": "enumerate the ABI and assert no such selector exists, in the shape of the existing bindLaunch one-shot proof",
+   "note": "I-9 is the product claim"
+  }
+ ],
+ "must_fail": [
+  {
+   "condition": "commit from any address other than committer",
+   "error": "Unauthorized"
+  },
+  {
+   "condition": "commit with bps == 0",
+   "error": "InvalidCommitment"
+  },
+  {
+   "condition": "commit with recipient == address(0)",
+   "error": "ZeroAddress"
+  },
+  {
+   "condition": "commit where allocatedBps + bps > maxAllocatedBps",
+   "error": "ExceedsUnallocated"
+  },
+  {
+   "condition": "constructor with any zero address",
+   "error": "ZeroAddress"
+  },
+  {
+   "condition": "constructor with maxAllocatedBps == 0 or > 10000",
+   "error": "InvalidConfiguration"
+  },
+  {
+   "condition": "withdraw(index) where index >= commitmentCount",
+   "error": "InvalidCommitment"
+  },
+  {
+   "condition": "any reentrant path",
+   "error": "ReentrantCall"
+  },
+  {
+   "condition": "native ETH sent to the contract",
+   "error": "NativeEthRejected"
+  }
+ ],
+ "deliberately_not_failures": [
+  "two commitments to the same recipient — they simply both pay",
+  "a commitment to the committer itself",
+  "withdraw when claimable is zero — returns 0 rather than reverting, so a batch relayer is not griefed by one empty payee",
+  "sync() when the delta is zero"
+ ],
+ "test_vectors": {
+  "method": "generated from a reference model and machine-checked for solvency at every step",
+  "requirement": "reproduce exactly; a step that does not sum to totalReceived is a failed run, not a rounding note",
+  "critical_steps": {
+   "V4": "commit A at 1500 bps AFTER 1e18 already arrived and was withdrawn -> A entitlement is 0. No retroactive grant, no insolvency.",
+   "V6": "commit B at 500 bps -> A's entitlement is byte-identically unchanged (I-4)"
+  },
+  "steps": [
+   {
+    "step": "V1 deployed, nothing committed",
+    "totalReceived": 0,
+    "allocatedBps": 0,
+    "commitments": [],
+    "creatorEntitlement": 0,
+    "creatorWithdrawn": 0,
+    "creatorClaimable": 0,
+    "solvent": true
+   },
+   {
+    "step": "V2 1e18 arrives, no commitments -> all creator",
+    "totalReceived": 1000000000000000000,
+    "allocatedBps": 0,
+    "commitments": [],
+    "creatorEntitlement": 1000000000000000000,
+    "creatorWithdrawn": 0,
+    "creatorClaimable": 1000000000000000000,
+    "solvent": true
+   },
+   {
+    "step": "V3 creator withdraws",
+    "totalReceived": 1000000000000000000,
+    "allocatedBps": 0,
+    "commitments": [],
+    "creatorEntitlement": 1000000000000000000,
+    "creatorWithdrawn": 1000000000000000000,
+    "creatorClaimable": 0,
+    "solvent": true
+   },
+   {
+    "step": "V4 commit A 1500bps AFTER 1e18 already arrived",
+    "totalReceived": 1000000000000000000,
+    "allocatedBps": 1500,
+    "commitments": [
+     {
+      "recipient": "0xA...A",
+      "bps": 1500,
+      "baseline": 1000000000000000000,
+      "entitlement": 0,
+      "withdrawn": 0,
+      "claimable": 0
+     }
+    ],
+    "creatorEntitlement": 1000000000000000000,
+    "creatorWithdrawn": 1000000000000000000,
+    "creatorClaimable": 0,
+    "solvent": true
+   },
+   {
+    "step": "V5 second 1e18 arrives",
+    "totalReceived": 2000000000000000000,
+    "allocatedBps": 1500,
+    "commitments": [
+     {
+      "recipient": "0xA...A",
+      "bps": 1500,
+      "baseline": 1000000000000000000,
+      "entitlement": 150000000000000000,
+      "withdrawn": 0,
+      "claimable": 150000000000000000
+     }
+    ],
+    "creatorEntitlement": 1850000000000000000,
+    "creatorWithdrawn": 1000000000000000000,
+    "creatorClaimable": 850000000000000000,
+    "solvent": true
+   },
+   {
+    "step": "V6 commit B 500bps; A entitlement MUST be unchanged",
+    "totalReceived": 2000000000000000000,
+    "allocatedBps": 2000,
+    "commitments": [
+     {
+      "recipient": "0xA...A",
+      "bps": 1500,
+      "baseline": 1000000000000000000,
+      "entitlement": 150000000000000000,
+      "withdrawn": 0,
+      "claimable": 150000000000000000
+     },
+     {
+      "recipient": "0xB...B",
+      "bps": 500,
+      "baseline": 2000000000000000000,
+      "entitlement": 0,
+      "withdrawn": 0,
+      "claimable": 0
+     }
+    ],
+    "creatorEntitlement": 1850000000000000000,
+    "creatorWithdrawn": 1000000000000000000,
+    "creatorClaimable": 850000000000000000,
+    "solvent": true
+   },
+   {
+    "step": "V7 awkward amount arrives",
+    "totalReceived": 5333333333333333333,
+    "allocatedBps": 2000,
+    "commitments": [
+     {
+      "recipient": "0xA...A",
+      "bps": 1500,
+      "baseline": 1000000000000000000,
+      "entitlement": 649999999999999999,
+      "withdrawn": 0,
+      "claimable": 649999999999999999
+     },
+     {
+      "recipient": "0xB...B",
+      "bps": 500,
+      "baseline": 2000000000000000000,
+      "entitlement": 166666666666666666,
+      "withdrawn": 0,
+      "claimable": 166666666666666666
+     }
+    ],
+    "creatorEntitlement": 4516666666666666668,
+    "creatorWithdrawn": 1000000000000000000,
+    "creatorClaimable": 3516666666666666668,
+    "solvent": true
+   },
+   {
+    "step": "V8 everyone withdraws",
+    "totalReceived": 5333333333333333333,
+    "allocatedBps": 2000,
+    "commitments": [
+     {
+      "recipient": "0xA...A",
+      "bps": 1500,
+      "baseline": 1000000000000000000,
+      "entitlement": 649999999999999999,
+      "withdrawn": 649999999999999999,
+      "claimable": 0
+     },
+     {
+      "recipient": "0xB...B",
+      "bps": 500,
+      "baseline": 2000000000000000000,
+      "entitlement": 166666666666666666,
+      "withdrawn": 166666666666666666,
+      "claimable": 0
+     }
+    ],
+    "creatorEntitlement": 4516666666666666668,
+    "creatorWithdrawn": 4516666666666666668,
+    "creatorClaimable": 0,
+    "solvent": true
+   },
+   {
+    "step": "V9 dust amount of 7 wei arrives",
+    "totalReceived": 5333333333333333340,
+    "allocatedBps": 2000,
+    "commitments": [
+     {
+      "recipient": "0xA...A",
+      "bps": 1500,
+      "baseline": 1000000000000000000,
+      "entitlement": 650000000000000001,
+      "withdrawn": 649999999999999999,
+      "claimable": 2
+     },
+     {
+      "recipient": "0xB...B",
+      "bps": 500,
+      "baseline": 2000000000000000000,
+      "entitlement": 166666666666666667,
+      "withdrawn": 166666666666666666,
+      "claimable": 1
+     }
+    ],
+    "creatorEntitlement": 4516666666666666672,
+    "creatorWithdrawn": 4516666666666666668,
+    "creatorClaimable": 4,
+    "solvent": true
+   },
+   {
+    "step": "V10 withdraw the dust",
+    "totalReceived": 5333333333333333340,
+    "allocatedBps": 2000,
+    "commitments": [
+     {
+      "recipient": "0xA...A",
+      "bps": 1500,
+      "baseline": 1000000000000000000,
+      "entitlement": 650000000000000001,
+      "withdrawn": 650000000000000001,
+      "claimable": 0
+     },
+     {
+      "recipient": "0xB...B",
+      "bps": 500,
+      "baseline": 2000000000000000000,
+      "entitlement": 166666666666666667,
+      "withdrawn": 166666666666666667,
+      "claimable": 0
+     }
+    ],
+    "creatorEntitlement": 4516666666666666672,
+    "creatorWithdrawn": 4516666666666666672,
+    "creatorClaimable": 0,
+    "solvent": true
+   }
+  ]
+ },
+ "deployment_ordering": {
+  "why": "residualRecipient is a Distributor constructor argument and immutable",
+  "sequence": [
+   "deploy BermResidualSplitter with creatorRecipient, committer, maxAllocatedBps",
+   "deploy the Distributor with residualRecipient = <splitter address>",
+   "commit nothing"
+  ],
+  "cost_if_never_used": "with allocatedBps == 0 the splitter is a pass-through and the creator receives 100%, identical to deploying with a plain address",
+  "create2_variant": {
+   "what": "compute the address in advance from keccak(initCode) and name it before deployment",
+   "makes_it_verifiable_if": "the init code and salt are published — then it is a cryptographic commitment, not a trust assumption",
+   "limit": "it defers the deploy transaction, NOT the design; the init code must be final to publish its hash",
+   "must_not_ship": "naming a CREATE2 address without publishing the init code — for that window nobody can verify what governs the money"
+  }
+ },
+ "out_of_scope": [
+  {
+   "item": "revoking, reducing or reassigning a commitment",
+   "reason": "I-9; the entire point"
+  },
+  {
+   "item": "pausing, sweeping or expiring",
+   "reason": "invariant 3"
+  },
+  {
+   "item": "an upgrade path or proxy",
+   "reason": "a mutable splitter is a promise"
+  },
+  {
+   "item": "committing against the community's 6000 bps",
+   "reason": "structurally impossible; this contract only ever sees residual"
+  },
+  {
+   "item": "transferable or tradeable commitments",
+   "reason": "UC-12 governs; legal advice first"
+  },
+  {
+   "item": "scheduling or vesting a commitment",
+   "reason": "baseline is the only time dimension"
+  },
+  {
+   "item": "a fourth cohort",
+   "reason": "COHORT_COUNT is 3 and hardcoded; GRADUATION and FOMO already provide post-launch cohorts from the COMMUNITY share. This contract is only for slices of the creator's own share."
+  }
+ ],
+ "disclosure_owed_if_it_ships": {
+  "sovereignty_md": "committer is a named authority: it may permanently reduce the creator's own future share up to maxAllocatedBps and nothing else — it cannot revoke, cannot reach committed value, and cannot touch any supporter pocket",
+  "public_page": "distinguish a COMMITTED slice (as permanent as a Founding pocket) from the UNCOMMITTED remainder (the creator's, carrying no promise at all)"
+ }
+}

@@ -1,0 +1,205 @@
+[
+ {
+  "step": "V1 deployed, nothing committed",
+  "totalReceived": 0,
+  "allocatedBps": 0,
+  "commitments": [],
+  "creatorEntitlement": 0,
+  "creatorWithdrawn": 0,
+  "creatorClaimable": 0,
+  "solvent": true
+ },
+ {
+  "step": "V2 1e18 arrives, no commitments -> all creator",
+  "totalReceived": 1000000000000000000,
+  "allocatedBps": 0,
+  "commitments": [],
+  "creatorEntitlement": 1000000000000000000,
+  "creatorWithdrawn": 0,
+  "creatorClaimable": 1000000000000000000,
+  "solvent": true
+ },
+ {
+  "step": "V3 creator withdraws",
+  "totalReceived": 1000000000000000000,
+  "allocatedBps": 0,
+  "commitments": [],
+  "creatorEntitlement": 1000000000000000000,
+  "creatorWithdrawn": 1000000000000000000,
+  "creatorClaimable": 0,
+  "solvent": true
+ },
+ {
+  "step": "V4 commit A 1500bps AFTER 1e18 already arrived",
+  "totalReceived": 1000000000000000000,
+  "allocatedBps": 1500,
+  "commitments": [
+   {
+    "recipient": "0xA...A",
+    "bps": 1500,
+    "baseline": 1000000000000000000,
+    "entitlement": 0,
+    "withdrawn": 0,
+    "claimable": 0
+   }
+  ],
+  "creatorEntitlement": 1000000000000000000,
+  "creatorWithdrawn": 1000000000000000000,
+  "creatorClaimable": 0,
+  "solvent": true
+ },
+ {
+  "step": "V5 second 1e18 arrives",
+  "totalReceived": 2000000000000000000,
+  "allocatedBps": 1500,
+  "commitments": [
+   {
+    "recipient": "0xA...A",
+    "bps": 1500,
+    "baseline": 1000000000000000000,
+    "entitlement": 150000000000000000,
+    "withdrawn": 0,
+    "claimable": 150000000000000000
+   }
+  ],
+  "creatorEntitlement": 1850000000000000000,
+  "creatorWithdrawn": 1000000000000000000,
+  "creatorClaimable": 850000000000000000,
+  "solvent": true
+ },
+ {
+  "step": "V6 commit B 500bps; A entitlement MUST be unchanged",
+  "totalReceived": 2000000000000000000,
+  "allocatedBps": 2000,
+  "commitments": [
+   {
+    "recipient": "0xA...A",
+    "bps": 1500,
+    "baseline": 1000000000000000000,
+    "entitlement": 150000000000000000,
+    "withdrawn": 0,
+    "claimable": 150000000000000000
+   },
+   {
+    "recipient": "0xB...B",
+    "bps": 500,
+    "baseline": 2000000000000000000,
+    "entitlement": 0,
+    "withdrawn": 0,
+    "claimable": 0
+   }
+  ],
+  "creatorEntitlement": 1850000000000000000,
+  "creatorWithdrawn": 1000000000000000000,
+  "creatorClaimable": 850000000000000000,
+  "solvent": true
+ },
+ {
+  "step": "V7 awkward amount arrives",
+  "totalReceived": 5333333333333333333,
+  "allocatedBps": 2000,
+  "commitments": [
+   {
+    "recipient": "0xA...A",
+    "bps": 1500,
+    "baseline": 1000000000000000000,
+    "entitlement": 649999999999999999,
+    "withdrawn": 0,
+    "claimable": 649999999999999999
+   },
+   {
+    "recipient": "0xB...B",
+    "bps": 500,
+    "baseline": 2000000000000000000,
+    "entitlement": 166666666666666666,
+    "withdrawn": 0,
+    "claimable": 166666666666666666
+   }
+  ],
+  "creatorEntitlement": 4516666666666666668,
+  "creatorWithdrawn": 1000000000000000000,
+  "creatorClaimable": 3516666666666666668,
+  "solvent": true
+ },
+ {
+  "step": "V8 everyone withdraws",
+  "totalReceived": 5333333333333333333,
+  "allocatedBps": 2000,
+  "commitments": [
+   {
+    "recipient": "0xA...A",
+    "bps": 1500,
+    "baseline": 1000000000000000000,
+    "entitlement": 649999999999999999,
+    "withdrawn": 649999999999999999,
+    "claimable": 0
+   },
+   {
+    "recipient": "0xB...B",
+    "bps": 500,
+    "baseline": 2000000000000000000,
+    "entitlement": 166666666666666666,
+    "withdrawn": 166666666666666666,
+    "claimable": 0
+   }
+  ],
+  "creatorEntitlement": 4516666666666666668,
+  "creatorWithdrawn": 4516666666666666668,
+  "creatorClaimable": 0,
+  "solvent": true
+ },
+ {
+  "step": "V9 dust amount of 7 wei arrives",
+  "totalReceived": 5333333333333333340,
+  "allocatedBps": 2000,
+  "commitments": [
+   {
+    "recipient": "0xA...A",
+    "bps": 1500,
+    "baseline": 1000000000000000000,
+    "entitlement": 650000000000000001,
+    "withdrawn": 649999999999999999,
+    "claimable": 2
+   },
+   {
+    "recipient": "0xB...B",
+    "bps": 500,
+    "baseline": 2000000000000000000,
+    "entitlement": 166666666666666667,
+    "withdrawn": 166666666666666666,
+    "claimable": 1
+   }
+  ],
+  "creatorEntitlement": 4516666666666666672,
+  "creatorWithdrawn": 4516666666666666668,
+  "creatorClaimable": 4,
+  "solvent": true
+ },
+ {
+  "step": "V10 withdraw the dust",
+  "totalReceived": 5333333333333333340,
+  "allocatedBps": 2000,
+  "commitments": [
+   {
+    "recipient": "0xA...A",
+    "bps": 1500,
+    "baseline": 1000000000000000000,
+    "entitlement": 650000000000000001,
+    "withdrawn": 650000000000000001,
+    "claimable": 0
+   },
+   {
+    "recipient": "0xB...B",
+    "bps": 500,
+    "baseline": 2000000000000000000,
+    "entitlement": 166666666666666667,
+    "withdrawn": 166666666666666667,
+    "claimable": 0
+   }
+  ],
+  "creatorEntitlement": 4516666666666666672,
+  "creatorWithdrawn": 4516666666666666672,
+  "creatorClaimable": 0,
+  "solvent": true
+ }
+]
