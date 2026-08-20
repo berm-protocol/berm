@@ -1,0 +1,382 @@
+{
+ "schema": "berm.opus.rc3_review.r1",
+ "title": "Opus review — CORE_RC R3 Functional Checkpoint Relay Pack R4",
+ "companion_md": "bags/RC3-REVIEW.md",
+ "pack": {
+  "sha256": "4197c97c73533631f88acde568f653694f711c3918fff03eefff5dbc13e3767c",
+  "branch": "build/bermlaunch-bags-bindlaunch-constitution-anchor-r1",
+  "head_r": "1e1bb2027a2c1729ab906cf90758ed9aa4958011",
+  "manifest": {
+   "verified": 435,
+   "total": 435,
+   "mismatch": 0,
+   "missing": 0,
+   "unlisted_on_disk": [
+    "MANIFEST_SHA256.txt",
+    "MANIFEST_SHA256.json"
+   ],
+   "note": "the only unlisted files are the manifest itself"
+  }
+ },
+ "method": {
+  "evidence_rule": "no claim enters this document unless it was produced by running something: a test executed, an attack reproduced, or file:line read from the pack's current_relevant_source_snapshot",
+  "opinion_is_segregated": "section 4 is judgement and contains no findings",
+  "not_seen": "the 209-case matrix; section 4.2 proposes a method for collapsing it and is not a verdict on its contents"
+ },
+ "verified": {
+  "fail_open_class_closed": {
+   "method": "historical attacks re-executed against this build in a clean sandbox",
+   "results": [
+    {
+     "case": "C1",
+     "setup": "caller-supplied trustedObservation, null policy",
+     "outcome": "THREW",
+     "error": "pre_normalized_verified_enrollments_are_not_production_authority"
+    },
+    {
+     "case": "C2",
+     "setup": "caller-supplied trustedObservation, empty policy {observerPubkeys:[]}",
+     "outcome": "THREW",
+     "error": "pre_normalized_verified_enrollments_are_not_production_authority"
+    },
+    {
+     "case": "C3",
+     "setup": "populated policy, no receipts, pre-attached observation",
+     "outcome": "THREW",
+     "error": "pre_normalized_verified_enrollments_are_not_production_authority"
+    },
+    {
+     "case": "C9",
+     "setup": "attacker-supplied sequence 99 reaching the leaf",
+     "outcome": "THREW",
+     "error": "pre_normalized_verified_enrollments_are_not_production_authority"
+    },
+    {
+     "case": "C10",
+     "setup": "zero enrollments, production compile",
+     "outcome": "THREW",
+     "error": "raw_signed_enrollment_records_required"
+    }
+   ],
+   "anchor": "packages/sdk/src/enrollmentRoster.js:252",
+   "empty_observer_policy": "throws observer_policy_required at enrollmentRoster.js:142",
+   "assessment": "stronger than the fix requested: caller-normalised records cannot reach a production compile at all, so the category is removed rather than the instances patched"
+  },
+  "frozen_law": {
+   "constitution_bytes": 1862,
+   "constitution_sha256": "baef1dbfcc212379f9e66addf474c5cba1f48547783c64db97be66bb44e4995a",
+   "cohorts": [
+    50,
+    100,
+    300
+   ],
+   "cumulative_ranges": [
+    [
+     0,
+     2000
+    ],
+    [
+     2000,
+     4000
+    ],
+    [
+     4000,
+     6000
+    ]
+   ],
+   "economic_preset": {
+    "selected": "BERM_STANDARD",
+    "community_bps": 6000,
+    "creator_bps": 4000,
+    "mutable_after_launch": "NO"
+   },
+   "presets_available": {
+    "COMMUNITY_FIRST": 7500,
+    "BERM_STANDARD": 6000,
+    "BALANCED": 5000
+   },
+   "operating_fee_cap": {
+    "max_bps": 1000,
+    "anchor": "BermRobinhoodDistributorV01.sol:182"
+   },
+   "chain_lock": {
+    "chain_id": 4663,
+    "anchor": "BermRobinhoodDistributorV01.sol:181"
+   },
+   "deployment_binding": "DISTRIBUTOR_SELF_ANCHOR v1",
+   "result": "every consequence-bearing value matches frozen law"
+  },
+  "allocation_zero_dust": {
+   "function": "rangeAllocation",
+   "anchor": "BermRobinhoodDistributorV01.sol:436",
+   "test_total_wei": "123456789012345678901",
+   "results": [
+    {
+     "community_bps": 7500,
+     "diff": 0
+    },
+    {
+     "community_bps": 6000,
+     "diff": 0
+    },
+    {
+     "community_bps": 5000,
+     "diff": 0
+    }
+   ]
+  },
+  "creator_cannot_reach_community_bps": {
+   "function": "creatorTotal",
+   "anchor": "BermRobinhoodDistributorV01.sol:403",
+   "formula": "rangeAllocation(received, communityBps, BPS, BPS)",
+   "consequence": "unfilled slots strand in the contract and do not become creator upside; D-01 / BL-04 enforced in contract rather than prose"
+  },
+  "founding_root_immutable_at_deployment": {
+   "prelaunch_root_is_constructor_arg": true,
+   "anchors": [
+    "BermRobinhoodDistributorV01.sol:166",
+    "BermRobinhoodDistributorV01.sol:199"
+   ],
+   "finalizer_restricted_to": "GRADUATION and FOMO only, BermRobinhoodDistributorV01.sol:254",
+   "consequence": "no authority including the finalizer can alter cohort 0 after deployment; Founding enrollment must therefore complete BEFORE deployment"
+  },
+  "merkle_domain_separation": {
+   "leaf_prefix": "0x00",
+   "node_prefix": "0x01",
+   "anchors": [
+    "BermRobinhoodDistributorV01.sol:445",
+    "_verifyProof"
+   ],
+   "assessment": "correct against leaf/node second-preimage confusion"
+  },
+  "live_chain_evidence": {
+   "fork_tests_passed": 3,
+   "suite": "RobinhoodAtomicLaunchFork.t.sol",
+   "named": [
+    "testForkAtomicControllerBindsWithBagsOwnedFeeShare",
+    "testForkAtomicLaunchRollbackWhenAdapterRejectsPool",
+    "testForkFactoryCreatePinsPoolAndExposesFeeShareOwnerBlocker"
+   ],
+   "foundry_full": 30,
+   "foundry_native_distributor": 27
+  },
+  "enrollment_preimage_settled": {
+   "implemented": "R2 canonical-JSON form",
+   "anchor": "packages/sdk/src/enrollmentProtocol.js:302",
+   "authority": "spec/LAW-OWNERSHIP.md assigns the enrollment wire contract to the BermLaunch lane, so this build is authoritative",
+   "must_change": "the berm-side berm.enroll.v2\\n<campaign>\\n<mode>\\n<npub>\\n<evm> form",
+   "status": "the divergence previously flagged as blocking is decided; only conformance remains"
+  }
+ },
+ "findings": [
+  {
+   "id": "F-01",
+   "severity": "BLOCKING",
+   "title": "claimBuyback is sender-bound — decide before deployment",
+   "anchor": "BermRobinhoodDistributorV01.sol:321",
+   "code": "if (msg.sender != wallet) revert Unauthorized();",
+   "consequence": "every claimant needs native gas at the address in their leaf; under Path A that is the derived pocket, an address that by construction has never held anything",
+   "why_time_boxed": "the Distributor is immutable once deployed; if it ships sender-bound that campaign is sender-bound forever, with no retrofit",
+   "is_it_a_defect": false,
+   "classification": "a one-way door that is still open",
+   "proposal": "section 3"
+  },
+  {
+   "id": "F-02",
+   "severity": "HIGH",
+   "title": "member_count is unchecked against contract law",
+   "anchors": [
+    "BermRobinhoodDistributorV01.sol:396 memberCount is public pure returning only 50/100/300",
+    "packages/sdk/src/enrollmentRoster.js:250 takes cohortBundle.member_count verbatim"
+   ],
+   "demonstrated": {
+    "50": "0x1f3cac7a6068c97d471dca0e7fad8d43e1cf8743618da5261b15245587619bea",
+    "30": "0x43e267bf648a8b5fa9ffa1f35cecd7ee9e60a88094a10ed97212c3caa6f5912e",
+    "100": "0xac30cebb932dba0dfc1c21d3315ca45cde5efca011f9fd8373ccca6334ee9dbc"
+   },
+   "failure_mode": "a roster built with any other value produces a root no proof can ever verify on-chain; nothing fails at compile, finalization or seal, and the first symptom is InvalidProof for every member after the root is immutable",
+   "fix": "assert member_count === {0:50,1:100,2:300}[cohort_id] in the compiler, and assert the constitution cohort_law agrees"
+  },
+  {
+   "id": "F-03",
+   "severity": "HIGH",
+   "title": "under-fill has no honest path, and it strands the finalizer",
+   "cause": "memberCount is fixed and count is inside the leaf, so a GRADUATION roster must contain exactly 100 leaves",
+   "immediate": "an under-filled cohort can only be finalized by padding with provably-unclaimable leaves, and that padding law is written nowhere",
+   "second_order": [
+    "sealRoots() at :262 requires all three roots and all three evidence hashes non-zero",
+    "if FOMO never reaches 300 and no padding law exists, cohort 2 is never finalized",
+    "sealRoots() can never be called",
+    "rootFinalizer is never retired",
+    "'after sealing, no privileged actor remains' never becomes true"
+   ],
+   "contradiction": "BERMLAUNCH-SCOPE.md BL-07 and §16 rule that 'an unfilled cohort is a smaller cohort'; either the padding law is written down or that ruling is wrong",
+   "fix": "write the padding law: what occupies an unfilled slot, why it is provably unclaimable, how the explorer renders it, and that sealing is reachable regardless of fill"
+  },
+  {
+   "id": "F-04",
+   "severity": "MEDIUM",
+   "title": "RootsNotSealed is declared and never thrown",
+   "anchor": "BermRobinhoodDistributorV01.sol:68",
+   "fact": "claimBuyback does not gate on rootsSealed",
+   "opus_position": "the contract is right and my own spec is wrong: enforcing RootsNotSealed would lock Founding claims behind cohorts that may never fill — F-03's failure mode with the money inside it",
+   "owed_codex": "remove the dead selector or use it",
+   "owed_opus": "correct BERMLAUNCH-SCOPE.md BL-11, which lists RootsNotSealed in its must-fail set"
+  },
+  {
+   "id": "F-05",
+   "severity": "MEDIUM",
+   "title": "the observer is one key with rotation disabled",
+   "anchor": "campaigns/example-robinhood-beta/campaign-constitution.v2.canonical.json",
+   "policy": {
+    "observer_pubkeys": [
+     "0x3bb03660430c43f7e3b68acf00fe692b5ed6703cc808d7a7503b3536381180fe"
+    ],
+    "rotation_supported": false,
+    "version": "OBSERVER_POLICY_STATIC_V1"
+   },
+   "consequence": "if that key is lost or compromised no further observation receipts can be produced, so GRADUATION and FOMO can never be finalized — landing in F-03's terminal state",
+   "classification": "disclosure, not necessarily wrong for a canary",
+   "fix": "rule on it, and disclose it in SOVEREIGNTY.md at the same rank as the Bags rows either way"
+  },
+  {
+   "id": "F-06",
+   "severity": "LOW",
+   "title": "dead code retaining the closed vulnerability's shape",
+   "anchor": "packages/sdk/src/enrollmentRoster.js:107 recordsWithTrustedObservations",
+   "fact": "defined, called nowhere; it is the function that accepted caller-supplied observations",
+   "risk": "a dormant compiling copy of a closed bypass is a re-introduction hazard: a refactor that reaches for it restores C1–C9 without touching the guard that closed them",
+   "fix": "delete it, or move it to the test tree asserting it is unreachable from a production path"
+  }
+ ],
+ "not_a_finding_but_unrecorded": {
+  "title": "cohort boundaries are hardcoded equal thirds of the community share",
+  "anchor": "BermRobinhoodDistributorV01.sol:432",
+  "formula": "_cumulativeCohortBps = mulDiv(selectedCommunityBps, boundary, 3)",
+  "is_constitution_parameter": false,
+  "conflicts_with_frozen_law": false,
+  "per_slot_berm_standard": [
+   {
+    "cohort": "Founding",
+    "slots": 50,
+    "per_slot_pct_of_all_fees": 0.4
+   },
+   {
+    "cohort": "Graduation",
+    "slots": 100,
+    "per_slot_pct_of_all_fees": 0.2
+   },
+   {
+    "cohort": "Momentum",
+    "slots": 300,
+    "per_slot_pct_of_all_fees": 0.0667
+   }
+  ],
+  "headline": "a Founding slot is 6x a Momentum slot — the conviction ladder as an actual figure"
+ },
+ "gasless_claim_proposal": {
+  "addresses": "F-01",
+  "is_defect_claim": false,
+  "why_not_fully_permissionless": "harvest() and syncExternalDeposit() are permissionless because their destinations are immutable and no price is involved; claimBuyback executes a swap, so a permissionless caller would choose when the conversion happens and with what minTokensOut — a griefing surface",
+  "proposed_signature": "claimBuybackWithSig(uint8 cohortId, uint32 slotIndex, bytes32 npubRaw, address wallet, bytes32[] calldata proof, uint256 minTokensOut, uint256 deadline, uint256 nonce, bytes calldata signature)",
+  "design": [
+   "EIP-712 domain bound to campaignId, block.chainid and address(this)",
+   "signed struct covers every parameter including minTokensOut and deadline",
+   "recovered signer MUST equal wallet — the same address the Merkle proof already commits to",
+   "a per-identity nonce prevents replay of a signature after a partial claim",
+   "proceeds go to wallet exactly as today; the submitter receives nothing"
+  ],
+  "no_new_authority": "no trusted forwarder, no EIP-2771; the leaf address is already the verifying key and is already sealed in the root",
+  "mandatory_rules": [
+   {
+    "rule": "additive, never exclusive",
+    "reason": "claimBuyback stays as-is; replacing it would make entitlement unreachable if no relayer ran — a sweep by neglect, which invariant 3 forbids"
+   },
+   {
+    "rule": "anyone may relay",
+    "reason": "if the only working relayer is ours, claiming requires our permission, which invariant 4 forbids; the function must not check the caller at all"
+   },
+   {
+    "rule": "gas is funded from the operating fee",
+    "reason": "it exists to pay for service, is capped at 1000 bps and is immutable, so it cannot grow to swallow what it sponsors",
+    "forbidden": "the community's 6000 bps, consistent with the UC-13 ruling"
+   }
+  ],
+  "alternatives": [
+   {
+    "option": "EIP-7702",
+    "appeal": "sponsors the derived EOA with no contract change",
+    "caveat": "NOT VERIFIED that Robinhood chain supports it, and it grants the pocket more capability than the task needs",
+    "verdict": "worth checking, not worth depending on"
+   },
+   {
+    "option": "gas drip",
+    "appeal": "no contract change, works today, near-zero cost",
+    "caveat": "operational, heuristic, and fails for the person arriving in three years when nobody runs it",
+    "verdict": "acceptable stopgap, wrong foundation — the late arrival is precisely who this product exists for"
+   }
+  ],
+  "the_decision": "if claimBuybackWithSig is not in the deployed bytecode it never can be; adding it costs a function and a nonce mapping now, omitting it costs nothing now and cannot be undone"
+ },
+ "opus_view_opinion_not_findings": {
+  "disclaimer": "judgement, to be argued with rather than implemented; contains no defect claims",
+  "what_this_pack_changed": "the defect class that has dominated every review since the sealed R1 is closed at the right altitude — made structurally unreachable rather than patched instance by instance. What remains is two decisions (F-01, F-05), one missing law (F-03), one missing assertion (F-02), and two lines of cleanup (F-04, F-06). None is research; all are closable in days.",
+  "on_the_209": {
+   "caveat": "the matrix has not been read; this is a method for shrinking it, not a claim about its contents",
+   "partition_in_order": [
+    {
+     "question": "is it a one-way door?",
+     "members": [
+      "constructor arguments",
+      "the constitution hash",
+      "the PRELAUNCH root",
+      "the observer policy",
+      "the claim path",
+      "the Bags claimers fixed at create_fee_config",
+      "a sealed root"
+     ],
+     "why": "the only cases where being wrong is unrecoverable",
+     "opus_expectation": "under twenty, and the only set with a real deadline"
+    },
+    {
+     "question": "does it serve the first fifty, or strangers?",
+     "observation": "the entire ncryptsec + signer-application + postMessage + ROR + rpIdFromOrigin block exists so that someone with no Nostr key can enroll; NIP-07 and NIP-46 are built and tested today",
+     "why": "fifty founding supporters recruited personally can bring their own signer; every case downstream of 'a stranger with no key arrives unaided' is a PLATFORM case, and the opening is a CAMPAIGN"
+    },
+    {
+     "question": "is it a decision or a build?",
+     "why": "decisions cost an afternoon and usually unblock several cases each; builds cost weeks and usually unblock one",
+     "opus_expectation": "133 is not 133 independent items but roughly five clusters plus a handful of unmade rulings"
+    }
+   ],
+   "falsification_test": "if partitioning the 209 this way does not collapse it substantially, the reframe is wrong — and that is worth knowing rather than politely adopting"
+  },
+  "recommended_order": [
+   "rule on F-01 — the only item with a hard deadline attached to an irreversible event",
+   "close F-02 — two assertions against a silent permanent failure, the best effort-to-risk ratio on the page",
+   "write F-03's padding law — not code, a paragraph that stops it being invented under pressure",
+   "rule on F-05 and disclose it either way",
+   "delete F-06 and F-04's dead selector — minutes",
+   "then partition the 209 and re-cost what is left"
+  ],
+  "would_not_defer": "the fail-open defects are closed and must stay closed. If any later simplification reintroduces a path where caller-supplied data reaches a production compile, that is not a scope decision — it is invariant 2, and it is the credibility of everything else. The 209 partition is about deferring PLATFORM work; it is not about deferring correctness."
+ },
+ "not_authorized": [
+  "deployment",
+  "beta",
+  "canary",
+  "public release",
+  "Explorer authorization",
+  "implementation",
+  "any reduction of fail-closed behaviour"
+ ],
+ "pack_self_disclosure": {
+  "declared_non_closure": [
+   "S/A/B source-artifact-evidence commits were not created",
+   "the canonical 209-case matrix and RR/BR final result contract were not started",
+   "production PASS remains fail-closed pending reviewed accepted Bags runtime code hashes and real same-block Controller/Distributor/Bags readback"
+  ],
+  "exclusions_note": "a fork log was included only as a redacted copy because it printed the RPC endpoint",
+  "opus_assessment": "this is the behaviour a pack should have, and it is the opposite of the sealed R1 that was manifest-clean, honestly self-classified, and still shipped an undisclosed bypass"
+ }
+}
