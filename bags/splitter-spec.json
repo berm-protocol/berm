@@ -1,7 +1,7 @@
 {
  "schema": "berm.bermlaunch.residual_splitter_spec.r1",
- "status": "PROPOSAL_FOR_COSTING",
- "authorized": false,
+ "status": "FOUNDER_APPROVED",
+ "authorized": true,
  "in_frozen_scope": false,
  "scope_note": "adding it requires a BERMLAUNCH-SCOPE.md revision under §18",
  "companion_md": "bags/SPLITTER-SPEC.md",
@@ -48,7 +48,9 @@
    "purpose": "bounds the damage of a compromised committer key",
    "at_10000": "a stolen key can permanently zero the creator's stream",
    "at_5000": "a stolen key cannot take more than half",
-   "note": "immutable — choose deliberately"
+   "note": "immutable — choose deliberately",
+   "FOUNDER_RULING": 5000,
+   "rationale": "bounds a compromised committer key to at most half the residual, while leaving room for 1000-2000 bps of total fees (2500-5000 bps of residual) to be committed more than once"
   }
  },
  "interface": {
@@ -423,5 +425,8 @@
  "disclosure_owed_if_it_ships": {
   "sovereignty_md": "committer is a named authority: it may permanently reduce the creator's own future share up to maxAllocatedBps and nothing else — it cannot revoke, cannot reach committed value, and cannot touch any supporter pocket",
   "public_page": "distinguish a COMMITTED slice (as permanent as a Founding pocket) from the UNCOMMITTED remainder (the creator's, carrying no promise at all)"
- }
+ },
+ "part_of_frozen_209": false,
+ "classification": "non-gating engineering task with a hard deployment deadline",
+ "proposed_component_id": "BL-15"
 }

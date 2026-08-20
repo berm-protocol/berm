@@ -1,6 +1,7 @@
 # BermResidualSplitter — specification
 
-**Status: proposal for costing. Not authorized, not scheduled, not in frozen scope.**
+**Status: FOUNDER-APPROVED. `maxAllocatedBps = 5000`. Not in the frozen 209 — a non-gating
+engineering task with a hard deployment deadline.**
 
 Adding it requires a `BERMLAUNCH-SCOPE.md` revision under §18.
 
@@ -76,7 +77,12 @@ Commitment[] public commitments;
 
 `maxAllocatedBps` bounds the damage of a compromised `committer` key. At 10000 a
 stolen key can zero the creator's stream permanently; at 5000 it cannot take more
-than half. **Choose it deliberately — it is immutable.**
+than half.
+
+**FOUNDER RULING: `maxAllocatedBps = 5000`, immutable.** It bounds a compromised
+committer key to at most half the residual, while leaving room for the stated
+1000–2000 bps of total fees (2500–5000 bps of residual) to be committed more than
+once. It cannot be raised later.
 
 ---
 
