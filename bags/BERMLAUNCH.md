@@ -292,6 +292,85 @@ another. That is not an engineering judgement and this document should not prete
 otherwise — take advice **before**, because transferability is the specific feature
 that moves it.
 
+## 18. A visibility pocket — DEX listing, then boosts **[roadmap — nice to have]**
+
+*The question every memecoin community asks by day two:* **"wen dex?"**
+
+*The shape:* a pocket anyone can fund and anyone can trigger, which pays for the
+token's DexScreener listing first and its Boosts afterwards — so the answer to
+"wen dex" is a public balance and a threshold rather than a promise from the dev.
+
+**Priority, stated plainly: this is nice to have, not a differentiator.** Bags
+already ships it. They partnered with DexScreener to build **DEX Boosts on Bags**,
+described as *"a custom fee sharing app that uses fees to buy DEX Screener boosts
+automatically"*, alongside a **Pay DEX** app. The idea is sound and it is no longer
+ours to introduce. It is recorded here because the *composition* is still
+interesting — a permissionless trigger on a public balance is a different object
+from a hosted app — not because it moves anyone's decision to launch with us.
+
+### Verified mechanics, because designing around an assumption is how the last four defects got in
+
+| | What DexScreener actually documents |
+|---|---|
+| **Enhanced Token Info** | $299, discounted from $499. "All major cryptocurrencies and credit/debit cards." A **form** plus a payment. Processed in minutes, up to 12 hours |
+| **Boosts** | Bought by clicking the yellow **Boost** button on the token page. 12–24h depending on pack. A multiplier on Trending Score, not a guarantee of placement. Golden Ticker at 500+ active. **Non-refundable.** Web browser only — not in the mobile app |
+| **Who may buy a Boost** | Not restricted to the token owner. The terms say only: *"It is the User's sole responsibility to ensure they are purchasing Boosts for the correct token"* |
+| **Programmatic route** | **Not documented for either.** No API, no published payment address |
+
+The third row is the one that helps: a **community-triggered** boost is legitimate
+under DexScreener's own terms. Nothing requires the buyer to be the creator.
+
+The fourth row is the one that decides the design.
+
+### The blocker, named honestly
+
+**A permissionless `trigger()` can move money to an address. It cannot click a
+button.** If there is no address — and none is published — then the pocket funds a
+purchase that a *person* completes. That person is a **new trusted party**, and
+they rank in `SOVEREIGNTY.md` alongside the observer and Bags, because a funded
+pocket with an unfulfilled purchase is exactly the failure the trust surface exists
+to render.
+
+Bags' version resolves this through a **partnership integration** with DexScreener.
+That is a business conversation, not a build task, and it is the honest reason this
+sits in roadmap rather than in a sprint.
+
+### The constraint that is already law
+
+**A boost pocket cannot be a second Bags claimer.** `BL-03 bindLaunch` requires our
+Distributor to be **sole claimer at 10000 bps**; a second claimer reverts the launch
+with `InvalidLaunchBinding`. So Bags' own DEX apps and our Distributor are mutually
+exclusive on the same token, and any pocket of ours must be funded **downstream** of
+the Distributor — from the operating fee or the creator's residual.
+
+**Never from the community's 6000 bps.** A creator spending supporters' entitlement
+on their own marketing is the thing this whole product exists to make impossible.
+
+### Two more things that would go wrong
+
+**Sequencing is a preference, not a dependency.** Boosts work on a token with no
+Enhanced Token Info at all. Order them if you like, but a hard gate means a stalled
+form freezes the pocket permanently — a fail-closed that closes on the wrong thing.
+
+**$299 is a fiat price and the pocket holds WETH.** Either an oracle, or a WETH
+threshold with deliberate headroom and the overshoot rolling into boosts.
+
+### The part with independent value
+
+The creator signs a statement that **the metadata they gave BermLaunch is the dex
+metadata** — name, description, socials, website. That artifact needs nothing from
+DexScreener. It gives a canonical, creator-signed record that can be handed to
+whoever submits, including a human.
+
+And when a creator has **no website**, the link goes to their **BermLaunch token
+page** — which carries that same metadata *and* the Nostr-signed messages from their
+supporters. The dex surface then points back at the community that funded it, and
+that page is readable whether or not anything above ever ships.
+
+One rule, and it is the same rule as the X composer in BL-14: **signing the
+metadata is not the metadata being live.** Until a fetch of the token page confirms
+it, the status is *submitted*, never *listed*.
+
 ---
 
 # Part IV — How a creator uses it
@@ -437,7 +516,7 @@ is preserved, not your exit price.
 
 # Part VIII — The v1 boundary
 
-`BERMLAUNCH-SCOPE.md` is the frozen scope: 14 components, 16 explicitly
+`BERMLAUNCH-SCOPE.md` is the frozen scope: 14 components, 19 explicitly
 out-of-scope items, 4 invariants. Everything marked **[roadmap]** here is
 mechanism the contract supports and the v1 constitution does not configure.
 

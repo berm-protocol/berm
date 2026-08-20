@@ -1,9 +1,9 @@
 {
  "schema": "berm.bermlaunch.functional_description.v1",
- "title": "BermLaunch \u2014 what it is, what it unlocks, and how anyone checks it",
+ "title": "BermLaunch — what it is, what it unlocks, and how anyone checks it",
  "companion_md": "bags/BERMLAUNCH.md",
  "scope_boundary": "bags/BERMLAUNCH-SCOPE.md",
- "one_line": "A token launchpad where a creator hands a share of their own trading fees to named people \u2014 before the token exists, at graduation, or years later \u2014 and nobody, including the creator, can take it back.",
+ "one_line": "A token launchpad where a creator hands a share of their own trading fees to named people — before the token exists, at graduation, or years later — and nobody, including the creator, can take it back.",
  "core_primitive": {
   "name": "pocket",
   "definition": "A permanent, proportional claim on a fee stream, owned by a key.",
@@ -32,7 +32,7 @@
    "slots": 50,
    "bps_start": 0,
    "bps_end": 2000,
-   "why": "the hardest supporters to reward \u2014 at that point there is no token and no way to pay anyone, so historically you promise"
+   "why": "the hardest supporters to reward — at that point there is no token and no way to pay anyone, so historically you promise"
   },
   {
    "id": "GRADUATION",
@@ -63,7 +63,7 @@
  "allocation_formula": {
   "function": "rangeAllocation(total, start, end, denominator)",
   "body": "mulDiv(total, end, denominator) - mulDiv(total, start, denominator)",
-  "visibility": "public pure \u2014 anyone can call it and check their own share",
+  "visibility": "public pure — anyone can call it and check their own share",
   "property": "adjacent ranges telescope exactly; no dust, no rounding remainder, no residual pool"
  },
  "fee_intake": {
@@ -130,7 +130,7 @@
    "status": "v1",
    "holder": "early supporters",
    "when": "pre-launch",
-   "why": "no alternative exists today \u2014 you cannot pay from a token that does not exist"
+   "why": "no alternative exists today — you cannot pay from a token that does not exist"
   },
   {
    "id": "UC-02",
@@ -174,7 +174,7 @@
    "name": "Moderators on a recurring basis",
    "status": "roadmap",
    "shape": "weekly or monthly, must stop when the work stops",
-   "needs": "a second allocation dimension \u2014 epochs or versioned roots with an activation point",
+   "needs": "a second allocation dimension — epochs or versioned roots with an activation point",
    "open_question": "what happens when nobody rolls the epoch: does the moderator keep earning, or does everything halt",
    "risk_note": "that unanswered fallback is the same shape as the worst bug this project has found",
    "legal_note": "recurring payment for ongoing work is compensation-shaped rather than fee-share-shaped and deserves qualified review"
@@ -205,7 +205,7 @@
   },
   {
    "id": "UC-12",
-   "name": "Tradeable pocket \u2014 the credit / claim split",
+   "name": "Tradeable pocket — the credit / claim split",
    "status": "roadmap",
    "question": "could a pocket be an NFT, so it can be sold",
    "mechanism_safe": "a wrapper contract accepts a deposit of the claim right and mints an ERC-721; no leaf-schema change, no new constitution, no migration",
@@ -229,16 +229,85 @@
     "the Nostr community graph is untouched because it is keyed to npubs"
    ],
    "gap_it_closes": "today a supporter needing liquidity can only convert and sell through the buyback, exiting the token; a transferable claim lets them exit the stream while the stream continues",
-   "secondary_benefit": "price discovery \u2014 a Founding slot trading at X is a legible signal about the mechanism",
+   "secondary_benefit": "price discovery — a Founding slot trading at X is a legible signal about the mechanism",
    "before_it_is_built": "transferability is the specific property that changes the legal shape; a non-transferable claim received for participating differs from a transferable instrument paying a proportional share of revenue from a common enterprise. Take advice before, not after. This is not an engineering judgement."
+  },
+  {
+   "id": "UC-13",
+   "name": "Visibility pocket — DEX listing, then boosts",
+   "status": "roadmap",
+   "priority": "nice_to_have",
+   "priority_reason": "Bags already ships this. They partnered with DexScreener to build 'DEX Boosts on Bags' — a custom fee sharing app that uses fees to buy DexScreener boosts automatically — alongside a 'Pay DEX' app. The idea is sound and is no longer ours to introduce. Recorded for the composition (a permissionless trigger on a public balance is a different object from a hosted app), not because it moves a launch decision.",
+   "question": "the question every memecoin community asks by day two: 'wen dex?'",
+   "shape": "a pocket anyone can fund and anyone can trigger, paying for the DexScreener listing first and Boosts afterwards, so the answer is a public balance and a threshold rather than a promise from the dev",
+   "verified_mechanics": {
+    "method": "fetched from DexScreener's own documentation and marketplace at review time; not assumed",
+    "enhanced_token_info": {
+     "price_usd": 299,
+     "list_price_usd": 499,
+     "payment": "all major cryptocurrencies and credit/debit cards",
+     "route": "a form plus a payment",
+     "processing": "minutes, up to 12 hours",
+     "source": "https://marketplace.dexscreener.com/product/token-info"
+    },
+    "boosts": {
+     "route": "click the yellow Boost button on the token page",
+     "duration": "12-24 hours depending on pack",
+     "effect": "a multiplier on Trending Score, not a guarantee of placement",
+     "golden_ticker": "500+ active boosts",
+     "refundable": false,
+     "mobile_app": false,
+     "source": "https://docs.dexscreener.com/boosting"
+    },
+    "who_may_buy_a_boost": {
+     "restricted_to_token_owner": false,
+     "terms_quote": "It is the User's sole responsibility to ensure they are purchasing Boosts for the correct token",
+     "consequence": "a community-triggered boost is legitimate under DexScreener's own terms",
+     "source": "https://docs.dexscreener.com/privacy/boosting-terms-and-conditions"
+    },
+    "programmatic_route": {
+     "documented": false,
+     "api": null,
+     "published_payment_address": null,
+     "note": "this is the row that decides the design"
+    }
+   },
+   "blocker": {
+    "statement": "a permissionless trigger() can move money to an address; it cannot click a button",
+    "consequence": "with no published address, the pocket funds a purchase a person completes, and that person is a NEW TRUSTED PARTY",
+    "disclosure_rank": "SOVEREIGNTY.md, alongside the observer and Bags",
+    "why_roadmap": "Bags resolves this through a partnership integration with DexScreener — a business conversation, not a build task"
+   },
+   "existing_law_constraint": {
+    "rule": "a boost pocket cannot be a second Bags claimer",
+    "anchor": "BL-03 bindLaunch requires this Distributor as sole claimer at 10000 bps",
+    "failure": "InvalidLaunchBinding — the launch reverts",
+    "consequence": "Bags' own DEX apps and our Distributor are mutually exclusive on the same token",
+    "funding_source_allowed": [
+     "operating fee",
+     "creator residual"
+    ],
+    "funding_source_forbidden": "the community's 6000 bps, under any condition"
+   },
+   "design_errors_to_avoid": [
+    "hard-gating boosts on the listing step: boosts work on a token with no Enhanced Token Info, so a stalled form would freeze the pocket permanently — a fail-closed that closes on the wrong thing",
+    "a fiat threshold against a WETH balance: $299 is a fiat price; either an oracle, or a WETH threshold with deliberate headroom and the overshoot rolling into boosts",
+    "rendering 'listed' from a payment: payment is not fulfilment"
+   ],
+   "independent_value": {
+    "depends_on_dexscreener": false,
+    "creator_metadata_consent": "the creator signs a statement that the metadata given to BermLaunch IS the dex metadata — name, description, socials, website — producing a canonical signed record that can be handed to whoever submits, including a human",
+    "website_fallback": "where a creator has no website, the dex website link points to their BermLaunch token page, which carries the same metadata AND the Nostr-signed messages from their supporters; the dex surface then points back at the community that funded it",
+    "status_rule": "signing the metadata is not the metadata being live — the same rule as BL-14's X composer. Until a fetch of the token page confirms it, the status is 'submitted', never 'listed'"
+   }
   }
  ],
  "creator_flow": [
   "decide the shape (constitution)",
-  "deploy the Distributor \u2014 parameters immutable from this instant",
-  "launch atomically \u2014 any invariant failure reverts everything",
+  "deploy the Distributor — parameters immutable from this instant",
+  "launch atomically — any invariant failure reverts everything",
   "waive the manager role and publish the transaction",
-  "let people enroll \u2014 never assign membership",
+  "let people enroll — never assign membership",
   "finalize each cohort, then seal"
  ],
  "creator_cannot_ever": [
@@ -250,10 +319,10 @@
   "introduce a deadline or expiry on anyone's entitlement"
  ],
  "supporter_flow": [
-  "get an identity \u2014 existing signer, or generate and download the encrypted file (not optional)",
+  "get an identity — existing signer, or generate and download the encrypted file (not optional)",
   "enroll with one signature including proof of address control",
-  "get a slot from published snapshots \u2014 you are in the batch where you were seen",
-  "wait or don't \u2014 entitlement accrues with no window and no deadline",
+  "get a slot from published snapshots — you are in the batch where you were seen",
+  "wait or don't — entitlement accrues with no window and no deadline",
   "claim when you want, with no account, no approval, and no requirement that our website is reachable"
  ],
  "supporter_trusts": [
@@ -323,7 +392,7 @@
   "cannot_tell_you": [
    "that Bags will not rewrite the fee configuration",
    "that the token will be worth anything",
-   "that a market route will be available when you claim \u2014 entitlement is preserved, not exit price"
+   "that a market route will be available when you claim — entitlement is preserved, not exit price"
   ]
  },
  "invariants": [

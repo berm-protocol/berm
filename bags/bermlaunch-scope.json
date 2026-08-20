@@ -1,7 +1,7 @@
 {
  "schema": "berm.bermlaunch.functional_scope.v1",
  "status": "FROZEN",
- "version": 2,
+ "version": 3,
  "authority": "FOUNDER",
  "authority_note": "Scope is not owned by an implementation. LAW-OWNERSHIP.md assigns the laws to the BermLaunch lane; this document assigns what the product must and must not do, and constrains both repositories.",
  "purpose": [
@@ -56,7 +56,7 @@
    "id": "BL-01",
    "name": "Campaign constitution",
    "part": "creator",
-   "does": "Fixes cohort sizes and cumulative bps ranges, economic preset, observer policy and its hash, chain and domain, enrollment verifier path, roster and receipt schemas \u2014 before anything launches.",
+   "does": "Fixes cohort sizes and cumulative bps ranges, economic preset, observer policy and its hash, chain and domain, enrollment verifier path, roster and receipt schemas — before anything launches.",
    "authority": "Founder at authoring time; immutable thereafter, hash committed by the Distributor at deployment",
    "must_fail": [
     "zero constitution hash at deployment",
@@ -176,7 +176,7 @@
    "operation": "finalizeCohortRoot(cohortId, root, evidenceManifestHash) / sealRoots()",
    "part": "supporter",
    "does": "Publishes one root per cohort with non-zero evidence hashes; sealRoots permanently retires the finalizer.",
-   "authority": "rootFinalizer \u2014 temporary and disclosed, existing because GRADUATION and FOMO members cannot exist before they do; cannot move money, change economics, or alter a root already set",
+   "authority": "rootFinalizer — temporary and disclosed, existing because GRADUATION and FOMO members cannot exist before they do; cannot move money, change economics, or alter a root already set",
    "must_fail": [
     "RootAlreadySet",
     "RootsAlreadySealed",
@@ -243,7 +243,7 @@
    "name": "Trust and Verify",
    "part": "public",
    "does": "Publishes constitution hash, roots, evidence manifests, cutoffs, economics, Bags upstream authority snapshot and per-member evidence status.",
-   "authority_boundary": "PUBLISHER_AND_DISCLOSURE_ONLY \u2014 does not emit an independent recomputation verdict; only BL-13 may",
+   "authority_boundary": "PUBLISHER_AND_DISCLOSURE_ONLY — does not emit an independent recomputation verdict; only BL-13 may",
    "must_fail": [
     "any affirmative status rendered from missing, partial, mock or asserted evidence"
    ],
@@ -344,9 +344,29 @@
   {
    "item": "tradeable pocket / NFT-wrapped claim",
    "reason": "a purchasable pocket separates the payout from the person by design, turning a supporter cohort into a pre-sale; also the property that changes the legal shape",
-   "roadmap_shape": "credit (who was there \u2014 in the sealed root, never transferable) separated from claim (who collects \u2014 a layer above, optionally transferable)",
+   "roadmap_shape": "credit (who was there — in the sealed root, never transferable) separated from claim (who collects — a layer above, optionally transferable)",
    "reference": "UC-12 in bermlaunch.json / BERMLAUNCH.md section 17",
    "precondition": "legal advice before build, because transferability is the specific feature that moves it"
+  },
+  {
+   "item": "DEX listing / boost pocket",
+   "reason": "roadmap, nice-to-have — Bags already ships it",
+   "recorded_as": "UC-13, BERMLAUNCH.md §18",
+   "evidence": "Bags partnered with DexScreener to build 'DEX Boosts on Bags', a fee sharing app that buys boosts automatically, plus a 'Pay DEX' app",
+   "law_that_survives_regardless": [
+    "a boost pocket cannot be a second Bags claimer — BL-03 requires this Distributor as sole claimer at 10000 bps; a second claimer reverts with InvalidLaunchBinding, so Bags' own DEX apps and our Distributor are mutually exclusive on the same token",
+    "nothing is ever paid for out of the community's 6000 bps — not marketing, listings, boosts, or our own costs; permitted sources are the operating fee and the creator's residual"
+   ],
+   "not_blocked_by_this": [
+    "a creator-signed statement that the metadata held by BermLaunch IS the dex metadata",
+    "a website-fallback link pointing at the BermLaunch token page, which carries the metadata and the Nostr-signed community messages"
+   ],
+   "governing_invariant": "2 — 'submitted' is not 'listed' until a fetch confirms it"
+  },
+  {
+   "item": "paying for anything from community bps",
+   "reason": "the split is the supporters', full stop",
+   "restates": "BL-04, so it cannot be re-argued as an exception for a good cause"
   }
  ],
  "invariants": [
@@ -363,7 +383,13 @@
   },
   {
    "version": 2,
-   "change": "added tradeable-pocket / NFT to out_of_scope_v1 with the credit-claim split recorded as the proposed shape. Scope unchanged in substance \u2014 the item was already absent; this records the decision and its reasoning so it is not re-litigated."
+   "change": "added tradeable-pocket / NFT to out_of_scope_v1 with the credit-claim split recorded as the proposed shape. Scope unchanged in substance — the item was already absent; this records the decision and its reasoning so it is not re-litigated."
+  },
+  {
+   "version": 3,
+   "change": "added the DEX visibility pocket (listing then boosts) to out_of_scope, ruled roadmap/nice-to-have because Bags already ships it; added the explicit community-bps funding prohibition",
+   "substance_changed": false,
+   "note": "both items were already absent. This records the ruling and the funding-source constraint so neither is re-litigated."
   }
  ]
 }

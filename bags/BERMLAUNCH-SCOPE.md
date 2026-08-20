@@ -1,11 +1,12 @@
 # BermLaunch — frozen functional scope
 
-**Status: FROZEN at v2. Founder authority.**
+**Status: FROZEN at v3. Founder authority.**
 
 | Version | Change |
 |---|---|
 | v1 | initial freeze |
 | v2 | added the tradeable-pocket / NFT item to §16 with the credit-claim split recorded as its proposed shape. **Scope is unchanged in substance** — the item was already absent. This records the decision and its reasoning so it is not re-litigated. |
+| v3 | added the DEX visibility pocket (listing then boosts) to §16, ruled **roadmap, nice-to-have** because Bags already ships it. **Scope is unchanged in substance** — the item was already absent. Also records the funding-source constraint, which is not new law but was not written down. |
 
 Scope is not owned by an implementation. `spec/LAW-OWNERSHIP.md` assigns the
 *laws* — the enrollment wire contract, the roster law, the contracts — to the
@@ -258,7 +259,29 @@ recovering a lost key                    stated plainly in recovery/
 passkey tier at launch                   deferred, ENROLLMENT-SPEC §1.3
 third-party API key issuance             broker commercial layer, post-launch
 tradeable pocket / NFT-wrapped claim     separates payout from person by design
+DEX listing / boost pocket               roadmap, nice-to-have — Bags ships it
+paying for anything from community bps   the split is the supporters', full stop
 ```
+
+**On the DEX visibility pocket**, recorded as **UC-13** in `BERMLAUNCH.md` §18:
+Bags already partnered with DexScreener to buy boosts from fees automatically, so
+this is **not a differentiator**. Two facts from that ruling are law regardless of
+whether it is ever built:
+
+1. **A boost pocket cannot be a second Bags claimer.** `BL-03` requires this
+   Distributor as **sole claimer at 10000 bps** — a second claimer reverts the
+   launch with `InvalidLaunchBinding`. Bags' own DEX apps and our Distributor are
+   therefore mutually exclusive on the same token.
+2. **Nothing is ever paid for out of the community's 6000 bps** — not marketing,
+   not listings, not boosts, not our own costs. Permitted sources are the operating
+   fee and the creator's residual. This is `BL-04` restated so it cannot be
+   re-argued as an exception for a good cause.
+
+**Separately in scope-adjacent territory and not blocked by any of the above:** a
+creator-signed statement that the metadata held by BermLaunch *is* the dex metadata,
+and a website-fallback link pointing at the BermLaunch token page. Neither requires
+anything from DexScreener. Both are governed by invariant 2 — *submitted* is not
+*listed* until a fetch confirms it.
 
 **On the tradeable pocket specifically**, because it will be asked again: a
 purchasable pocket turns a supporter cohort into a pre-sale, and transferability is
