@@ -18,6 +18,11 @@
 set -euo pipefail
 . /etc/xonly.env
 
+# sudo -n throughout: NOPASSWD skips PAM's auth phase, not its account phase,
+# which inspects the TARGET user's password aging. A stock image with root's
+# password expired makes plain `sudo` try to force a password change it cannot
+# prompt for. `-n` avoids that entirely.
+
 if [ -z "${GIT_REMOTE:-}" ]; then
   echo "GIT_REMOTE is not set. Edit /etc/xonly.env first." >&2
   exit 2
@@ -29,12 +34,12 @@ CADDY=/etc/caddy/Caddyfile
 if [ ! -d "$SRC/.git" ]; then
   echo "==> first clone"
   rm -rf "$SRC"
-  sudo -u berm git clone --branch "$GIT_BRANCH" "$GIT_REMOTE" "$SRC"
+  sudo -n -u berm git clone --branch "$GIT_BRANCH" "$GIT_REMOTE" "$SRC"
 else
   echo "==> fetch"
-  sudo -u berm git -C "$SRC" fetch --prune origin "$GIT_BRANCH"
-  sudo -u berm git -C "$SRC" reset --hard "origin/$GIT_BRANCH"
-  sudo -u berm git -C "$SRC" clean -fdx
+  sudo -n -u berm git -C "$SRC" fetch --prune origin "$GIT_BRANCH"
+  sudo -n -u berm git -C "$SRC" reset --hard "origin/$GIT_BRANCH"
+  sudo -n -u berm git -C "$SRC" clean -fdx
 fi
 
 COMMIT=$(git -C "$SRC" rev-parse --short HEAD)
