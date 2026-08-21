@@ -9,7 +9,8 @@
     "test": "node test/run.mjs",
     "verify": "node verify.mjs",
     "serve": "node serve.mjs",
-    "verify:sdk": "node verify-sdk.mjs"
+    "verify:sdk": "node verify-sdk.mjs",
+    "csp": "node csp-check.mjs"
   },
   "devDependencies": {
     "esbuild": "^0.28.1",

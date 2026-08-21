@@ -35,6 +35,28 @@ writeFileSync(out, html);
  * the web server. If it does, whoever takes the server signs whatever they
  * serve." Signing happens offline, at release, from this file.
  */
+/*
+ * CSP HASHES.
+ *
+ * The production Caddyfile serves the signer with `script-src 'self'` and
+ * `style-src 'self'` — no 'unsafe-inline'. A single self-contained file is
+ * therefore INERT under it, which a browser test caught rather than a reviewer.
+ *
+ * Two ways out. Split into external .js/.css and satisfy 'self' — which loses
+ * the one-file/one-hash property the attestation depends on. Or pin the exact
+ * inline bytes with a hash, which keeps the single file AND is strictly
+ * stronger: with 'self' the origin may serve any script it likes; with a hash
+ * it may serve only these bytes.
+ *
+ * Hashes cover the CONTENT of a <script>/<style> element. They do not cover
+ * style="" attributes — those need 'unsafe-hashes', so the template has none.
+ */
+const b64 = (s) => createHash('sha256').update(s, 'utf8').digest('base64');
+const inline = (tag) => [...html.matchAll(new RegExp(`<${tag}[^>]*>([\\s\\S]*?)</${tag}>`, 'g'))].map((m) => m[1]);
+const scriptHashes = inline('script').map((c) => `'sha256-${b64(c)}'`);
+const styleHashes  = inline('style').map((c) => `'sha256-${b64(c)}'`);
+if (/style="/.test(html)) throw new Error('inline style attribute present — a CSP style hash cannot cover it');
+
 const sha256 = createHash('sha256').update(html).digest('hex');
 const attestInput = {
   origin: process.env.SIGNER_ORIGIN ?? 'https://signer.xonly.ai',
@@ -45,8 +67,15 @@ const attestInput = {
 };
 writeFileSync(resolve(here, 'dist/attestation-input.json'), JSON.stringify(attestInput, null, 2) + '\n');
 
+const csp =
+  `default-src 'self'; script-src 'self' ${scriptHashes.join(' ')}; ` +
+  `style-src 'self' ${styleHashes.join(' ')}; img-src 'self' data:; ` +
+  `connect-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'`;
+writeFileSync(resolve(here, 'dist/csp.txt'), csp + '\n');
+
 console.log(`wrote ${out}`);
 console.log(`  js    : ${(js.length / 1024).toFixed(1)} KB`);
 console.log(`  total : ${(html.length / 1024).toFixed(1)} KB`);
 console.log(`  sha256: ${sha256}`);
 console.log(`  attest: dist/attestation-input.json — sign OFFLINE, never on the server`);
+console.log(`  csp   : dist/csp.txt — ${scriptHashes.length} script hash, ${styleHashes.length} style hash`);

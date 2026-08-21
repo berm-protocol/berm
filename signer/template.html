@@ -31,6 +31,11 @@ pre{background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:
 .scrim{position:fixed;inset:0;background:rgba(0,0,0,.72);display:flex;align-items:center;justify-content:center;padding:1.25rem;z-index:10}
 .scrim .card{max-width:34rem;width:100%;margin:0;max-height:88vh;overflow:auto}
 [hidden]{display:none!important}
+.mt-4{margin-top:.4rem}.mt-5{margin-top:.5rem}.mt-6{margin-top:.6rem}
+.mt-8{margin-top:.8rem}.mt-9{margin-top:.9rem}.mt-16{margin-top:1rem}
+.mb-4{margin:0 0 .4rem}
+select.pick{font:inherit;padding:.5rem;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--fg);width:100%}
+
 </style>
 
 <main>
@@ -66,11 +71,11 @@ pre{background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:
       <p class="warn">This is the only copy. If you lose it, the identity is gone — along with anything it was ever entitled to. Nobody can issue you another.</p>
       <label>Your public name</label>
       <code class="mono-break" id="saved-npub"></code>
-      <label style="margin-top:.9rem">Your encrypted key file</label>
+      <label class="mt-9">Your encrypted key file</label>
       <code class="mono-break" id="saved-file"></code>
-      <div class="row" style="margin-top:.9rem"><button id="download">Download the file</button><button class="ghost" id="copy-file">Copy it</button></div>
+      <div class="row mt-9" ><button id="download">Download the file</button><button class="ghost" id="copy-file">Copy it</button></div>
       <p class="muted" id="saved-status"></p>
-      <div class="row" style="margin-top:.6rem"><button id="saved-continue" disabled>I have saved it — continue</button></div>
+      <div class="row mt-6" ><button id="saved-continue" disabled>I have saved it — continue</button></div>
     </div>
   </section>
 
@@ -81,7 +86,7 @@ pre{background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:
       <label for="unlock-file">Key file (<code>ncryptsec1…</code>)</label>
       <textarea id="unlock-file" spellcheck="false" placeholder="ncryptsec1…"></textarea>
       <input id="unlock-pick" type="file" accept=".txt,.ncryptsec,text/plain">
-      <label for="unlock-pass" style="margin-top:.6rem">Passphrase</label>
+      <label for="unlock-pass" class="mt-6">Passphrase</label>
       <input id="unlock-pass" type="password" autocomplete="current-password" spellcheck="false">
       <div class="row"><button id="unlock-go" disabled>Unlock</button><button class="ghost" id="back-2">Back</button></div>
       <p class="muted" id="unlock-status"></p>
@@ -93,7 +98,7 @@ pre{background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:
       <h2>Unlocked</h2>
       <label>Signed-in as</label>
       <code class="mono-break" id="session-npub"></code>
-      <p class="muted" id="session-custody" style="margin-top:.8rem"></p>
+      <p class="muted mt-8" id="session-custody" ></p>
       <div class="row"><button class="ghost" id="lock">Lock and forget the key</button></div>
     </div>
     <div class="card">
@@ -107,21 +112,21 @@ pre{background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:
   <div class="card">
     <h2><span id="ap-who"></span> wants you to sign</h2>
     <code class="mono-break" id="ap-origin"></code>
-    <p class="warn" id="ap-unknown" hidden style="margin-top:.8rem">We have never seen this site before. That is not proof of anything bad — but nothing vouches for it either.</p>
-    <div id="ap-human-wrap" style="margin-top:.9rem"><label>What it says this is for</label><p id="ap-human"></p></div>
-    <p class="warn" id="ap-noexplain" hidden style="margin-top:.8rem">This application did not explain what it is asking for. Read the request below before you decide.</p>
-    <label style="margin-top:.5rem">Request</label>
-    <p class="muted" id="ap-method" style="margin:0 0 .4rem"></p>
+    <p class="warn mt-8" id="ap-unknown" hidden >We have never seen this site before. That is not proof of anything bad — but nothing vouches for it either.</p>
+    <div id="ap-human-wrap" class="mt-9"><label>What it says this is for</label><p id="ap-human"></p></div>
+    <p class="warn mt-8" id="ap-noexplain" hidden >This application did not explain what it is asking for. Read the request below before you decide.</p>
+    <label class="mt-5">Request</label>
+    <p class="muted mb-4" id="ap-method" ></p>
     <pre id="ap-raw"></pre>
-    <div id="ap-grant-wrap" style="margin-top:.9rem">
+    <div id="ap-grant-wrap" class="mt-9">
       <label for="ap-grant">Remember this decision</label>
-      <select id="ap-grant" style="font:inherit;padding:.5rem;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--fg);width:100%">
+      <select id="ap-grant" class="pick">
         <option value="0">Just this once</option>
         <option value="900000">For 15 minutes, this site and this kind only</option>
         <option value="3600000">For 1 hour, this site and this kind only</option>
       </select>
     </div>
-    <div class="row" style="margin-top:1rem"><button id="ap-approve">Approve</button><button class="ghost" id="ap-decline">Decline</button></div>
+    <div class="row mt-16" ><button id="ap-approve">Approve</button><button class="ghost" id="ap-decline">Decline</button></div>
   </div>
 </div>
 

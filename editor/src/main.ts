@@ -592,7 +592,9 @@ function refreshXExport(): void {
 
   const list = $('x-images');
   if (!x.images.length) {
-    list.innerHTML = '<p class="hint" style="margin:0">No images in this document.</p>';
+    // A style attribute here would be injected at runtime and blocked by the
+    // deployed CSP, which forbids inline styles. Use a class.
+    list.innerHTML = '<p class="hint m0">No images in this document.</p>';
   } else {
     list.innerHTML = '';
     x.images.forEach((img) => {

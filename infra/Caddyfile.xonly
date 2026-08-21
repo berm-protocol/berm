@@ -35,12 +35,23 @@ xonly.ai, www.xonly.ai {
 # The signer. frame-ancestors 'none' is load-bearing rather than hygiene:
 # the approval UI must never be embeddable, because a client that can frame
 # it can cover it.
+
+# CSP SCRIPT/STYLE HASHES.
+#
+# Both apps ship as ONE self-contained file, which `script-src 'self'` makes
+# inert — a browser test caught that, not a reviewer. Pinning the exact inline
+# bytes keeps the single file and is STRICTER than 'self': with 'self' this
+# origin may serve any script it likes; with a hash it may serve only these.
+#
+# The hashes are emitted by each build into dist/csp.txt and MUST be updated
+# together with the bundle. A stale hash fails closed — a blank page, never a
+# silently unprotected one.
 signer.xonly.ai {
 	import hardened
 	root * /srv/xonly/signer
 	encode zstd gzip
 	file_server
-	header Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'"
+	header Content-Security-Policy "default-src 'self'; script-src 'self' 'sha256-pcLGM2KtpbDDckjB3ilGg5tOd3J4ev9AX7qVVhH7SPo='; style-src 'self' 'sha256-xeijQKRalnfRhKALi+2EsywKRVOCtAGhTdayt1Jh80Y='; img-src 'self' data:; connect-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'"
 
 	handle /health {
 		respond "signer-ok" 200
@@ -52,7 +63,7 @@ editor.xonly.ai {
 	root * /srv/xonly/editor
 	encode zstd gzip
 	file_server
-	header Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; connect-src 'self' wss:; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"
+	header Content-Security-Policy "default-src 'self'; script-src 'self' 'sha256-Vpv8dwGuSXtrKmm/RGipaD+CLRnKQyQ+CwovFIvz3ok='; style-src 'self' 'sha256-4BYtcdAbX2nzKEVfzzG5B5bHjrxX41ZKSSj8rrOYB/4=' 'sha256-3/DHQGO/pQN64Nl7pByYKtVw4yKDQ7Y/FDXML0+N83U='; img-src 'self' data: blob:; connect-src 'self' wss:; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"
 
 	handle /health {
 		respond "editor-ok" 200

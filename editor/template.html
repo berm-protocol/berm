@@ -197,6 +197,12 @@
   ::-webkit-scrollbar{width:9px;height:9px}
   ::-webkit-scrollbar-thumb{background:var(--line2);border-radius:9px}
   ::-webkit-scrollbar-track{background:transparent}
+
+.u0{width:100%}
+.u1{width:100%;margin-bottom:8px}
+.u2{width:100%;margin-top:12px}
+.u3{width:100%;margin-top:6px}
+.m0{margin:0}
 </style>
 </head>
 <body>
@@ -279,7 +285,7 @@
           <div class="hd"><div class="dot"></div><div class="nm">X · native Article</div></div>
           <div class="det" id="t-x-detail">Waiting…</div>
         </div>
-        <button class="ghost hidden" id="open-node" style="width:100%;margin-top:6px">Open the node page</button>
+        <button class="ghost hidden u3" id="open-node" >Open the node page</button>
         <div class="sect">Request that was built</div>
         <pre class="out" id="req-preview">—</pre>
       </div>
@@ -300,7 +306,7 @@
           <div class="s" id="card-desc"></div>
         </div>
       </div>
-      <button class="ghost" id="download-card" style="width:100%;margin-top:12px">Download card image</button>
+      <button class="ghost u2" id="download-card" >Download card image</button>
       <p class="hint">
         1200×630, generated live. X's crawler is anonymous — no cookies, no session — so a card can
         never be personalised per viewer. It is personalised <em>per URL</em>, which is all that's
@@ -314,8 +320,8 @@
     <!-- FOR X -->
     <div class="pane" id="pane-xexport">
       <div class="sect">Paste into X</div>
-      <button class="ghost" id="copy-x-title" style="width:100%;margin-bottom:8px">Copy title</button>
-      <button id="copy-x-body" style="width:100%">Copy body as rich text</button>
+      <button class="ghost u1" id="copy-x-title" >Copy title</button>
+      <button id="copy-x-body" class="u0">Copy body as rich text</button>
       <p class="hint">
         Two pastes, because a body paste leaves X’s title field empty. The body is transformed
         for what X can actually render — measured against the real editor, not the docs.
