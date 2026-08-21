@@ -169,6 +169,27 @@ write_files:
         chown berm:berm /home/berm/DEPLOY_KEY.pub
       fi
 
+      # Root's password ships EXPIRED on stock images, to force a change at the
+      # console. With PermitRootLogin no nobody ever changes it, so it stays
+      # expired forever — and sudo's NOPASSWD skips PAM's auth phase but NOT its
+      # account phase, which inspects the TARGET user's aging. Every plain `sudo`
+      # then tries to force a password change, needs a tty it does not have, and
+      # dies with "Authentication token manipulation error". This cost a deploy.
+      echo "--- root password: lock it, and clear the expiry that breaks sudo"
+      passwd -l root || true
+      chage -d "$(date +%Y-%m-%d)" -M -1 root || true
+      chage -l root | head -2
+
+      echo "--- ssh effective config, asserted rather than assumed"
+      sshd -t
+      for kw in permitrootlogin passwordauthentication kbdinteractiveauthentication; do
+        printf '    %s\n' "$(sshd -T | grep "^$kw ")"
+      done
+      if sshd -T | grep -q '^passwordauthentication yes'; then
+        echo "!! password authentication is ON despite the drop-in — check include order" >&2
+        exit 1
+      fi
+
       echo "--- firewall"
       ufw --force reset >/dev/null
       ufw default deny incoming
@@ -195,7 +216,21 @@ write_files:
       Unattended-Upgrade::Automatic-Reboot-Time "04:40";
       Unattended-Upgrade::Remove-Unused-Dependencies "true";
 
-  - path: /etc/ssh/sshd_config.d/99-berm.conf
+  # 00-, NOT 99-.
+  #
+  # sshd is FIRST-MATCH-WINS per keyword, not last. cloud-init writes its own
+  # /etc/ssh/sshd_config.d/50-cloud-init.conf containing `PasswordAuthentication
+  # yes`, which is read before a 99- file and therefore beat it. On the first box
+  # provisioned from this template the result was:
+  #
+  #     permitrootlogin no            <- ours won, cloud-init does not set it
+  #     passwordauthentication yes    <- cloud-init won, ours never applied
+  #     kbdinteractiveauthentication no
+  #
+  # Verified with `sshd -T`, not assumed. The file said the box refused passwords
+  # for two weeks while it accepted them — worse than either state, because it
+  # was believed.
+  - path: /etc/ssh/sshd_config.d/00-berm-hardening.conf
     permissions: '0644'
     content: |
       PermitRootLogin no

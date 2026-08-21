@@ -249,7 +249,11 @@ write_files:
       Unattended-Upgrade::Automatic-Reboot-Time "04:30";
       Unattended-Upgrade::Remove-Unused-Dependencies "true";
 
-  - path: /etc/ssh/sshd_config.d/99-berm.conf
+  # 00-, NOT 99-. sshd is FIRST-match-wins per keyword, and cloud-init's own
+  # 50-cloud-init.conf sets `PasswordAuthentication yes`, which beat a 99- file.
+  # Confirmed on the xonly box with `sshd -T`: passwordauthentication was yes
+  # while this file claimed no. Same template, same defect, both machines.
+  - path: /etc/ssh/sshd_config.d/00-berm-hardening.conf
     permissions: '0644'
     content: |
       PermitRootLogin no
