@@ -16,7 +16,7 @@ import { docToNodePage, cardMeta } from './targets/node-page.js';
 import { docToDraftJs, buildDraftPayload, publishXArticle, X_API } from './targets/x-article.js';
 import { cardToDataUrl } from './og/card-image.js';
 import { createLocalSigner, isLocalOrigin } from './sdk/local-signer.js';
-import { createBrokerSigner } from '../../sdk/src/backends/broker.js';
+import { setup, detect } from '../../sdk/src/connect.js';
 import { UserDeclinedError } from './sdk/types.js';
 import type { XnsbSdk, Session, SignedEvent } from './sdk/types.js';
 
@@ -794,30 +794,42 @@ function renderBadge(): void {
 
 function boot(): void {
   /*
-   * WHICH SIGNER.
+   * WHICH SIGNER — ask the SDK, do not decide here.
    *
-   * Off localhost there is exactly one answer: the broker, talking to
-   * signer.xonly.ai in a top-level popup. `createDevSigner` throws anywhere but
-   * localhost by design, so a deployed build that reached for it would die on
-   * boot — which is the correct outcome and the reason this branch is explicit
-   * rather than a try/catch.
+   * `connect.ts` already knows the tier order: an existing NIP-07 extension
+   * first because the user already trusts it and we should touch nothing, then
+   * our own signer origin, then a bunker they already run. Hard-wiring one
+   * backend here would have taken tier 0 away from anyone with Alby installed
+   * and called it an improvement.
    *
-   * On localhost the dev signer stays, because a raw key in localStorage is the
+   * Tier 1 is offered only because this app names a signer origin explicitly.
+   * `detect()` reports it unavailable otherwise, and that stays true until the
+   * origin serves the signer rather than a placeholder — a tier that
+   * auto-selects and then fails is worse than one that admits it is not ready.
+   *
+   * On localhost the dev signer still wins: a raw key in localStorage is the
    * right tool for a test loop and the wrong tool for a person.
    */
-  const signerOrigin = new URLSearchParams(location.search).get('signer') ?? undefined;
-  sdk = isLocalOrigin() && !signerOrigin
-    ? createLocalSigner({
-        relays: RELAYS,
-        approve: requestApproval,
-        displayName: 'You',
-        handle: localStorage.getItem('berm_dev_handle') ?? undefined,
-      })
-    : createBrokerSigner({
-        relays: RELAYS,
-        signerOrigin,
-        appName: 'xonly editor',
-      });
+  const params = new URLSearchParams(location.search);
+  const signerOrigin = params.get('signer') ?? (isLocalOrigin() ? undefined : 'https://signer.xonly.ai');
+
+  if (isLocalOrigin() && !params.get('signer')) {
+    sdk = createLocalSigner({
+      relays: RELAYS,
+      approve: requestApproval,
+      displayName: 'You',
+      handle: localStorage.getItem('berm_dev_handle') ?? undefined,
+    });
+  } else {
+    const opts = {
+      relays: RELAYS,
+      appName: 'xonly editor',
+      signer: signerOrigin ? { signerOrigin } : undefined,
+    };
+    // Report what is actually available rather than guessing in the UI later.
+    console.info('[xonly] signer tiers:', detect(opts).map((t) => `${t.tier}:${t.available ? 'yes' : t.reason}`).join(' · '));
+    sdk = setup(opts);
+  }
   (window as any).berm = sdk;
 
   const title = $('title') as HTMLTextAreaElement;

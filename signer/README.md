@@ -32,3 +32,19 @@ that returns something plausible.
 
 There is no passkey tier here. `ENROLLMENT-SPEC.md` §1.3 defers it, so no WebAuthn
 ceremony runs and no RP ID is committed.
+
+**No handle claiming.** The signer makes a key and signs events; it does not
+write a kind 0 or attach an external identity. That is not an omission to fill in
+later without reading `nips/01-issue-nip39-fragility.md` first: NIP-39 binds to a
+**mutable handle** on X, GitHub and Mastodon — a name that can be released and
+re-registered by someone else — while only Telegram binds to an immutable ID.
+A badge rendered from such a claim is doing real work for a reader, and it breaks
+in exactly the case it exists for. Whatever this project ships for handle claims
+has to answer that first.
+
+## Where it sits
+
+One tier-1 client talks to this page: `sdk/src/backends/berm-signer.ts`, reached
+through `connect.ts` `setup()`. Applications do not choose a backend — they name
+a signer origin and let `detect()` report what is actually available. Tier 0, an
+extension the user already has, still wins over this whenever it is present.

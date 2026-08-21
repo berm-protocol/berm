@@ -21,7 +21,32 @@ for (const bad of ['cdn.', 'unpkg', 'jsdelivr', 'googleapis', 'fonts.g']) {
 mkdirSync(resolve(here, 'dist'), { recursive: true });
 const out = resolve(here, 'dist/xonly-signer.html');
 writeFileSync(out, html);
+/*
+ * ATTESTATION INPUT.
+ *
+ * `signer-log/` exists because a signer origin can serve different JavaScript
+ * tomorrow — to one user, from one IP, for one hour — and nothing in the browser
+ * will say so. SRI does not help: the same origin controls the page declaring
+ * the hash. Transparency does not remove that power; it makes using it leave
+ * permanent, third-party-verifiable evidence.
+ *
+ * The build's only job here is to emit the exact bytes' hash. It deliberately
+ * does NOT sign: `signer-log/README.md` — "The attestation key must not live on
+ * the web server. If it does, whoever takes the server signs whatever they
+ * serve." Signing happens offline, at release, from this file.
+ */
+const sha256 = createHash('sha256').update(html).digest('hex');
+const attestInput = {
+  origin: process.env.SIGNER_ORIGIN ?? 'https://signer.xonly.ai',
+  version: JSON.parse(readFileSync(resolve(here, 'package.json'), 'utf8')).version,
+  sha256,
+  path: '/',
+  build: process.env.GIT_COMMIT ?? undefined,
+};
+writeFileSync(resolve(here, 'dist/attestation-input.json'), JSON.stringify(attestInput, null, 2) + '\n');
+
 console.log(`wrote ${out}`);
 console.log(`  js    : ${(js.length / 1024).toFixed(1)} KB`);
 console.log(`  total : ${(html.length / 1024).toFixed(1)} KB`);
-console.log(`  sha256: ${createHash('sha256').update(html).digest('hex')}`);
+console.log(`  sha256: ${sha256}`);
+console.log(`  attest: dist/attestation-input.json — sign OFFLINE, never on the server`);
