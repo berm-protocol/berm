@@ -6,22 +6,27 @@ sandbox can publish to production.
 
 ## Once, to wire it up
 
-```bash
-ssh root@167.233.229.170
-cat /home/berm/DEPLOY_KEY.pub          # created at provision time
-```
-
-Add that as a **read-only deploy key** on the repository, then:
+Connect as **`berm`**, not root — `cloud-init.xonly.yaml:201` sets
+`PermitRootLogin no`, and the key is on `berm`, who has passwordless sudo.
 
 ```bash
-cat >/etc/xonly.env <<'ENV'
-GIT_REMOTE=git@github.com:<owner>/<repo>.git
+ssh -i ~/.ssh/id_xonly berm@167.233.229.170
+sudo tee /etc/xonly.env >/dev/null <<'ENV'
+GIT_REMOTE=https://github.com/berm-protocol/berm.git
 GIT_BRANCH=main
 PUBLISH_DIR=public
 ENV
-
-install -m 0755 /srv/xonly/src/infra/xonly-deploy /usr/local/bin/xonly-deploy
 ```
+
+**Use the HTTPS remote, not SSH.** The repository is public, so the server
+clones anonymously and holds **no credential at all** — nothing to leak if the
+box is compromised, nothing to rotate, nothing to revoke. `berm-protocol` also
+disables deploy keys at the organisation level, so the SSH route is unavailable
+anyway; the provisioned `/home/berm/DEPLOY_KEY.pub` is left unused, which is the
+right outcome rather than a workaround.
+
+Only a private repository would need a credential here, and then a fine-grained
+read-only token beats a deploy key.
 
 ## Every deploy
 
