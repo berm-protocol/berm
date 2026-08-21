@@ -46,6 +46,34 @@ function zero(buf: Uint8Array | null): void {
 
 export function isUnlocked(): boolean { return secret !== null; }
 
+/**
+ * Resolve once the user has FINISHED — not merely once a key exists.
+ *
+ * A client's first call is `connect`, and it arrives the instant the popup
+ * opens, before the person has typed anything. Answering `no_session` there
+ * reports a failure for what is only "not finished yet", so connect waits.
+ *
+ * But it must wait for the right moment. Releasing on key generation put the
+ * approval dialog on top of the SAVE YOUR KEY FILE screen — covering the one
+ * screen where the user has to keep the only copy of their key, and offering
+ * them a button to click instead. Creation is not finished when the key exists;
+ * it is finished when the user says they have saved it.
+ *
+ * So the page calls `sessionReady()`, and the crypto layer does not guess.
+ */
+const unlockWaiters: (() => void)[] = [];
+
+export function whenUnlocked(): Promise<void> {
+  if (secret) return Promise.resolve();
+  return new Promise((resolve) => unlockWaiters.push(resolve));
+}
+
+/** The page calls this when the user reaches the unlocked session screen. */
+export function sessionReady(): void {
+  if (!secret) return;
+  while (unlockWaiters.length) unlockWaiters.shift()!();
+}
+
 export function pubkey(): string {
   if (!pubkeyHex) throw new Error('no_session');
   return pubkeyHex;

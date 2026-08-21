@@ -46,6 +46,10 @@ function toScreen(id: string): void {
 }
 
 function renderSession(npub: string): void {
+  // The user is done: key in memory, file saved or deliberately declined. Only
+  // now may a waiting client's connect() proceed — earlier and its approval
+  // dialog would cover the screen telling them to save their only copy.
+  vault.sessionReady();
   text('session-npub', npub);
   text('session-custody', 'This key exists in this tab and nowhere else. Closing the tab locks it. Your downloaded file is the only copy that survives.');
   renderGrants();

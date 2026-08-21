@@ -51,7 +51,7 @@ signer.xonly.ai {
 	root * /srv/xonly/signer
 	encode zstd gzip
 	file_server
-	header Content-Security-Policy "default-src 'self'; script-src 'self' 'sha256-pcLGM2KtpbDDckjB3ilGg5tOd3J4ev9AX7qVVhH7SPo='; style-src 'self' 'sha256-xeijQKRalnfRhKALi+2EsywKRVOCtAGhTdayt1Jh80Y='; img-src 'self' data:; connect-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'"
+	header Content-Security-Policy "default-src 'self'; script-src 'self' 'sha256-hx4CNq9nxUKuyppurwHvu4gC9b9EsyQZDCwNJwGA7Jg='; style-src 'self' 'sha256-xeijQKRalnfRhKALi+2EsywKRVOCtAGhTdayt1Jh80Y='; img-src 'self' data:; connect-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'"
 
 	handle /health {
 		respond "signer-ok" 200

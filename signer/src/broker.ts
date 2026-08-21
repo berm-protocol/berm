@@ -68,7 +68,18 @@ async function handle(req: Request, origin: string, approve: Approver): Promise<
 
   if (req.method === 'ping') return ok(req.id, 'pong');
 
-  if (!vault.isUnlocked()) return err(req.id, 'no_session', 'the signer is locked');
+  // `connect` is the FIRST thing a client sends, and it arrives before the user
+  // has created or unlocked anything. Rejecting it as no_session reports a
+  // failure for what is really "not finished yet" — and it is the one order a
+  // real user always takes and neither of my tests did. So connect WAITS.
+  //
+  // Everything else still fails closed: a signature request against a locked
+  // vault is a genuine no_session and must say so.
+  if (req.method === 'connect') {
+    await vault.whenUnlocked();
+  } else if (!vault.isUnlocked()) {
+    return err(req.id, 'no_session', 'the signer is locked');
+  }
 
   const kind =
     req.method === 'sign_event'

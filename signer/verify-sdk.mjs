@@ -71,6 +71,19 @@ const signer = await popupPromise;
 await signer.waitForLoadState('networkidle');
 t('the SDK opened a top-level popup at the signer origin', new URL(signer.url()).port === String(SIGNER_PORT));
 
+// THE ORDER A REAL USER TAKES, and the one neither test used before.
+//
+// A client calls connect() the moment the popup opens. The vault is locked —
+// the person has not typed anything yet. Earlier this returned no_session and
+// the client reported "Could not connect: the signer is locked", which is a
+// failure message for something that is not a failure.
+//
+// Sit on the start screen deliberately, and prove connect() is still pending.
+await signer.waitForSelector('#screen-start:not([hidden])');
+await page.waitForTimeout(2500);
+const settled = await Promise.race([connecting.then(() => 'settled'), new Promise((r) => setTimeout(() => r('pending'), 400))]);
+t('connect() WAITS on a locked signer instead of failing', settled === 'pending');
+
 // Create an identity while connect() is polling ping — the real newcomer race.
 await signer.click('#go-create');
 await signer.fill('#create-pass', 'correct horse battery staple');
