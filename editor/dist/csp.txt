@@ -1,0 +1,1 @@
+default-src 'self'; script-src 'self' 'sha256-Vpv8dwGuSXtrKmm/RGipaD+CLRnKQyQ+CwovFIvz3ok='; style-src 'self' 'sha256-4BYtcdAbX2nzKEVfzzG5B5bHjrxX41ZKSSj8rrOYB/4=' 'sha256-3/DHQGO/pQN64Nl7pByYKtVw4yKDQ7Y/FDXML0+N83U='; img-src 'self' data: blob:; connect-src 'self' wss:; frame-ancestors 'none'; base-uri 'none'; form-action 'self'

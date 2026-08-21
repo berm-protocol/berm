@@ -33,6 +33,22 @@ It clones or fast-forwards, checks each bundle against the served CSP, swaps by
 rename so no visitor sees a half-copied tree, validates the Caddyfile, reloads
 Caddy, and prints the status of all three hosts.
 
+## The bundles are tracked in git, on purpose
+
+`dist/` is normally ignored. `signer/dist/xonly-signer.html`,
+`editor/dist/xonly-editor.html` and both `csp.txt` files are **exceptions** and
+must stay committed — `xonly-deploy` publishes what git contains.
+
+Three things then commit to the same bytes and can be checked against each
+other by anyone: the **git blob**, the **served CSP hash**, and the
+**signer-log attestation**. Building on the server instead would put node, npm
+and a dependency tree on the machine that holds keys, and leave the served bytes
+reproducible from nowhere.
+
+If a bundle is missing, the deploy **fails with a non-zero exit** rather than
+skipping the host. An earlier version skipped and exited 0, which meant a deploy
+that published nothing looked exactly like a deploy that worked.
+
 ## The one thing that will bite you
 
 Both apps ship as **one self-contained file** served under

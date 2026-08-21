@@ -40,14 +40,24 @@ fi
 COMMIT=$(git -C "$SRC" rev-parse --short HEAD)
 echo "==> at $COMMIT"
 
-# host<TAB>source file<TAB>csp file  — an empty source means "not built yet".
+# publish_one <host> <source file> <csp file> <required|optional>
+#
+# REQUIRED is the default for the two app hosts, and it matters: dist/ used to be
+# gitignored, so these files were absent from every clone and this script skipped
+# both hosts, exited 0, and reported success. A deploy that publishes nothing must
+# say so with a non-zero exit, not a tidy log line.
 publish_one() {
-  local host="$1" src_file="$2" csp_file="$3"
+  local host="$1" src_file="$2" csp_file="$3" req="${4:-required}"
   local dst="/srv/xonly/$host"
 
   if [ ! -f "$SRC/$src_file" ]; then
-    echo "    $host: no $src_file at $COMMIT — leaving the current site alone"
-    return 0
+    if [ "$req" = "optional" ]; then
+      echo "    $host: no $src_file at $COMMIT — leaving the current site alone"
+      return 0
+    fi
+    echo "    $host: $src_file is MISSING at $COMMIT" >&2
+    echo "           it is a tracked build artifact — run the build and commit it." >&2
+    return 1
   fi
 
   if [ -n "$csp_file" ]; then
@@ -80,8 +90,8 @@ publish_one() {
 }
 
 echo "==> publish"
-publish_one signer "signer/dist/xonly-signer.html" "signer/dist/csp.txt"
-publish_one editor "editor/dist/xonly-editor.html" "editor/dist/csp.txt"
+publish_one signer "signer/dist/xonly-signer.html" "signer/dist/csp.txt" required
+publish_one editor "editor/dist/xonly-editor.html" "editor/dist/csp.txt" required
 
 # The apex is a directory of assets, not one file, so it follows the
 # bermlaunch pattern instead.

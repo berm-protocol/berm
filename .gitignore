@@ -49,3 +49,21 @@ demo/shot-*.png
 prf-check/shot-*.png
 wordpress/tests/card.png
 bags/dispute.png
+
+# Deployed bundles are TRACKED, deliberately.
+#
+# `xonly-deploy` publishes what git contains, so an ignored dist/ meant the
+# deploy silently skipped both hosts and reported success. Beyond fixing that:
+# these are single self-contained files served under a hash-pinned CSP and
+# covered by a signer-log attestation. Tracking them means the git blob, the
+# served policy and the attestation all commit to the SAME bytes, and anyone can
+# check all three against each other. Building on the server instead would put
+# node, npm and a dependency tree on the box that holds keys, and leave the
+# served bytes reproducible from nowhere.
+!signer/dist/
+!signer/dist/xonly-signer.html
+!signer/dist/csp.txt
+!signer/dist/attestation-input.json
+!editor/dist/
+!editor/dist/xonly-editor.html
+!editor/dist/csp.txt
