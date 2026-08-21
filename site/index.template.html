@@ -1,0 +1,63 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>xonly — your key, your name, your writing</title>
+<meta name="description" content="Hold a real Nostr identity, write under it, and publish where you choose. Part of Berm.">
+<meta property="og:title" content="xonly">
+<meta property="og:description" content="Hold a real Nostr identity, write under it, and publish where you choose.">
+<style>
+:root{--bg:#faf9f7;--fg:#16181c;--mut:#5f646c;--line:#e2e0dc;--card:#fff;--acc:#9a6b00}
+@media(prefers-color-scheme:dark){:root{--bg:#0d0f12;--fg:#e8e6e3;--mut:#8b8f96;--line:#23262b;--card:#14171b;--acc:#d9a441}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.6 ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;padding:3rem 1.25rem 5rem}
+main{max-width:40rem;margin:0 auto}
+h1{font-size:1.9rem;line-height:1.2;margin:0 0 .5rem;letter-spacing:-.01em}
+h2{font-size:1.05rem;margin:2.6rem 0 .8rem;letter-spacing:.02em;color:var(--mut);text-transform:uppercase;font-weight:600}
+p{margin:0 0 1rem}
+.lede{font-size:1.12rem;color:var(--mut);margin-bottom:2rem}
+a{color:var(--fg);text-decoration-color:var(--acc);text-underline-offset:3px}
+.card{display:block;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:1.1rem 1.25rem;margin:0 0 .7rem;text-decoration:none;color:inherit}
+.card:hover{border-color:var(--acc)}
+.card b{display:block;font-size:1.02rem;margin-bottom:.2rem}
+.card span{color:var(--mut);font-size:.92rem}
+.note{border-left:3px solid var(--acc);padding-left:.9rem;color:var(--mut);font-size:.95rem}
+footer{margin-top:3.5rem;padding-top:1.2rem;border-top:1px solid var(--line);color:var(--mut);font-size:.88rem}
+code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.88em}
+</style>
+
+<main>
+  <h1>Your key, your name, your writing.</h1>
+  <p class="lede">A Nostr identity you actually hold, a place to write under it, and publishing that does not depend on anyone's permission — including ours.</p>
+
+  <h2>Use it</h2>
+
+  <a class="card" href="https://signer.xonly.ai/">
+    <b>Signer →</b>
+    <span>Make an identity and keep the only copy. Encrypted with your passphrase, downloaded to your machine, never stored here.</span>
+  </a>
+
+  <a class="card" href="https://editor.xonly.ai/">
+    <b>Editor →</b>
+    <span>Write once and publish to Nostr as a long-form article, to your own node, or as a draft for X. Declining publishes nothing.</span>
+  </a>
+
+  <p class="note">If you already have a signer extension or a remote signer, use it. Those are better than anything a website can offer you, and the editor will prefer them automatically. Ours exists for people who have neither.</p>
+
+  <h2>Check it</h2>
+
+  <a class="card" href="/who.html"><b>Who →</b><span>Resolve an identity and see what is claimed versus what is verified.</span></a>
+  <a class="card" href="/import.html"><b>Import →</b><span>Bring a following graph across, and see exactly what moves.</span></a>
+  <a class="card" href="/prf-check.html"><b>Passkey check →</b><span>Whether your device can derive a key from a passkey, tested in your own browser.</span></a>
+
+  <h2>Understand it</h2>
+
+  <a class="card" href="/docs/"><b>Documentation →</b><span>What a berm is, why identity has to be a key rather than an account, and what none of this can promise you.</span></a>
+
+  <h2>Where you stand</h2>
+  <p>Nothing here holds your key but your own device. There is no account, no reset, and no support address that can recover a lost passphrase — that is the cost of nobody else being able to sign as you.</p>
+  <p>This is early software. It is public so it can be checked, not because it is finished.</p>
+
+  <footer>
+    Part of <a href="https://github.com/berm-protocol/berm">Berm</a> · every page here is built from that repository and can be reproduced from it.
+  </footer>
+</main>

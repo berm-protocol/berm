@@ -67,3 +67,9 @@ bags/dispute.png
 !editor/dist/
 !editor/dist/xonly-editor.html
 !editor/dist/csp.txt
+
+# The assembled apex tree. Same reasoning as the bundles above: xonly-deploy
+# publishes what git contains, and the served bytes should be reproducible from
+# the repository by anyone who wants to check them.
+!public/
+!public/**

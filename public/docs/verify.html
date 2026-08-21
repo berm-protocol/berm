@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Verify it yourself · Berm</title>
+<meta name="description" content="Every claim on this site, and the command that checks it. Including this page.">
+<meta property="og:title" content="Verify it yourself">
+<meta property="og:description" content="Every claim on this site, and the command that checks it. Including this page.">
+<meta property="og:type" content="article">
+<style>:root{--ink:#16181c;--dim:#5b6270;--faint:#8b919c;--line:#e6e8ec;--bg:#fff;--accent:#3b5bdb;
+      --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Inter,system-ui,sans-serif;
+      --mono:ui-monospace,'SF Mono',Menlo,Consolas,monospace}
+@media(prefers-color-scheme:dark){:root{--ink:#e8eaed;--dim:#9aa1ad;--faint:#787f8b;
+      --line:#242832;--bg:#0d0e11;--accent:#7c9cff}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.7 var(--sans)}
+.layout{display:grid;grid-template-columns:230px minmax(0,1fr);max-width:1060px;margin:0 auto;gap:44px;padding:0 22px}
+@media(max-width:820px){.layout{grid-template-columns:1fr;gap:0}}
+nav{padding:40px 0;position:sticky;top:0;align-self:start;max-height:100vh;overflow-y:auto}
+@media(max-width:820px){nav{position:static;max-height:none;border-bottom:1px solid var(--line)}}
+nav .brand{font-weight:700;font-size:18px;letter-spacing:-.01em;margin-bottom:4px;display:block;color:var(--ink);text-decoration:none}
+nav .tag{font-size:12.5px;color:var(--faint);margin-bottom:20px}
+nav a.pg{display:block;padding:5px 0;font-size:14.5px;color:var(--dim);text-decoration:none}
+nav a.pg:hover{color:var(--ink)}
+nav a.pg.on{color:var(--accent);font-weight:600}
+main{padding:40px 0 100px;min-width:0}
+h1{font-size:34px;line-height:1.2;letter-spacing:-.02em;margin:0 0 8px}
+h2{font-size:24px;margin:38px 0 10px;letter-spacing:-.01em}
+h3{font-size:19px;margin:28px 0 8px}
+.sum{font-size:18px;color:var(--dim);margin:0 0 30px;padding-bottom:22px;border-bottom:1px solid var(--line)}
+p{margin:0 0 18px}
+a{color:var(--accent)}
+a.hash{opacity:0;margin-left:8px;text-decoration:none;font-weight:400;color:var(--faint)}
+h1:hover a.hash,h2:hover a.hash,h3:hover a.hash{opacity:1}
+pre{background:rgba(127,127,127,.09);border:1px solid var(--line);border-radius:8px;padding:14px;
+    overflow-x:auto;font:13.5px/1.6 var(--mono)}
+code{font:.88em var(--mono);background:rgba(127,127,127,.12);padding:2px 5px;border-radius:4px}
+pre code{background:none;padding:0}
+.tbl{overflow-x:auto;margin:22px 0}
+table{border-collapse:collapse;width:100%;font-size:14.5px}
+th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-weight:600;border-bottom:2px solid var(--accent)}
+td{color:var(--dim)}
+blockquote{margin:22px 0;padding:2px 0 2px 18px;border-left:3px solid var(--accent);color:var(--dim)}
+ul,ol{margin:0 0 18px;padding-left:24px}li{margin-bottom:6px}
+hr{border:0;border-top:1px solid var(--line);margin:34px 0}
+footer{margin-top:60px;padding-top:22px;border-top:1px solid var(--line);font-size:13.5px;color:var(--faint)}
+footer code{font-size:12px}</style>
+</head>
+<body>
+<div class="layout">
+<nav>
+  <a class="brand" href="index.html">Berm</a>
+  <div class="tag">Identity you hold. X as a claim, not a login.</div>
+  <a class="pg" href="why.html">The garden around the wall</a><a class="pg" href="start.html">Start here</a><a class="pg" href="concepts.html">Concepts</a><a class="pg" href="custody.html">Custody tiers</a><a class="pg" href="sdk.html">SDK reference</a><a class="pg" href="identity.html">Identity and X</a><a class="pg" href="recovery.html">Recovery</a><a class="pg" href="node.html">Running a node</a><a class="pg" href="security.html">Security model</a><a class="pg" href="limits.html">Limits</a><a class="pg on" href="verify.html">Verify it yourself</a>
+</nav>
+<main>
+  <h1>Verify it yourself</h1>
+  <p class="sum">Every claim on this site, and the command that checks it. Including this page.</p>
+  <p>&quot;Public and transparent from day one&quot; is a claim like any other. Here is how to check it.</p>
+<h2 id="check-this-page">Check this page<a class="hash" href="#check-this-page" aria-label="link to this section">#</a></h2>
+<p>This documentation is published as signed Nostr events. Every page carries its event id and <code>naddr</code> in the footer, and resolves in <strong>any</strong> Nostr client:</p>
+<pre><code>30023:&lt;project-pubkey&gt;:docs/verify</code></pre>
+<p>If a page only renders on xonly.ai, we built a website and called it a protocol. Resolve it somewhere else. That is the test.</p>
+<p>The site serves from a disk cache rather than fetching relays per request — a docs site that is slow because of relay round-trips is an argument against the architecture, made by us, in public. The footer shows which relays the page came from and when it was last reconciled, so a stale cache is visible rather than invisible.</p>
+<h2 id="check-the-crypto">Check the crypto<a class="hash" href="#check-the-crypto" aria-label="link to this section">#</a></h2>
+<pre data-lang="bash"><code>git clone https://github.com/berm-protocol/berm &amp;&amp; cd berm/crypto
+npm install
+npm test          # 119 tests</code></pre>
+<p>Nothing downstream is safe to build until that is green, because everything inherits its guarantees.</p>
+<p><strong>Rebuild the test vectors from scratch.</strong> Every input is itself the SHA-256 of a fixed string, so anyone can regenerate the file and get identical bytes:</p>
+<pre data-lang="bash"><code>npm run vectors:generate &amp;&amp; git diff --exit-code vectors/</code></pre>
+<p>A non-empty diff means a derivation changed — which means every existing user&#39;s identity changed. That is a migration, never a fix for a red test.</p>
+<h2 id="check-the-old-design-really-was-broken">Check the old design really was broken<a class="hash" href="#check-the-old-design-really-was-broken" aria-label="link to this section">#</a></h2>
+<pre data-lang="bash"><code>npm test -- negative</code></pre>
+<p><code>attackerRecoversV1Key(&amp;#39;12345678&amp;#39;)</code> takes a public integer and returns the private key its victim would derive. The PIN-search test brute-forces a six-digit PIN in about nine seconds on one core.</p>
+<p>These do not argue that v1 was broken. They compute it.</p>
+<h2 id="check-the-sdk">Check the SDK<a class="hash" href="#check-the-sdk" aria-label="link to this section">#</a></h2>
+<pre data-lang="bash"><code>cd sdk &amp;&amp; npm install
+npm test               # 34 tests
+npm run example:verify # real browser, two local relays, end to end</code></pre>
+<p>The tests worth reading are the negative ones: the dev signer refusing a public origin, a forged event from a hostile relay being dropped, one relay accepting not being reported as published.</p>
+<p>The forgery test first confirms the relay really does serve the forgery, then asserts the SDK dropped it — otherwise it would pass because nothing happened, which is the most common way a security test lies.</p>
+<h2 id="check-the-bundles-you-are-loading">Check the bundles you are loading<a class="hash" href="#check-the-bundles-you-are-loading" aria-label="link to this section">#</a></h2>
+<pre data-lang="bash"><code>npm run bundle
+sha256sum -c dist/berm-sdk.global.min.js.sha256</code></pre>
+<p>Compare against the hash published with the release. Use the SRI attribute in your <code>&amp;lt;script&amp;gt;</code> tag. The unminified build ships deliberately, so that a person about to grant a script a signing surface can read it.</p>
+<h2 id="check-the-php-node">Check the PHP node<a class="hash" href="#check-the-php-node" aria-label="link to this section">#</a></h2>
+<pre data-lang="bash"><code>cd wordpress/xonly-node &amp;&amp; php tests/run.php</code></pre>
+<p>All 15 official BIP-340 vectors, verified in pure PHP with no GMP and no BCMath — so any shared host can run the check, not only privileged infrastructure.</p>
+<h2 id="check-a-published-event-end-to-end">Check a published event end to end<a class="hash" href="#check-a-published-event-end-to-end" aria-label="link to this section">#</a></h2>
+<pre data-lang="bash"><code>node scripts/publish-and-read.mjs</code></pre>
+<p>Signs an event, publishes to two public relays, reads it back, and re-verifies the signature on the returned copy.</p>
+<p>One footgun to know if you write your own: <code>nostr-tools</code> memoises <code>verifyEvent</code> via a <code>Symbol</code> on the object. <strong>Object spread copies that symbol</strong>, so a tampered clone can report itself valid. Clone through JSON when you are testing tamper detection, or you will write a test that proves nothing.</p>
+<h2 id="what-we-cannot-prove-to-you">What we cannot prove to you<a class="hash" href="#what-we-cannot-prove-to-you" aria-label="link to this section">#</a></h2>
+<p>Some things are enforced by the browser rather than by our code — chiefly that a passkey cannot be used from a second origin. That is the WebAuthn RP-ID guarantee, it cannot be unit-tested in Node, and we call our coverage of it partial rather than implying otherwise. The manual checklist is in <code>crypto/scripts/e2e-checklist.md</code> and runs per platform before each release.</p>
+<p>You are welcome to run it yourself and tell us if it fails.</p>
+  <footer>
+    Built from a public commit. Every file's SHA-256 is in
+    <a href="manifest.json">manifest.json</a> — hash what you were served and
+    compare, rather than taking a deploy's word for it.
+  </footer>
+</main>
+</div>
+</body>
+</html>

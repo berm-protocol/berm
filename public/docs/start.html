@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Start here · Berm</title>
+<meta name="description" content="A signed, published event in ten minutes. No X developer app, no API key, nothing anyone can revoke.">
+<meta property="og:title" content="Start here">
+<meta property="og:description" content="A signed, published event in ten minutes. No X developer app, no API key, nothing anyone can revoke.">
+<meta property="og:type" content="article">
+<style>:root{--ink:#16181c;--dim:#5b6270;--faint:#8b919c;--line:#e6e8ec;--bg:#fff;--accent:#3b5bdb;
+      --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Inter,system-ui,sans-serif;
+      --mono:ui-monospace,'SF Mono',Menlo,Consolas,monospace}
+@media(prefers-color-scheme:dark){:root{--ink:#e8eaed;--dim:#9aa1ad;--faint:#787f8b;
+      --line:#242832;--bg:#0d0e11;--accent:#7c9cff}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.7 var(--sans)}
+.layout{display:grid;grid-template-columns:230px minmax(0,1fr);max-width:1060px;margin:0 auto;gap:44px;padding:0 22px}
+@media(max-width:820px){.layout{grid-template-columns:1fr;gap:0}}
+nav{padding:40px 0;position:sticky;top:0;align-self:start;max-height:100vh;overflow-y:auto}
+@media(max-width:820px){nav{position:static;max-height:none;border-bottom:1px solid var(--line)}}
+nav .brand{font-weight:700;font-size:18px;letter-spacing:-.01em;margin-bottom:4px;display:block;color:var(--ink);text-decoration:none}
+nav .tag{font-size:12.5px;color:var(--faint);margin-bottom:20px}
+nav a.pg{display:block;padding:5px 0;font-size:14.5px;color:var(--dim);text-decoration:none}
+nav a.pg:hover{color:var(--ink)}
+nav a.pg.on{color:var(--accent);font-weight:600}
+main{padding:40px 0 100px;min-width:0}
+h1{font-size:34px;line-height:1.2;letter-spacing:-.02em;margin:0 0 8px}
+h2{font-size:24px;margin:38px 0 10px;letter-spacing:-.01em}
+h3{font-size:19px;margin:28px 0 8px}
+.sum{font-size:18px;color:var(--dim);margin:0 0 30px;padding-bottom:22px;border-bottom:1px solid var(--line)}
+p{margin:0 0 18px}
+a{color:var(--accent)}
+a.hash{opacity:0;margin-left:8px;text-decoration:none;font-weight:400;color:var(--faint)}
+h1:hover a.hash,h2:hover a.hash,h3:hover a.hash{opacity:1}
+pre{background:rgba(127,127,127,.09);border:1px solid var(--line);border-radius:8px;padding:14px;
+    overflow-x:auto;font:13.5px/1.6 var(--mono)}
+code{font:.88em var(--mono);background:rgba(127,127,127,.12);padding:2px 5px;border-radius:4px}
+pre code{background:none;padding:0}
+.tbl{overflow-x:auto;margin:22px 0}
+table{border-collapse:collapse;width:100%;font-size:14.5px}
+th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-weight:600;border-bottom:2px solid var(--accent)}
+td{color:var(--dim)}
+blockquote{margin:22px 0;padding:2px 0 2px 18px;border-left:3px solid var(--accent);color:var(--dim)}
+ul,ol{margin:0 0 18px;padding-left:24px}li{margin-bottom:6px}
+hr{border:0;border-top:1px solid var(--line);margin:34px 0}
+footer{margin-top:60px;padding-top:22px;border-top:1px solid var(--line);font-size:13.5px;color:var(--faint)}
+footer code{font-size:12px}</style>
+</head>
+<body>
+<div class="layout">
+<nav>
+  <a class="brand" href="index.html">Berm</a>
+  <div class="tag">Identity you hold. X as a claim, not a login.</div>
+  <a class="pg" href="why.html">The garden around the wall</a><a class="pg on" href="start.html">Start here</a><a class="pg" href="concepts.html">Concepts</a><a class="pg" href="custody.html">Custody tiers</a><a class="pg" href="sdk.html">SDK reference</a><a class="pg" href="identity.html">Identity and X</a><a class="pg" href="recovery.html">Recovery</a><a class="pg" href="node.html">Running a node</a><a class="pg" href="security.html">Security model</a><a class="pg" href="limits.html">Limits</a><a class="pg" href="verify.html">Verify it yourself</a>
+</nav>
+<main>
+  <h1>Start here</h1>
+  <p class="sum">A signed, published event in ten minutes. No X developer app, no API key, nothing anyone can revoke.</p>
+  <p>Ten minutes, one HTML file, no accounts to create.</p>
+<h2 id="1-get-the-sdk">1. Get the SDK<a class="hash" href="#1-get-the-sdk" aria-label="link to this section">#</a></h2>
+<pre data-lang="bash"><code>npm install @berm/sdk</code></pre>
+<p>Or drop the browser build in and skip the build step entirely:</p>
+<pre data-lang="html"><code>&lt;script src=&quot;https://docs.xonly.ai/dist/berm-sdk.global.min.js&quot;
+        integrity=&quot;sha256-…&quot; crossorigin=&quot;anonymous&quot;&gt;&lt;/script&gt;</code></pre>
+<p>The integrity hash is printed by <code>npm run bundle</code> and published with every release. Use it. A project whose whole claim is &quot;public and verifiable&quot; should not be asking you to load an unchecked script.</p>
+<h2 id="2-connect-sign-publish">2. Connect, sign, publish<a class="hash" href="#2-connect-sign-publish" aria-label="link to this section">#</a></h2>
+<pre data-lang="html"><code>&lt;button id=&quot;connect&quot;&gt;Connect&lt;/button&gt;
+&lt;button id=&quot;publish&quot;&gt;Publish&lt;/button&gt;
+
+&lt;script&gt;
+  const sdk = Berm.install({ dev: true });      // dev key on localhost only
+
+  connect.onclick = async () =&gt; {
+    const session = await sdk.connect();        // may prompt, may be declined
+    console.log(session.npub, session.tier, session.custody);
+  };
+
+  publish.onclick = async () =&gt; {
+    const event = await sdk.signEvent({
+      kind: 1,
+      created_at: Math.floor(Date.now() / 1000),
+      tags: [],
+      content: &#39;hello from berm&#39;,
+    });
+    const receipt = await sdk.publish(event);   // two relays, or it did not publish
+    console.log(receipt.success, receipt.accepted);
+  };
+&lt;/script&gt;</code></pre>
+<p>That is the whole integration. There is no registration step, no key to obtain, and no quota, because nothing was issued to you.</p>
+<h2 id="3-check-your-work">3. Check your work<a class="hash" href="#3-check-your-work" aria-label="link to this section">#</a></h2>
+<p><code>receipt.success</code> is <code>true</code> only when <strong>two or more</strong> relays accepted. One relay accepting is not a publish — it is a single point of failure wearing the costume of a success message. The receipt gives you the per-relay breakdown:</p>
+<pre data-lang="json"><code>{
+  &quot;eventId&quot;: &quot;3a0f1597db61…&quot;,
+  &quot;accepted&quot;: [&quot;wss://relay.damus.io&quot;, &quot;wss://nos.lol&quot;],
+  &quot;failed&quot;: [],
+  &quot;success&quot;: true
+}</code></pre>
+<p>Paste the event id into any Nostr client. It resolves, because you published to the open network rather than to us.</p>
+<h2 id="4-handle-the-four-failures">4. Handle the four failures<a class="hash" href="#4-handle-the-four-failures" aria-label="link to this section">#</a></h2>
+<p>Every one of these will happen to a real user. An app that only handles the happy path is a demo.</p>
+<div class="tbl"><table><thead><tr><th>Error</th><th>Means</th><th>Do</th></tr></thead><tbody><tr><td><code>UserDeclinedError</code></td><td>The user said no</td><td>Return to the previous state, quietly. Not a red banner.</td></tr><tr><td><code>SignerUnavailableError</code></td><td>Signer offline, asleep, or popup-blocked</td><td>Offer a retry</td></tr><tr><td><code>NoSignerError</code></td><td>Nothing in this browser can sign</td><td>Show onboarding — every new user starts here</td></tr><tr><td><code>DevSignerMisuseError</code></td><td>Dev signer outside localhost</td><td>You shipped it. Remove it.</td></tr></tbody></table></div>
+<pre data-lang="js"><code>try {
+  await sdk.signEvent(template);
+} catch (e) {
+  if (e instanceof Berm.UserDeclinedError) return;   // not an error, a decision
+  showRetry(e.message);
+}</code></pre>
+<h2 id="5-turn-off-the-dev-signer">5. Turn off the dev signer<a class="hash" href="#5-turn-off-the-dev-signer" aria-label="link to this section">#</a></h2>
+<p><code>{ dev: true }</code> gives you a raw key in <code>localStorage</code>. It <strong>refuses to load</strong> anywhere but localhost, a <code>file://</code> page, or Node — it throws rather than warns, because every dev mode that merely warns eventually ships.</p>
+<p>For production, give it a real signer to find:</p>
+<pre data-lang="js"><code>const sdk = Berm.install({
+  signer: { signerOrigin: &#39;https://signer.xonly.ai&#39; },   // passkey, tier 1
+  appName: &#39;My App&#39;,
+});</code></pre>
+<p>If the user already has a NIP-07 extension, the SDK uses that instead — without being asked. They made a custody decision before they met you, and overriding it would be the behaviour this project exists to be an alternative to.</p>
+<h2 id="next">Next<a class="hash" href="#next" aria-label="link to this section">#</a></h2>
+<ul><li><a href="concepts.html">Concepts</a> — what is actually going on, in five minutes</li><li><a href="custody.html">Custody tiers</a> — where the key lives, and who to show that to</li><li><a href="sdk.html">SDK reference</a> — the full surface</li><li><a href="limits.html">Limits</a> — what this does not do, before you find out the hard way</li></ul>
+  <footer>
+    Built from a public commit. Every file's SHA-256 is in
+    <a href="manifest.json">manifest.json</a> — hash what you were served and
+    compare, rather than taking a deploy's word for it.
+  </footer>
+</main>
+</div>
+</body>
+</html>

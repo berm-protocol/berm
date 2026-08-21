@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Concepts · Berm</title>
+<meta name="description" content="X is the on-ramp, not the custodian. The one inversion that everything else follows from.">
+<meta property="og:title" content="Concepts">
+<meta property="og:description" content="X is the on-ramp, not the custodian. The one inversion that everything else follows from.">
+<meta property="og:type" content="article">
+<style>:root{--ink:#16181c;--dim:#5b6270;--faint:#8b919c;--line:#e6e8ec;--bg:#fff;--accent:#3b5bdb;
+      --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Inter,system-ui,sans-serif;
+      --mono:ui-monospace,'SF Mono',Menlo,Consolas,monospace}
+@media(prefers-color-scheme:dark){:root{--ink:#e8eaed;--dim:#9aa1ad;--faint:#787f8b;
+      --line:#242832;--bg:#0d0e11;--accent:#7c9cff}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.7 var(--sans)}
+.layout{display:grid;grid-template-columns:230px minmax(0,1fr);max-width:1060px;margin:0 auto;gap:44px;padding:0 22px}
+@media(max-width:820px){.layout{grid-template-columns:1fr;gap:0}}
+nav{padding:40px 0;position:sticky;top:0;align-self:start;max-height:100vh;overflow-y:auto}
+@media(max-width:820px){nav{position:static;max-height:none;border-bottom:1px solid var(--line)}}
+nav .brand{font-weight:700;font-size:18px;letter-spacing:-.01em;margin-bottom:4px;display:block;color:var(--ink);text-decoration:none}
+nav .tag{font-size:12.5px;color:var(--faint);margin-bottom:20px}
+nav a.pg{display:block;padding:5px 0;font-size:14.5px;color:var(--dim);text-decoration:none}
+nav a.pg:hover{color:var(--ink)}
+nav a.pg.on{color:var(--accent);font-weight:600}
+main{padding:40px 0 100px;min-width:0}
+h1{font-size:34px;line-height:1.2;letter-spacing:-.02em;margin:0 0 8px}
+h2{font-size:24px;margin:38px 0 10px;letter-spacing:-.01em}
+h3{font-size:19px;margin:28px 0 8px}
+.sum{font-size:18px;color:var(--dim);margin:0 0 30px;padding-bottom:22px;border-bottom:1px solid var(--line)}
+p{margin:0 0 18px}
+a{color:var(--accent)}
+a.hash{opacity:0;margin-left:8px;text-decoration:none;font-weight:400;color:var(--faint)}
+h1:hover a.hash,h2:hover a.hash,h3:hover a.hash{opacity:1}
+pre{background:rgba(127,127,127,.09);border:1px solid var(--line);border-radius:8px;padding:14px;
+    overflow-x:auto;font:13.5px/1.6 var(--mono)}
+code{font:.88em var(--mono);background:rgba(127,127,127,.12);padding:2px 5px;border-radius:4px}
+pre code{background:none;padding:0}
+.tbl{overflow-x:auto;margin:22px 0}
+table{border-collapse:collapse;width:100%;font-size:14.5px}
+th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-weight:600;border-bottom:2px solid var(--accent)}
+td{color:var(--dim)}
+blockquote{margin:22px 0;padding:2px 0 2px 18px;border-left:3px solid var(--accent);color:var(--dim)}
+ul,ol{margin:0 0 18px;padding-left:24px}li{margin-bottom:6px}
+hr{border:0;border-top:1px solid var(--line);margin:34px 0}
+footer{margin-top:60px;padding-top:22px;border-top:1px solid var(--line);font-size:13.5px;color:var(--faint)}
+footer code{font-size:12px}</style>
+</head>
+<body>
+<div class="layout">
+<nav>
+  <a class="brand" href="index.html">Berm</a>
+  <div class="tag">Identity you hold. X as a claim, not a login.</div>
+  <a class="pg" href="why.html">The garden around the wall</a><a class="pg" href="start.html">Start here</a><a class="pg on" href="concepts.html">Concepts</a><a class="pg" href="custody.html">Custody tiers</a><a class="pg" href="sdk.html">SDK reference</a><a class="pg" href="identity.html">Identity and X</a><a class="pg" href="recovery.html">Recovery</a><a class="pg" href="node.html">Running a node</a><a class="pg" href="security.html">Security model</a><a class="pg" href="limits.html">Limits</a><a class="pg" href="verify.html">Verify it yourself</a>
+</nav>
+<main>
+  <h1>Concepts</h1>
+  <p class="sum">X is the on-ramp, not the custodian. The one inversion that everything else follows from.</p>
+  <h2 id="the-inversion">The inversion<a class="hash" href="#the-inversion" aria-label="link to this section">#</a></h2>
+<p>Almost every app that uses X as a login treats X as the <strong>custodian</strong>: the account is the identity, so when the account dies, the user dies with it. People who signed up to a service years ago with an X account they have since lost are simply gone — not locked out, gone, with no path back that anyone can offer.</p>
+<p>Berm inverts that.</p>
+<pre><code>  conventional          the identity IS the X account
+                        X can revoke it, therefore X owns your users
+
+  Berm                  the identity is a key the user holds
+                        the X handle is a CLAIM attached to it
+                        X can revoke the claim; the identity is untouched</code></pre>
+<p>That single change is where every other property comes from. It is worth being precise about what each piece is.</p>
+<h2 id="identity">Identity<a class="hash" href="#identity" aria-label="link to this section">#</a></h2>
+<p>A secp256k1 keypair. The public half is an <code>npub</code>; the private half never leaves the user&#39;s signer. This is the account. Nothing about it depends on X, and nothing about it depends on any server staying online.</p>
+<p>For most users the key is derived from a <strong>passkey</strong> — specifically, from the WebAuthn PRF extension, which returns 32 bytes of secret that exist only inside the authenticator and cannot be computed from anything public. The user experiences it as Face ID. What they get is a cryptographic identity.</p>
+<p>One qualifier, and it belongs here rather than three pages later: that passkey path — tier 1 — <strong>does</strong> depend on us, because WebAuthn ties the credential to our DNS name and the authenticator cannot tell us apart from whoever holds that name next. A user on a browser extension (tier 0) or their own bunker (tier 2) has no such dependency. The protocol is sovereign; its easiest on-ramp is not yet. <a href="custody#what-tier-1-costs.html">Custody tiers</a> is the full statement, and it is the one page to read before believing anything else here.</p>
+<h2 id="claim">Claim<a class="hash" href="#claim" aria-label="link to this section">#</a></h2>
+<p>A statement, published by the user and signed with their key, that says <em>&quot;I control @handle on X&quot;</em> — a NIP-39 <code>i</code> tag in their profile, pointing at a proof post on X that names their <code>npub</code>.</p>
+<p>It is a claim, not a fact, until something checks it. Which brings us to the distinction the whole binding model rests on:</p>
+<div class="tbl"><table><thead><tr><th>State</th><th>Means</th></tr></thead><tbody><tr><td><code>unlinked</code></td><td>No claim at all</td></tr><tr><td><code>claimed</code></td><td>The user asserted a handle. <strong>Nothing has been checked.</strong> Anyone can assert anything.</td></tr><tr><td><code>verified</code></td><td>Something fetched the proof post and matched it</td></tr></tbody></table></div>
+<p>Rendering <code>claimed</code> as <code>verified</code> is an impersonation vector, not a cosmetic bug. The SDK&#39;s profile parser is structurally incapable of producing <code>verified</code> — a browser has no CORS-open way to check a post on X, so the optimistic value cannot be constructed there at all. The upgrade is a node&#39;s job, server-side.</p>
+<p>See <a href="identity.html">Identity and X</a> for the full flow, including why an archived proof matters more than a live one.</p>
+<h2 id="relay">Relay<a class="hash" href="#relay" aria-label="link to this section">#</a></h2>
+<p>A dumb, replaceable server that stores signed events and hands them out. Relays do not authenticate anyone and cannot forge anything, because every event carries its author&#39;s signature.</p>
+<p>Two rules fall out of that:</p>
+<ul><li><strong>Publish to at least two.</strong> One relay is a single point of failure. The SDK reports <code>success: false</code> at one acceptance, on purpose.</li><li><strong>Verify everything they return.</strong> A relay is an untrusted party that can send whatever it likes. The SDK checks every signature and drops what fails — and the test suite proves it against a relay that deliberately serves a forgery, because otherwise that check is an assumption rather than a fact.</li></ul>
+<h2 id="node">Node<a class="hash" href="#node" aria-label="link to this section">#</a></h2>
+<p>A server that renders published events into web pages — the WordPress plugin is one implementation. Its trust boundary is narrow and worth memorising:</p>
+<p><strong>The node never touches key material. The node never signs. Ever.</strong></p>
+<p>It verifies signatures, renders content, serves pages, and makes the server-side checks a browser cannot (like fetching a proof post from X to upgrade <code>claimed</code> to <code>verified</code>). If a node disappears, nothing is lost: the content is on relays, and another node renders it.</p>
+<p>That is why a node can be run by anyone, including people you have no reason to trust. It has nothing worth stealing.</p>
+<h2 id="app">App<a class="hash" href="#app" aria-label="link to this section">#</a></h2>
+<p>Anything built on <code>window.berm</code>. It asks the signer for signatures and gets back events. It never sees a key, and it holds no credential from X.</p>
+<p>This is the part that matters for a developer deciding whether to build here: <strong>there is nothing for a policy change to revoke, because nothing was issued.</strong> No API key, no developer app, no rate limit, no review queue.</p>
+<h2 id="putting-it-together">Putting it together<a class="hash" href="#putting-it-together" aria-label="link to this section">#</a></h2>
+<pre><code>   passkey ──► signer ──► signs events ──► relays ──► node ──► the web
+   (key)       (origin)                    (data)     (view)
+                                              │
+   X handle ──► proof post ──► archived ──────┘
+   (claim)                     (evidence)</code></pre>
+<p>Read it once more with the failure cases in mind, because that is the actual argument:</p>
+<ul><li><strong>X bans the user.</strong> The claim goes stale. The identity, the content, the followers and the app access are untouched. The user posts a new proof from a new handle and updates their profile.</li><li><strong>A relay dies.</strong> Another one has the same events. Nothing was unique to it.</li><li><strong>The node dies.</strong> Someone else renders the same events. Nothing was unique to it.</li><li><strong>xonly.ai dies.</strong> Every published event still resolves in every other Nostr client. This is the test that separates a protocol from a website.</li><li><strong>The user loses their key with no backup.</strong> This one is real, and it is the only unrecoverable loss in the system. See <a href="recovery.html">Recovery</a> — it is the page we would most like you to read before you need it.</li></ul>
+  <footer>
+    Built from a public commit. Every file's SHA-256 is in
+    <a href="manifest.json">manifest.json</a> — hash what you were served and
+    compare, rather than taking a deploy's word for it.
+  </footer>
+</main>
+</div>
+</body>
+</html>

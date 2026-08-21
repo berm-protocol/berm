@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Security model · Berm</title>
+<meta name="description" content="Who we defend against, what is out of scope, and the design we shipped broken and then killed.">
+<meta property="og:title" content="Security model">
+<meta property="og:description" content="Who we defend against, what is out of scope, and the design we shipped broken and then killed.">
+<meta property="og:type" content="article">
+<style>:root{--ink:#16181c;--dim:#5b6270;--faint:#8b919c;--line:#e6e8ec;--bg:#fff;--accent:#3b5bdb;
+      --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Inter,system-ui,sans-serif;
+      --mono:ui-monospace,'SF Mono',Menlo,Consolas,monospace}
+@media(prefers-color-scheme:dark){:root{--ink:#e8eaed;--dim:#9aa1ad;--faint:#787f8b;
+      --line:#242832;--bg:#0d0e11;--accent:#7c9cff}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.7 var(--sans)}
+.layout{display:grid;grid-template-columns:230px minmax(0,1fr);max-width:1060px;margin:0 auto;gap:44px;padding:0 22px}
+@media(max-width:820px){.layout{grid-template-columns:1fr;gap:0}}
+nav{padding:40px 0;position:sticky;top:0;align-self:start;max-height:100vh;overflow-y:auto}
+@media(max-width:820px){nav{position:static;max-height:none;border-bottom:1px solid var(--line)}}
+nav .brand{font-weight:700;font-size:18px;letter-spacing:-.01em;margin-bottom:4px;display:block;color:var(--ink);text-decoration:none}
+nav .tag{font-size:12.5px;color:var(--faint);margin-bottom:20px}
+nav a.pg{display:block;padding:5px 0;font-size:14.5px;color:var(--dim);text-decoration:none}
+nav a.pg:hover{color:var(--ink)}
+nav a.pg.on{color:var(--accent);font-weight:600}
+main{padding:40px 0 100px;min-width:0}
+h1{font-size:34px;line-height:1.2;letter-spacing:-.02em;margin:0 0 8px}
+h2{font-size:24px;margin:38px 0 10px;letter-spacing:-.01em}
+h3{font-size:19px;margin:28px 0 8px}
+.sum{font-size:18px;color:var(--dim);margin:0 0 30px;padding-bottom:22px;border-bottom:1px solid var(--line)}
+p{margin:0 0 18px}
+a{color:var(--accent)}
+a.hash{opacity:0;margin-left:8px;text-decoration:none;font-weight:400;color:var(--faint)}
+h1:hover a.hash,h2:hover a.hash,h3:hover a.hash{opacity:1}
+pre{background:rgba(127,127,127,.09);border:1px solid var(--line);border-radius:8px;padding:14px;
+    overflow-x:auto;font:13.5px/1.6 var(--mono)}
+code{font:.88em var(--mono);background:rgba(127,127,127,.12);padding:2px 5px;border-radius:4px}
+pre code{background:none;padding:0}
+.tbl{overflow-x:auto;margin:22px 0}
+table{border-collapse:collapse;width:100%;font-size:14.5px}
+th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-weight:600;border-bottom:2px solid var(--accent)}
+td{color:var(--dim)}
+blockquote{margin:22px 0;padding:2px 0 2px 18px;border-left:3px solid var(--accent);color:var(--dim)}
+ul,ol{margin:0 0 18px;padding-left:24px}li{margin-bottom:6px}
+hr{border:0;border-top:1px solid var(--line);margin:34px 0}
+footer{margin-top:60px;padding-top:22px;border-top:1px solid var(--line);font-size:13.5px;color:var(--faint)}
+footer code{font-size:12px}</style>
+</head>
+<body>
+<div class="layout">
+<nav>
+  <a class="brand" href="index.html">Berm</a>
+  <div class="tag">Identity you hold. X as a claim, not a login.</div>
+  <a class="pg" href="why.html">The garden around the wall</a><a class="pg" href="start.html">Start here</a><a class="pg" href="concepts.html">Concepts</a><a class="pg" href="custody.html">Custody tiers</a><a class="pg" href="sdk.html">SDK reference</a><a class="pg" href="identity.html">Identity and X</a><a class="pg" href="recovery.html">Recovery</a><a class="pg" href="node.html">Running a node</a><a class="pg on" href="security.html">Security model</a><a class="pg" href="limits.html">Limits</a><a class="pg" href="verify.html">Verify it yourself</a>
+</nav>
+<main>
+  <h1>Security model</h1>
+  <p class="sum">Who we defend against, what is out of scope, and the design we shipped broken and then killed.</p>
+  <h2 id="who-this-defends-against">Who this defends against<a class="hash" href="#who-this-defends-against" aria-label="link to this section">#</a></h2>
+<div class="tbl"><table><thead><tr><th>#</th><th>Actor</th><th>What they can do</th><th>Defence</th></tr></thead><tbody><tr><td>T1</td><td>Curious node operator</td><td>Read all server-side data and memory</td><td>The node never receives key material</td></tr><tr><td>T2</td><td>Malicious node operator</td><td>Serve modified JS to their visitors</td><td>Signer-origin isolation; SRI and reproducible builds</td></tr><tr><td>T3</td><td>Public observer</td><td>Knows every user&#39;s X ID, handle and npub</td><td>No secret is derivable from public data</td></tr><tr><td>T4</td><td>Relay operator</td><td>Sees every published event and connecting IP</td><td>NIP-44 for private payloads; relay diversity</td></tr><tr><td>T5</td><td>X, the platform</td><td>Revoke OAuth, ban accounts, change APIs</td><td>X is on the auth path, never the correctness path</td></tr><tr><td>T6</td><td>Impersonator</td><td>Register lookalike handles and npubs</td><td>Two-way binding; <code>claimed</code> never rendered as <code>verified</code></td></tr><tr><td>T7</td><td>Supply-chain attacker</td><td>Compromise a dependency, CDN or release</td><td>No CDN, pinned deps, reproducible signed releases</td></tr><tr><td>T8</td><td><strong>This project</strong></td><td>We host the default signer origin</td><td>The signer cannot decrypt; self-hosting is first-class</td></tr><tr><td>T9</td><td><strong>Whoever holds the signer domain next</strong></td><td>Obtain the identity key of every tier-1 user who authenticates after the transfer</td><td><strong>Not defended against.</strong> Tiers 0 and 2 avoid it entirely; the fix for tier 1 is specified and unbuilt</td></tr></tbody></table></div>
+<p>T8 is not decoration. A protocol that requires you to trust its authors has not solved the problem it claims to solve, and the correct response to &quot;why should we trust you&quot; is a design where you do not have to.</p>
+<p><strong>T9 is the one we got wrong for a long time.</strong> WebAuthn binds every credential to an RP ID derived from the signer origin, and the authenticator will release the secret to any page served under that name — it has no way to tell one operator from another. Domain lapse, sale, registrar action or a court order all hand that ability over, with no compromise of any system. Everything under <em>Practices</em> below defends the <strong>bytes served under a name</strong>; this is an attack on the <strong>name</strong>, and none of it applies.</p>
+<p>Two things bound the damage, and neither removes it. A future name-holder can sign as the user going forward but cannot alter, delete or claim what the user already published — signed events on relays are not theirs to touch. And nodes running the <a href="node.html">signer gate</a> refuse an origin whose bytes do not match an attestation signed by a pinned, offline key, which a new name-holder cannot produce — protecting users who arrive through a gated node, not users who go to the signer origin directly.</p>
+<p>The documentation used to present the three tiers as differing only in friction. That was false. <a href="custody#what-tier-1-costs.html">Custody tiers</a> now ranks them correctly and states the resolution path.</p>
+<h2 id="out-of-scope-stated-rather-than-hand-waved">Out of scope, stated rather than hand-waved<a class="hash" href="#out-of-scope-stated-rather-than-hand-waved" aria-label="link to this section">#</a></h2>
+<ul><li>Malware on the user&#39;s device with DOM access at the signer origin</li><li>A compromised authenticator</li><li>A global passive adversary correlating traffic across relays</li></ul>
+<p>These are real. They are not defended against here, and pretending otherwise would be worse than admitting it.</p>
+<h2 id="the-design-we-killed">The design we killed<a class="hash" href="#the-design-we-killed" aria-label="link to this section">#</a></h2>
+<p>The first version derived the identity key from a <strong>public</strong> value:</p>
+<pre><code>nsec = HKDF(x_user_id, public_salt)          ← every input is public</code></pre>
+<p>X user IDs are public. The salt was in the source. So anyone could compute anyone&#39;s private key from information printed on their profile. Zero bits of security — not weak, not &quot;sufficient for now&quot;: <strong>none</strong>.</p>
+<p>Adding a PIN would not have saved it. A six-digit PIN falls to exhaustive offline search in about nine seconds on one CPU core, and the test suite proves that by <em>doing it</em>, rather than asserting it.</p>
+<p>The broken derivation is kept in the repository under <code>src/quarantine/</code>, excluded from the build, imported by exactly one test file, with CI asserting all three conditions. <code>attackerRecoversV1Key(&amp;#39;12345678&amp;#39;)</code> takes nothing but a public integer and returns the victim&#39;s private key. It is the slowest test in the suite and worth every second, because a design failure that is merely described gets rediscovered, while one that is executed cannot be.</p>
+<p>The fix was not a patch. It was replacing the entropy source with the WebAuthn PRF extension: 32 bytes computed inside the authenticator, not derivable from anything public.</p>
+<h2 id="guarantees-and-where-they-stop">Guarantees, and where they stop<a class="hash" href="#guarantees-and-where-they-stop" aria-label="link to this section">#</a></h2>
+<p><strong>Proven by tests you can run.</strong> Derivation stability and purity; scalar boundary handling; NIP-01 canonical serialization; NIP-44 v2 against official cross-implementation vectors; multi-device wrapping including tampered, swapped and wrong-credential blobs; that the v1 derivation is attacker-reproducible; that a forged event from a hostile relay is dropped; that one relay accepting is not reported as published.</p>
+<p><strong>Enforced by the browser, not by us.</strong> That a passkey cannot be used from a second origin. This is the WebAuthn RP-ID guarantee and it cannot be unit-tested in Node. What <em>is</em> tested is our half — that the derivation refuses to run anywhere but the configured signer origin. The browser half is a manual checklist, run per platform, before release. We would rather say &quot;partial&quot; than imply coverage we do not have.</p>
+<p><strong>Not a cryptographic guarantee at all.</strong> Guardian rotation. It is social consensus and should never be described as key recovery.</p>
+<h2 id="practices">Practices<a class="hash" href="#practices" aria-label="link to this section">#</a></h2>
+<ul><li><strong>No CDN.</strong> Every artifact is served from origins the project controls, with published SHA-256 and SRI hashes. A supply-chain attack on a CDN is a supply-chain attack on every user at once.</li><li><strong>NIP-04 is prohibited repo-wide</strong>, including in tests. NIP-44 v2 only.</li><li><strong>Dependencies are pinned.</strong> A major bump to <code>nostr-tools</code>, <code>@noble/hashes</code> or <code>@noble/curves</code> invalidates the test vectors and must re-run them before merge.</li><li><strong>The test vectors are frozen.</strong> A changed value means every existing user&#39;s identity just changed. Regeneration is a deliberate, versioned migration, never a fix for a red test.</li></ul>
+<p>Every claim above has a command that checks it — see <a href="verify.html">Verify it yourself</a>. The boundaries this model does not cover are listed in <a href="limits.html">Limits</a>.</p>
+<h2 id="reporting">Reporting<a class="hash" href="#reporting" aria-label="link to this section">#</a></h2>
+<p>Security issues: open a GitHub issue for anything already public; for anything that is not, use the contact address in <code>SECURITY.md</code> rather than a public tracker. We will publish the finding and the fix — including, as above, our own.</p>
+  <footer>
+    Built from a public commit. Every file's SHA-256 is in
+    <a href="manifest.json">manifest.json</a> — hash what you were served and
+    compare, rather than taking a deploy's word for it.
+  </footer>
+</main>
+</div>
+</body>
+</html>

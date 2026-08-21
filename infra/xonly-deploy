@@ -98,9 +98,19 @@ echo "==> publish"
 publish_one signer "signer/dist/xonly-signer.html" "signer/dist/csp.txt" required
 publish_one editor "editor/dist/xonly-editor.html" "editor/dist/csp.txt" required
 
-# The apex is a directory of assets, not one file, so it follows the
-# bermlaunch pattern instead.
+# The apex is a directory, not one file, so it follows the bermlaunch pattern —
+# with the same CSP agreement check, because it ships three hash-pinned inline
+# scripts and a stale header would silently break all three tools.
 if [ -d "$SRC/${PUBLISH_DIR:-public}" ]; then
+  if [ -f "$SRC/${PUBLISH_DIR:-public}/csp.txt" ]; then
+    while read -r want; do
+      grep -qF "$want" "$CADDY" || {
+        echo "    public: Caddyfile does not carry $want" >&2
+        echo "           update $CADDY from $SRC/${PUBLISH_DIR:-public}/csp.txt and rerun." >&2
+        exit 1
+      }
+    done < <(grep -o "'sha256-[A-Za-z0-9+/=]*'" "$SRC/${PUBLISH_DIR:-public}/csp.txt")
+  fi
   PUB=/srv/xonly/public
   rm -rf "$PUB.new" "$PUB.old"
   cp -a "$SRC/${PUBLISH_DIR:-public}" "$PUB.new"

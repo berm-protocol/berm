@@ -1,0 +1,8 @@
+{
+  "name": "@berm/site",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Assembles the xonly.ai public tree from packages that already built and tested their own output.",
+  "type": "module",
+  "scripts": { "build": "node build.mjs" }
+}

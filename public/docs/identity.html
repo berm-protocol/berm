@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Identity and X · Berm</title>
+<meta name="description" content="How a handle becomes a claim, why the proof must be archived, and what happens the day the account dies.">
+<meta property="og:title" content="Identity and X">
+<meta property="og:description" content="How a handle becomes a claim, why the proof must be archived, and what happens the day the account dies.">
+<meta property="og:type" content="article">
+<style>:root{--ink:#16181c;--dim:#5b6270;--faint:#8b919c;--line:#e6e8ec;--bg:#fff;--accent:#3b5bdb;
+      --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Inter,system-ui,sans-serif;
+      --mono:ui-monospace,'SF Mono',Menlo,Consolas,monospace}
+@media(prefers-color-scheme:dark){:root{--ink:#e8eaed;--dim:#9aa1ad;--faint:#787f8b;
+      --line:#242832;--bg:#0d0e11;--accent:#7c9cff}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.7 var(--sans)}
+.layout{display:grid;grid-template-columns:230px minmax(0,1fr);max-width:1060px;margin:0 auto;gap:44px;padding:0 22px}
+@media(max-width:820px){.layout{grid-template-columns:1fr;gap:0}}
+nav{padding:40px 0;position:sticky;top:0;align-self:start;max-height:100vh;overflow-y:auto}
+@media(max-width:820px){nav{position:static;max-height:none;border-bottom:1px solid var(--line)}}
+nav .brand{font-weight:700;font-size:18px;letter-spacing:-.01em;margin-bottom:4px;display:block;color:var(--ink);text-decoration:none}
+nav .tag{font-size:12.5px;color:var(--faint);margin-bottom:20px}
+nav a.pg{display:block;padding:5px 0;font-size:14.5px;color:var(--dim);text-decoration:none}
+nav a.pg:hover{color:var(--ink)}
+nav a.pg.on{color:var(--accent);font-weight:600}
+main{padding:40px 0 100px;min-width:0}
+h1{font-size:34px;line-height:1.2;letter-spacing:-.02em;margin:0 0 8px}
+h2{font-size:24px;margin:38px 0 10px;letter-spacing:-.01em}
+h3{font-size:19px;margin:28px 0 8px}
+.sum{font-size:18px;color:var(--dim);margin:0 0 30px;padding-bottom:22px;border-bottom:1px solid var(--line)}
+p{margin:0 0 18px}
+a{color:var(--accent)}
+a.hash{opacity:0;margin-left:8px;text-decoration:none;font-weight:400;color:var(--faint)}
+h1:hover a.hash,h2:hover a.hash,h3:hover a.hash{opacity:1}
+pre{background:rgba(127,127,127,.09);border:1px solid var(--line);border-radius:8px;padding:14px;
+    overflow-x:auto;font:13.5px/1.6 var(--mono)}
+code{font:.88em var(--mono);background:rgba(127,127,127,.12);padding:2px 5px;border-radius:4px}
+pre code{background:none;padding:0}
+.tbl{overflow-x:auto;margin:22px 0}
+table{border-collapse:collapse;width:100%;font-size:14.5px}
+th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-weight:600;border-bottom:2px solid var(--accent)}
+td{color:var(--dim)}
+blockquote{margin:22px 0;padding:2px 0 2px 18px;border-left:3px solid var(--accent);color:var(--dim)}
+ul,ol{margin:0 0 18px;padding-left:24px}li{margin-bottom:6px}
+hr{border:0;border-top:1px solid var(--line);margin:34px 0}
+footer{margin-top:60px;padding-top:22px;border-top:1px solid var(--line);font-size:13.5px;color:var(--faint)}
+footer code{font-size:12px}</style>
+</head>
+<body>
+<div class="layout">
+<nav>
+  <a class="brand" href="index.html">Berm</a>
+  <div class="tag">Identity you hold. X as a claim, not a login.</div>
+  <a class="pg" href="why.html">The garden around the wall</a><a class="pg" href="start.html">Start here</a><a class="pg" href="concepts.html">Concepts</a><a class="pg" href="custody.html">Custody tiers</a><a class="pg" href="sdk.html">SDK reference</a><a class="pg on" href="identity.html">Identity and X</a><a class="pg" href="recovery.html">Recovery</a><a class="pg" href="node.html">Running a node</a><a class="pg" href="security.html">Security model</a><a class="pg" href="limits.html">Limits</a><a class="pg" href="verify.html">Verify it yourself</a>
+</nav>
+<main>
+  <h1>Identity and X</h1>
+  <p class="sum">How a handle becomes a claim, why the proof must be archived, and what happens the day the account dies.</p>
+  <p>X is on the <strong>authentication</strong> path and never on the <strong>correctness</strong> path. Every design decision here follows from that sentence, and the test for any proposed feature is whether it survives X saying no.</p>
+<h2 id="the-two-way-binding">The two-way binding<a class="hash" href="#the-two-way-binding" aria-label="link to this section">#</a></h2>
+<p>A link between an npub and an X handle is only meaningful if it is asserted from both sides. One side alone is a claim about someone else.</p>
+<p><strong>Nostr → X.</strong> A NIP-39 <code>i</code> tag in the user&#39;s kind 0 profile:</p>
+<pre data-lang="json"><code>[&quot;i&quot;, &quot;twitter:dorian&quot;, &quot;https://x.com/dorian/status/1789456123456789012&quot;]</code></pre>
+<p><strong>X → Nostr.</strong> A post from that account naming the npub:</p>
+<pre><code>Verifying my Nostr identity:
+npub1fn27skur6m05z747px3epnlclf8etedhahky9zxrwxad8gll2lmstnpsey</code></pre>
+<p>Neither half is sufficient. Anyone can put any handle in their own profile; anyone can post any npub. Together, and only together, they demonstrate that the same person controls both.</p>
+<h2 id="three-states-never-two">Three states, never two<a class="hash" href="#three-states-never-two" aria-label="link to this section">#</a></h2>
+<div class="tbl"><table><thead><tr><th>State</th><th>Means</th><th>Render as</th></tr></thead><tbody><tr><td><code>unlinked</code></td><td>No claim</td><td>nothing</td></tr><tr><td><code>claimed</code></td><td>Asserted, unchecked</td><td>&quot;claimed&quot; — visibly weaker</td></tr><tr><td><code>verified</code></td><td>Proof post fetched and matched</td><td>a badge</td></tr></tbody></table></div>
+<p>Collapsing <code>claimed</code> into <code>verified</code> is the single most damaging bug this project could ship, because it converts &quot;anyone can say anything&quot; into &quot;the system says so&quot;. The codebase is built so it cannot happen by accident:</p>
+<ul><li>The <strong>SDK cannot produce <code>verified</code></strong>. A browser has no CORS-open way to fetch a post from X, so the optimistic value is unconstructible client-side.</li><li>Only a <strong>node</strong> upgrades the state, server-side, after actually fetching and matching the proof.</li><li>A test asserts a signed, valid, well-formed profile claiming <code>@elonmusk</code> still resolves to <code>claimed</code>.</li></ul>
+<h2 id="archive-the-proof-or-you-have-nothing">Archive the proof, or you have nothing<a class="hash" href="#archive-the-proof-or-you-have-nothing" aria-label="link to this section">#</a></h2>
+<p>This is the part people skip, and it is the part that matters.</p>
+<p>Your proof post lives on X. If the account is suspended, deleted, or renamed, the post disappears — <strong>at exactly the moment somebody else holds that handle and is claiming to be you</strong>. The evidence evaporates precisely when it is needed.</p>
+<p>So the flow includes a third step: capture the proof post to a third-party archive with no stake in any future dispute, and publish an attestation recording it.</p>
+<pre><code>kind 30078, d = berm:archive:v1
+  [&quot;u&quot;,       &quot;https://x.com/dorian/status/1789456123456789012&quot;]
+  [&quot;archive&quot;, &quot;https://web.archive.org/web/20260727224400/https://x.com/…&quot;]
+  [&quot;ts&quot;,      &quot;1785000240&quot;]</code></pre>
+<p>It takes about a minute and needs no credentials. It is the difference between &quot;I used to have that account&quot; and a timestamped snapshot held by a neutral party.</p>
+<p><strong>A caution about timestamps.</strong> An event&#39;s <code>created_at</code> is chosen by whoever signs it and is not evidence of when anything happened. For priority claims that have to withstand a hostile reading, anchor to something you do not control — the archive capture time, or an OpenTimestamps proof.</p>
+<h2 id="when-the-x-account-dies">When the X account dies<a class="hash" href="#when-the-x-account-dies" aria-label="link to this section">#</a></h2>
+<p>The whole architecture exists for this paragraph.</p>
+<ol><li><strong>Sign in with your key.</strong> It never depended on X. Your content, your followers, your app access and your published work are all untouched.</li><li><strong>Post a fresh proof</strong> from the new account, and archive it.</li><li><strong>Publish an updated profile: new claim in, dead claim OUT.</strong></li></ol>
+<p>Step 3 matters more than step 2. Abandoned handles get re-registered, and a stale claim leaves your profile pointing at a stranger who now holds that name. Removing the old claim is the security-relevant action; adding the new one is merely convenient.</p>
+<p>What you lose is a badge. What you keep is everything else.</p>
+<h2 id="nip-05-as-an-anchor">NIP-05 as an anchor<a class="hash" href="#nip-05-as-an-anchor" aria-label="link to this section">#</a></h2>
+<p>A NIP-05 address (<code>_@xonly.ai</code> via <code>/.well-known/nostr.json</code>) is a second, independent anchor — useful because it is controlled by DNS rather than by X. It requires CORS to be open on that endpoint, and it fails safe: an unreachable NIP-05 means &quot;unverified&quot;, never &quot;verified&quot;.</p>
+<h2 id="rotation-and-its-honest-limit">Rotation, and its honest limit<a class="hash" href="#rotation-and-its-honest-limit" aria-label="link to this section">#</a></h2>
+<p>If a key is lost, no cryptography can move an identity to a new one. What can work is <strong>social consensus</strong>: guardians named in advance who attest that a new key is the same person.</p>
+<p>Two constraints, stated plainly because a guarantee that gets overstated is a liability:</p>
+<ul><li>The pre-commitment must be <strong>anchored before the loss</strong>. It cannot be added at the moment you would want it.</li><li>It works only because relying parties <strong>choose</strong> to honour it. Nobody holds a share of your key. This is a social mechanism wearing cryptographic clothes, and it should be described that way to users.</li></ul>
+<p>See <a href="recovery.html">Recovery</a>.</p>
+  <footer>
+    Built from a public commit. Every file's SHA-256 is in
+    <a href="manifest.json">manifest.json</a> — hash what you were served and
+    compare, rather than taking a deploy's word for it.
+  </footer>
+</main>
+</div>
+</body>
+</html>

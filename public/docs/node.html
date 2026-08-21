@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Running a node · Berm</title>
+<meta name="description" content="What a node does, the short list of things it may do, and why it has nothing worth stealing.">
+<meta property="og:title" content="Running a node">
+<meta property="og:description" content="What a node does, the short list of things it may do, and why it has nothing worth stealing.">
+<meta property="og:type" content="article">
+<style>:root{--ink:#16181c;--dim:#5b6270;--faint:#8b919c;--line:#e6e8ec;--bg:#fff;--accent:#3b5bdb;
+      --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Inter,system-ui,sans-serif;
+      --mono:ui-monospace,'SF Mono',Menlo,Consolas,monospace}
+@media(prefers-color-scheme:dark){:root{--ink:#e8eaed;--dim:#9aa1ad;--faint:#787f8b;
+      --line:#242832;--bg:#0d0e11;--accent:#7c9cff}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.7 var(--sans)}
+.layout{display:grid;grid-template-columns:230px minmax(0,1fr);max-width:1060px;margin:0 auto;gap:44px;padding:0 22px}
+@media(max-width:820px){.layout{grid-template-columns:1fr;gap:0}}
+nav{padding:40px 0;position:sticky;top:0;align-self:start;max-height:100vh;overflow-y:auto}
+@media(max-width:820px){nav{position:static;max-height:none;border-bottom:1px solid var(--line)}}
+nav .brand{font-weight:700;font-size:18px;letter-spacing:-.01em;margin-bottom:4px;display:block;color:var(--ink);text-decoration:none}
+nav .tag{font-size:12.5px;color:var(--faint);margin-bottom:20px}
+nav a.pg{display:block;padding:5px 0;font-size:14.5px;color:var(--dim);text-decoration:none}
+nav a.pg:hover{color:var(--ink)}
+nav a.pg.on{color:var(--accent);font-weight:600}
+main{padding:40px 0 100px;min-width:0}
+h1{font-size:34px;line-height:1.2;letter-spacing:-.02em;margin:0 0 8px}
+h2{font-size:24px;margin:38px 0 10px;letter-spacing:-.01em}
+h3{font-size:19px;margin:28px 0 8px}
+.sum{font-size:18px;color:var(--dim);margin:0 0 30px;padding-bottom:22px;border-bottom:1px solid var(--line)}
+p{margin:0 0 18px}
+a{color:var(--accent)}
+a.hash{opacity:0;margin-left:8px;text-decoration:none;font-weight:400;color:var(--faint)}
+h1:hover a.hash,h2:hover a.hash,h3:hover a.hash{opacity:1}
+pre{background:rgba(127,127,127,.09);border:1px solid var(--line);border-radius:8px;padding:14px;
+    overflow-x:auto;font:13.5px/1.6 var(--mono)}
+code{font:.88em var(--mono);background:rgba(127,127,127,.12);padding:2px 5px;border-radius:4px}
+pre code{background:none;padding:0}
+.tbl{overflow-x:auto;margin:22px 0}
+table{border-collapse:collapse;width:100%;font-size:14.5px}
+th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-weight:600;border-bottom:2px solid var(--accent)}
+td{color:var(--dim)}
+blockquote{margin:22px 0;padding:2px 0 2px 18px;border-left:3px solid var(--accent);color:var(--dim)}
+ul,ol{margin:0 0 18px;padding-left:24px}li{margin-bottom:6px}
+hr{border:0;border-top:1px solid var(--line);margin:34px 0}
+footer{margin-top:60px;padding-top:22px;border-top:1px solid var(--line);font-size:13.5px;color:var(--faint)}
+footer code{font-size:12px}</style>
+</head>
+<body>
+<div class="layout">
+<nav>
+  <a class="brand" href="index.html">Berm</a>
+  <div class="tag">Identity you hold. X as a claim, not a login.</div>
+  <a class="pg" href="why.html">The garden around the wall</a><a class="pg" href="start.html">Start here</a><a class="pg" href="concepts.html">Concepts</a><a class="pg" href="custody.html">Custody tiers</a><a class="pg" href="sdk.html">SDK reference</a><a class="pg" href="identity.html">Identity and X</a><a class="pg" href="recovery.html">Recovery</a><a class="pg on" href="node.html">Running a node</a><a class="pg" href="security.html">Security model</a><a class="pg" href="limits.html">Limits</a><a class="pg" href="verify.html">Verify it yourself</a>
+</nav>
+<main>
+  <h1>Running a node</h1>
+  <p class="sum">What a node does, the short list of things it may do, and why it has nothing worth stealing.</p>
+  <p>A node turns published events into web pages. Any WordPress site can be one.</p>
+<h2 id="the-trust-boundary">The trust boundary<a class="hash" href="#the-trust-boundary" aria-label="link to this section">#</a></h2>
+<p><strong>The node never receives key material. The node never signs.</strong></p>
+<p>That is not a guideline. It is the reason a node can be run by someone you have no reason to trust, and the reason a compromised node is an inconvenience rather than a catastrophe.</p>
+<h3 id="what-a-node-may-do-exhaustive-anything-else-is-a-bug">What a node may do (exhaustive — anything else is a bug)<a class="hash" href="#what-a-node-may-do-exhaustive-anything-else-is-a-bug" aria-label="link to this section">#</a></h3>
+<ol><li>Verify signatures on events it receives</li><li>Render content to HTML, and generate card images</li><li>Serve <code>/.well-known/nostr.json</code> for NIP-05</li><li>Fetch a proof post from X server-side to upgrade <code>claimed</code> → <code>verified</code></li><li>Cache what it has rendered</li><li>Store a <strong>pseudonymous</strong> mapping for routing</li></ol>
+<h3 id="what-a-node-must-never-do">What a node must never do<a class="hash" href="#what-a-node-must-never-do" aria-label="link to this section">#</a></h3>
+<ul><li>Hold, derive, wrap, unwrap or transmit a private key</li><li>Sign an event on a user&#39;s behalf</li><li>Persist a raw X user ID (HMAC pseudonym only — the one exception is an attestation the <em>user</em> published, which is public by their own choice)</li><li>Import <code>direct-messages.js</code> from an X archive export, in any form, ever</li><li>Accept an ingest request authorised only by an X session</li></ul>
+<p>The last two are worth dwelling on. A user uploading their X archive is handing over their entire private message history without thinking about it; the safe design is to never read that file. And authorising writes with an X session means X&#39;s auth state controls your data — which is the dependency this whole project exists to remove.</p>
+<h2 id="verification-without-dependencies">Verification without dependencies<a class="hash" href="#verification-without-dependencies" aria-label="link to this section">#</a></h2>
+<p>The WordPress plugin verifies BIP-340 Schnorr signatures in <strong>pure PHP</strong> — 16 limbs of 16 bits, no GMP, no BCMath, no extensions. Roughly 130 ms per verification, and all 15 official BIP-340 test vectors pass.</p>
+<p>That started as a constraint and became the point: verification that needs a compiled extension is verification most shared hosts cannot do, and a protocol whose correctness check only runs on privileged infrastructure has quietly recreated the thing it replaced.</p>
+<p>Base 2^16 was chosen because 2^256 lands exactly on limb 16, which makes fast reduction a clean split rather than a bit-shuffle.</p>
+<h2 id="what-a-wordpress-owner-gets">What a WordPress owner gets<a class="hash" href="#what-a-wordpress-owner-gets" aria-label="link to this section">#</a></h2>
+<ul><li>Long-form content that lives on relays and renders on their domain, under their design</li><li>Pages that survive their host, because the content is not stored there</li><li>An identity layer for readers that does not depend on X staying friendly</li><li>Card metadata and image generation, so links look right when shared</li></ul>
+<p>And what they take on: rendering and hosting. Nothing that requires them to be trustworthy, because nothing valuable passes through them.</p>
+<h2 id="serialization-one-rule-that-will-bite-you">Serialization: one rule that will bite you<a class="hash" href="#serialization-one-rule-that-will-bite-you" aria-label="link to this section">#</a></h2>
+<p>NIP-01 event IDs are the SHA-256 of a canonical JSON array. In PHP:</p>
+<pre data-lang="php"><code>json_encode($arr, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);</code></pre>
+<p>Omit either flag and your ids differ from every other implementation, silently, for content containing a slash or a non-ASCII character. Which is most content.</p>
+<h2 id="if-a-node-disappears">If a node disappears<a class="hash" href="#if-a-node-disappears" aria-label="link to this section">#</a></h2>
+<p>Nothing is lost. The content is on relays; another node renders it. Users keep their identity because it was never issued by the node.</p>
+<p>This is the property to test when someone claims to have built something sovereign: turn off their server and see what survives.</p>
+  <footer>
+    Built from a public commit. Every file's SHA-256 is in
+    <a href="manifest.json">manifest.json</a> — hash what you were served and
+    compare, rather than taking a deploy's word for it.
+  </footer>
+</main>
+</div>
+</body>
+</html>

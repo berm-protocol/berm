@@ -1,0 +1,102 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-g71U/KsD/SxEKrAa4eOEzafIvYyvk1REA69gW4OyD/g='; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; form-action 'none'; frame-ancestors 'none'; base-uri 'none'; object-src 'none'">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Import your X follows — xonly</title>
+<style>
+  :root { color-scheme: dark; }
+  body { font: 15px/1.65 ui-sans-serif, system-ui, sans-serif; max-width: 44rem;
+         margin: 3rem auto 6rem; padding: 0 1.5rem; background: #0b0d10; color: #e6e9ef; }
+  h1 { font-size: 1.5rem; margin: 0 0 .4rem; letter-spacing: -.01em; }
+  h2 { font-size: 1rem; margin: 2.2rem 0 .6rem; color: #c7cdd9; }
+  p.sub { color: #8b94a7; margin: 0 0 2rem; }
+  .card { border: 1px solid #1f2531; background: #11141a; border-radius: .7rem; padding: 1.1rem 1.2rem; margin: 1rem 0; }
+  .drop { border: 1px dashed #2f3849; border-radius: .7rem; padding: 2.2rem 1rem; text-align: center;
+          color: #8b94a7; cursor: pointer; transition: border-color .15s, background .15s; }
+  .drop:hover, .drop.over { border-color: #4c8dff; background: #0f141d; color: #e6e9ef; }
+  button { font: inherit; padding: .55rem 1rem; border-radius: .5rem; border: 1px solid #2a3040;
+           background: #171b23; color: #e6e9ef; cursor: pointer; }
+  button:hover:not(:disabled) { border-color: #4c8dff; }
+  button:disabled { opacity: .4; cursor: default; }
+  button.danger { border-color: #5a3030; }
+  button.danger:hover:not(:disabled) { border-color: #ff6b6b; }
+  .row { display: flex; gap: .6rem; flex-wrap: wrap; align-items: center; }
+  .stat { display: flex; justify-content: space-between; padding: .35rem 0; border-bottom: 1px solid #171b23; }
+  .stat:last-child { border-bottom: 0; }
+  .stat b { font-variant-numeric: tabular-nums; }
+  .muted { color: #8b94a7; }
+  .warn { color: #ffb454; }
+  .good { color: #6ee7a8; }
+  code, pre { font-family: ui-monospace, SFMono-Regular, monospace; font-size: 13px; }
+  pre { background: #0e1116; border: 1px solid #1b202a; border-radius: .5rem; padding: .8rem; overflow-x: auto; }
+  .badge { font-size: 11px; border: 1px solid #2a3040; border-radius: 1rem; padding: .1rem .5rem; color: #8b94a7; }
+  ul { padding-left: 1.1rem; }
+  li { margin: .2rem 0; }
+</style>
+
+<h1>Import your X follows</h1>
+<p class="sub">
+  From your own X archive. No developer app, no API key, no OAuth — and this page
+  cannot reach the network at all. <span class="badge" id="csp-badge">checking CSP…</span>
+</p>
+
+<div class="card">
+  <h2 style="margin-top:0">1 · Drop <code>following.js</code></h2>
+  <p class="muted" style="margin:.2rem 0 1rem">
+    In your X archive it is at <code>data/following.js</code>. Optionally add
+    <code>account.js</code> and <code>tweets.js</code>.
+    <strong>Do not add <code>direct-messages.js</code></strong> — this page refuses it by name.
+  </p>
+  <div class="drop" id="drop">
+    Drop files here, or click to choose
+    <input type="file" id="file" multiple accept=".js" hidden>
+  </div>
+  <div id="import-out" style="margin-top:1rem"></div>
+</div>
+
+<div class="card" id="match-card" hidden>
+  <h2 style="margin-top:0">2 · Matches</h2>
+  <div id="match-out"></div>
+</div>
+
+<div class="card" id="save-card" hidden>
+  <h2 style="margin-top:0">3 · Save</h2>
+  <p class="muted" style="margin:.2rem 0 1rem">
+    Private is the default. The list is encrypted to your own key before it
+    leaves this page, so relays store ciphertext.
+  </p>
+  <div class="row">
+    <button id="save-private">Save privately (encrypted)</button>
+    <button id="save-public" class="danger">Publish publicly…</button>
+  </div>
+  <div id="save-out" style="margin-top:1rem"></div>
+</div>
+
+<div class="card">
+  <h2 style="margin-top:0">What this page can prove</h2>
+  <ul class="muted" id="proofs">
+    <li><code>connect-src 'none'</code> — the browser refuses any outbound request from this page.</li>
+    <li>The archive is parsed with <code>JSON.parse</code>, never <code>eval</code>.</li>
+    <li>Files matching <code>direct-messages</code> are refused before being read.</li>
+    <li>The claimant index is bundled at build time, so matching needs no lookup.</li>
+    <li>The saved list contains no plaintext pubkey, npub, handle or X id.</li>
+  </ul>
+</div>
+
+<script>"use strict";(()=>{var m={v:1,generated_at:1785e6,claimants:[{uid:"1000000000",pubkey:"c68a7e13a929475f1a55872c3dce6f09e827905fafce554ddfd3c1fab3928b13",npub:"npub1c698uyaf99r47xj4sukrmnn0p85z0yzl4l892nwl60ql4vuj3vfsc4pd6z",handle:"dorian",verified:!0},{uid:"1000000001",pubkey:"4c6dc5e69b0511abd3f8d3accfde2d31c597f807acb48db3fad47de724bde178",npub:"npub1f3kute5mq5g6h5lc6wkvlh3dx8ze07q84j6gmvl66377wf9au9uqk8kryd",handle:"jack",verified:!0},{uid:"1000000002",pubkey:"742c9144d5dd14c8726ab86b689990e6b7957c79a75d8b8dba8327c96e554778",npub:"npub1wskfz3x4m52vsun2hp4k3xvsu6me2lre5awchrd6svnujmj4gauqxf4yn5",handle:"elon",verified:!0},{uid:"1000000003",pubkey:"ffa5fc745b61ac700492530c3558a38708178fd508cebea7998b567ebbbb8c3a",npub:"npub1l7jlcazmvxk8qpyj2vxr2k9rsuyp0r74pr8tafue3dt8awam3saqu09k4e",handle:"nostrdev",verified:!0},{uid:"1000000004",pubkey:"eb29552e9c1ee2098041b045c8145db467996f261df849f66c627013a2e10fc5",npub:"npub1av542t5urm3qnqzpkpzus9zak3nejmexrhuynanvvfcp8ghpplzs2jm3d0",handle:"sovereign",verified:!0},{uid:"1000000005",pubkey:"2b3ebea19ec300003f2d595440026888b8b3c64b279a9e7a9ee87788cd9d041c",npub:"npub19vltagv7cvqqq0edt92yqqng3zut83jty7dfu757apmc3nvaqswq33ffd8",handle:"archivist",verified:!0},{uid:"1000000006",pubkey:"2cc6e5cde861d6906fec21dcf98fd671bd9fa7d480a39b90a6b009de31f94602",npub:"npub19nrwtn0gv8tfqmlvy8w0nr7kwx7elf75sz3ehy9xkqyauv0egcpq7wmpqp",handle:"relayop",verified:!0},{uid:"1000000007",pubkey:"9e73d9bb8919bf3447cb7bc63c4137dc51b5fb3f6cea029cb2c36257da7ccc48",npub:"npub1neeanwufrxlng37t00rrcsfhm3gmt7eldn4q989jcd390knue3yq8rlaxn",handle:"builder",verified:!1}]};var P=/direct[-_]?message|\bdms?\b|inbox|conversation/i,g=class extends Error{constructor(t){super(`Refusing to read ${t}. This project never parses direct messages \u2014 they belong to people who are not party to this. Remove it and try again.`),this.name="ForbiddenFileError"}};function b(e){if(P.test(e))throw new g(e)}var h=class extends Error{constructor(t){super(t),this.name="ArchiveParseError"}};function v(e,t){b(t);let n=e.indexOf("="),s=e.slice(0,n===-1?80:n);if(!/^\s*window\.YTD\./.test(s))throw new h(`${t} does not look like an X archive file (expected "window.YTD.\u2026")`);let a=e.slice(n+1).trim();try{return JSON.parse(a)}catch{throw new h(`${t}: payload is not valid JSON`)}}var w=/^\d{1,20}$/;function $(e,t="following.js"){let n=v(e,t);if(!Array.isArray(n))throw new h(`${t}: expected an array`);let s=new Set,a=0;for(let r of n){let o=r?.following?.accountId;typeof o=="string"&&w.test(o)?s.add(o):a++}return{uids:[...s],skipped:a}}function M(e,t="account.js"){let n=v(e,t);if(!Array.isArray(n))return null;let s=n[0]?.account;return typeof s?.accountId!="string"||!w.test(s.accountId)?null:{uid:s.accountId,username:String(s.username??"")}}function A(e,t="tweets.js"){let n=new Map,s;try{s=v(e,t)}catch{return n}if(!Array.isArray(s))return n;for(let a of s){let r=a?.tweet?.entities?.user_mentions;if(Array.isArray(r))for(let o of r){let{id_str:i,screen_name:c}=o??{};typeof i=="string"&&w.test(i)&&typeof c=="string"&&c&&n.set(i,c)}}return n}function E(e,t,n=new Set){let s=new Map;for(let c of t.claimants){let p=s.get(c.uid);if(!p){s.set(c.uid,c);continue}p.verified&&c.verified?s.set(c.uid,{...c,verified:!1}):c.verified&&s.set(c.uid,c)}let a=[],r=[],o=0,i=0;for(let c of e){let p=s.get(c);if(!p){i++;continue}if(!p.verified){o++;continue}let x={uid:p.uid,pubkey:p.pubkey,npub:p.npub,handle:p.handle};n.has(p.pubkey)?r.push(x):a.push(x)}return{matched:a,rejectedUnverified:o,unmatched:i,alreadyFollowed:r}}function j(e,t,n=5e8){return e*t/n}var C="berm:graph:v1";async function _(e,t){let n=e.map(a=>["p",a.pubkey,"",a.handle]),s=await t.encrypt(t.selfPubkey,JSON.stringify(n));return{kind:3e4,created_at:t.now??Math.floor(Date.now()/1e3),tags:[["d",C],["title","Imported from X"]],content:s}}function S(e,t,n=Math.floor(Date.now()/1e3)){let s=e.filter(i=>i[0]==="p"&&typeof i[1]=="string"),a=new Set(s.map(i=>i[1])),r=[],o=[...s];for(let i of t)a.has(i.pubkey)||(a.add(i.pubkey),o.push(["p",i.pubkey,"",i.handle]),r.push(i.pubkey));return{event:{kind:3,created_at:n,tags:o,content:""},added:r,kept:s.map(i=>i[1]),removed:[]}}function k(e,t){let n=e.tags.find(s=>s[0]==="d")?.[1];if(e.kind===3e4&&n===C)return"Save a private follow list \u2014 encrypted so only you can read it. Relays store ciphertext; nobody else can see who you follow.";if(e.kind===3){let s=e.tags.filter(r=>r[0]==="p").length;return`PUBLISH your follow list publicly and permanently \u2014 ${t?`${t.added} new, ${t.kept} kept, 0 removed`:`${s} people`}. Anyone will be able to see who you follow.`}return`Sign a kind ${e.kind} event`}function T(e){let t=new Map;for(let r of e.split(";")){let[o,...i]=r.trim().split(/\s+/);o&&t.set(o.toLowerCase(),i)}let n=[],s=t.get("connect-src");if(!s)n.push("no connect-src \u2014 the page may reach any origin");else{s.includes("*")&&n.push("connect-src contains a bare wildcard '*'");for(let r of s)r.includes("*")&&n.push(`connect-src contains a wildcard: ${r}`),(r==="http:"||r==="https:"||r==="ws:"||r==="wss:")&&n.push(`connect-src contains the bare scheme "${r}", which allows every host`)}for(let r of["default-src","object-src","base-uri","form-action"])t.has(r)||n.push(`missing ${r}`);let a=t.get("script-src")??[];return a.includes("'unsafe-eval'")&&n.push("script-src allows 'unsafe-eval'"),a.includes("'unsafe-inline'")&&n.push("script-src allows 'unsafe-inline' \u2014 hash the inline script instead"),{ok:n.length===0,problems:n,directives:t}}var u=e=>{let t=document.getElementById(e);return t||(console.warn(`missing #${e}`),document.createElement("div"))},l=e=>String(e).replace(/[&<>"]/g,t=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[t]),d=null,I=null,F=new Map;{let e=document.querySelector('meta[http-equiv="Content-Security-Policy"]'),t=u("csp-badge");if(!e?.content)t.textContent="no CSP found",t.style.color="#ffb454";else{let n=T(e.content);t.textContent=n.ok?"connect-src 'none' \u2713":`CSP problem: ${n.problems[0]}`,t.style.color=n.ok?"#6ee7a8":"#ffb454"}}var f=u("drop"),y=u("file");f.addEventListener("click",()=>y.click());f.addEventListener("dragover",e=>{e.preventDefault(),f.classList.add("over")});f.addEventListener("dragleave",()=>f.classList.remove("over"));f.addEventListener("drop",e=>{e.preventDefault(),f.classList.remove("over");let t=e.dataTransfer?.files;t&&q(Array.from(t))});y.addEventListener("change",()=>{y.files&&q(Array.from(y.files))});async function q(e){let t=u("import-out"),n=[],s=[],a=0;for(let r of e){try{b(r.name)}catch(i){n.push(`<div class="warn">${l(r.name)} \u2014 ${l(i.message)}</div>`);continue}let o;try{o=await r.text()}catch{n.push(`<div class="warn">${l(r.name)}: could not be read</div>`);continue}try{if(/following/i.test(r.name)){let i=$(o,r.name);s=i.uids,a=i.skipped,n.push(`<div class="good">${l(r.name)} \u2014 ${i.uids.length} accounts followed</div>`)}else if(/account/i.test(r.name))I=M(o,r.name),n.push(`<div class="good">${l(r.name)} \u2014 you are @${l(I?.username??"?")}</div>`);else if(/tweets?/i.test(r.name)){let i=A(o,r.name);n.push(`<div class="good">${l(r.name)} \u2014 ${i.size} handle(s) learned from mentions</div>`)}else n.push(`<div class="muted">${l(r.name)} \u2014 not used</div>`)}catch(i){let c=i instanceof g?"warn":"muted";n.push(`<div class="${c}">${l(r.name)} \u2014 ${l(i.message)}</div>`)}}a&&n.push(`<div class="muted">${a} malformed entr${a===1?"y":"ies"} skipped</div>`),t.innerHTML=n.join(""),s.length&&N(s)}function N(e){let t=m;d=E(e,t),F=new Map(d.matched.map(r=>[r.pubkey,r.handle]));let n=j(e.length,t.claimants.length),a=[["Accounts you follow",e.length],["Matched (verified claim)",d.matched.length],["Already followed here",d.alreadyFollowed.length],["Rejected \u2014 claim not verified",d.rejectedUnverified],["No claim on file",d.unmatched]].map(([r,o])=>`<div class="stat"><span class="muted">${r}</span><b>${o}</b></div>`).join("");d.matched.length===0?a+=`<p class="warn" style="margin:1rem 0 0">
+      No matches, and that is expected right now. With ${t.claimants.length} people
+      claiming an identity so far, a ${e.length}-account follow list would
+      statistically match ${n.toFixed(3)} of them.
+      This works through density \u2014 adoption inside a community that already follows
+      each other \u2014 not through scale.</p>`:(a+=`<ul style="margin:1rem 0 0">${d.matched.slice(0,12).map(r=>`<li>@${l(r.handle)} <span class="muted">\u2192 ${l(r.npub.slice(0,16))}\u2026</span></li>`).join("")}</ul>`,d.matched.length>12&&(a+=`<p class="muted">\u2026and ${d.matched.length-12} more</p>`)),d.rejectedUnverified>0&&(a+=`<p class="muted" style="margin:1rem 0 0">
+      Rejected entries claim an X account without a verified proof. Matching them
+      would let anyone claim a popular account and be auto-followed.</p>`),u("match-out").innerHTML=a,u("match-card").hidden=!1,u("save-card").hidden=d.matched.length===0}async function D(e,t){let n=new TextEncoder().encode(t),s=await crypto.subtle.generateKey({name:"AES-GCM",length:256},!1,["encrypt"]),a=crypto.getRandomValues(new Uint8Array(12)),r=new Uint8Array(await crypto.subtle.encrypt({name:"AES-GCM",iv:a},s,n));return btoa(String.fromCharCode(...a,...r))}u("save-private").addEventListener("click",()=>{O()});u("save-public").addEventListener("click",()=>{R()});async function O(){if(!d)return;let e=await _(d.matched,{selfPubkey:"f".repeat(64),encrypt:D}),t=d.matched.filter(n=>JSON.stringify(e).includes(n.pubkey)||JSON.stringify(e).includes(n.handle));u("save-out").innerHTML=`
+    <div class="good">Approval prompt would read:</div>
+    <pre>${l(k(e))}</pre>
+    <div class="stat"><span class="muted">Public tags</span><b>${e.tags.map(n=>n[0]).join(", ")}</b></div>
+    <div class="stat"><span class="muted">Members visible to a relay</span><b class="${t.length?"warn":"good"}">${t.length}</b></div>
+    <pre id="event-json">${l(JSON.stringify(e,null,2).slice(0,600))}\u2026</pre>`}function R(){if(!d)return;let e=S([],d.matched);u("save-out").innerHTML=`
+    <div class="warn">Approval prompt would read:</div>
+    <pre>${l(k(e.event,{added:e.added.length,kept:e.kept.length}))}</pre>
+    <div class="muted">Nothing has been published. This page cannot reach the network.</div>`}})();
+</script>

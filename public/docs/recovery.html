@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Recovery · Berm</title>
+<meta name="description" content="What you must hold, what each loss actually costs, and the one loss that cannot be undone.">
+<meta property="og:title" content="Recovery">
+<meta property="og:description" content="What you must hold, what each loss actually costs, and the one loss that cannot be undone.">
+<meta property="og:type" content="article">
+<style>:root{--ink:#16181c;--dim:#5b6270;--faint:#8b919c;--line:#e6e8ec;--bg:#fff;--accent:#3b5bdb;
+      --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Inter,system-ui,sans-serif;
+      --mono:ui-monospace,'SF Mono',Menlo,Consolas,monospace}
+@media(prefers-color-scheme:dark){:root{--ink:#e8eaed;--dim:#9aa1ad;--faint:#787f8b;
+      --line:#242832;--bg:#0d0e11;--accent:#7c9cff}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.7 var(--sans)}
+.layout{display:grid;grid-template-columns:230px minmax(0,1fr);max-width:1060px;margin:0 auto;gap:44px;padding:0 22px}
+@media(max-width:820px){.layout{grid-template-columns:1fr;gap:0}}
+nav{padding:40px 0;position:sticky;top:0;align-self:start;max-height:100vh;overflow-y:auto}
+@media(max-width:820px){nav{position:static;max-height:none;border-bottom:1px solid var(--line)}}
+nav .brand{font-weight:700;font-size:18px;letter-spacing:-.01em;margin-bottom:4px;display:block;color:var(--ink);text-decoration:none}
+nav .tag{font-size:12.5px;color:var(--faint);margin-bottom:20px}
+nav a.pg{display:block;padding:5px 0;font-size:14.5px;color:var(--dim);text-decoration:none}
+nav a.pg:hover{color:var(--ink)}
+nav a.pg.on{color:var(--accent);font-weight:600}
+main{padding:40px 0 100px;min-width:0}
+h1{font-size:34px;line-height:1.2;letter-spacing:-.02em;margin:0 0 8px}
+h2{font-size:24px;margin:38px 0 10px;letter-spacing:-.01em}
+h3{font-size:19px;margin:28px 0 8px}
+.sum{font-size:18px;color:var(--dim);margin:0 0 30px;padding-bottom:22px;border-bottom:1px solid var(--line)}
+p{margin:0 0 18px}
+a{color:var(--accent)}
+a.hash{opacity:0;margin-left:8px;text-decoration:none;font-weight:400;color:var(--faint)}
+h1:hover a.hash,h2:hover a.hash,h3:hover a.hash{opacity:1}
+pre{background:rgba(127,127,127,.09);border:1px solid var(--line);border-radius:8px;padding:14px;
+    overflow-x:auto;font:13.5px/1.6 var(--mono)}
+code{font:.88em var(--mono);background:rgba(127,127,127,.12);padding:2px 5px;border-radius:4px}
+pre code{background:none;padding:0}
+.tbl{overflow-x:auto;margin:22px 0}
+table{border-collapse:collapse;width:100%;font-size:14.5px}
+th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-weight:600;border-bottom:2px solid var(--accent)}
+td{color:var(--dim)}
+blockquote{margin:22px 0;padding:2px 0 2px 18px;border-left:3px solid var(--accent);color:var(--dim)}
+ul,ol{margin:0 0 18px;padding-left:24px}li{margin-bottom:6px}
+hr{border:0;border-top:1px solid var(--line);margin:34px 0}
+footer{margin-top:60px;padding-top:22px;border-top:1px solid var(--line);font-size:13.5px;color:var(--faint)}
+footer code{font-size:12px}</style>
+</head>
+<body>
+<div class="layout">
+<nav>
+  <a class="brand" href="index.html">Berm</a>
+  <div class="tag">Identity you hold. X as a claim, not a login.</div>
+  <a class="pg" href="why.html">The garden around the wall</a><a class="pg" href="start.html">Start here</a><a class="pg" href="concepts.html">Concepts</a><a class="pg" href="custody.html">Custody tiers</a><a class="pg" href="sdk.html">SDK reference</a><a class="pg" href="identity.html">Identity and X</a><a class="pg on" href="recovery.html">Recovery</a><a class="pg" href="node.html">Running a node</a><a class="pg" href="security.html">Security model</a><a class="pg" href="limits.html">Limits</a><a class="pg" href="verify.html">Verify it yourself</a>
+</nav>
+<main>
+  <h1>Recovery</h1>
+  <p class="sum">What you must hold, what each loss actually costs, and the one loss that cannot be undone.</p>
+  <p>Read this before you need it. A recovery page that only helps <em>after</em> a loss is half a page — by the time you open it in anger, your options were already fixed by what you did or did not set up months earlier.</p>
+<h2 id="the-only-question-that-matters">The only question that matters<a class="hash" href="#the-only-question-that-matters" aria-label="link to this section">#</a></h2>
+<blockquote><strong>If you lost this device right now, what would happen?</strong></blockquote>
+<div class="tbl"><table><thead><tr><th>Your setup</th><th>The honest answer</th></tr></thead><tbody><tr><td>One device, no backup</td><td>Your identity would be gone permanently.</td></tr><tr><td>Two devices, no backup</td><td>You could recover from the other device, but losing your ecosystem account would end it.</td></tr><tr><td>One device, backup</td><td>You could recover from the backup file. Everything depends on that one file existing.</td></tr><tr><td>Two devices, backup</td><td>Nothing here is a single point of failure.</td></tr></tbody></table></div>
+<p>There is no reset, no support queue, and nobody who can help. A readiness check that softens that answer is worse than no check, because it converts a warning into reassurance.</p>
+<h2 id="what-to-hold">What to hold<a class="hash" href="#what-to-hold" aria-label="link to this section">#</a></h2>
+<p><strong>1. A second enrolled device.</strong> Ideally on a different ecosystem. Platform passkeys sync within an ecosystem, so a broken phone is survivable — but an iPhone plus a Windows PC is the case most people actually live in, and sync does not cover it.</p>
+<p><strong>2. An encrypted keyfile, stored off-device.</strong> Passphrase of at least 12 characters. This is the only thing that survives losing every device <em>and</em> the ecosystem account behind them.</p>
+<p><strong>3. Guardians, named in advance.</strong> Two or three people you trust, published as one signed event. They cannot restore your key; they can attest that a new one is you.</p>
+<p><strong>4. An archived proof post.</strong> So that if your X account dies, you can still demonstrate it was yours — see <a href="identity.html">Identity and X</a>.</p>
+<h2 id="what-each-loss-costs">What each loss costs<a class="hash" href="#what-each-loss-costs" aria-label="link to this section">#</a></h2>
+<p><strong>Your X account is gone.</strong> Recoverable, and barely an inconvenience. Sign in with your key, post a fresh proof from the new account, archive it, and publish an updated profile with the dead claim removed. You lose a badge.</p>
+<p><strong>One device lost.</strong> Recoverable. Sign in on another device — platform passkeys sync within an ecosystem. If it was a separate ecosystem, use the other enrolled device. If your passkey did not sync, restore from the backup. Then enrol a replacement so you are back to two.</p>
+<p><strong>Every device gone.</strong> Recoverable <em>if</em> you have the backup keyfile and its passphrase. Import it, restore, enrol a new device immediately, download a fresh backup. Without the file: check everywhere it might be, then fall through to guardians.</p>
+<p><strong>Key gone, no backup, no guardians.</strong> Not recoverable. This is the honest answer rather than a hopeful one. Your published work still exists on relays under the old key — readable forever — but you can no longer sign as its author. Create a new identity and link your handle to it afresh.</p>
+<h2 id="guardians-what-they-can-and-cannot-do">Guardians: what they can and cannot do<a class="hash" href="#guardians-what-they-can-and-cannot-do" aria-label="link to this section">#</a></h2>
+<p>They can sign a <strong>rotation attestation</strong> saying a new key belongs to the same person. Resolvers that honour guardian rotations will follow you.</p>
+<p>They cannot decrypt anything, cannot sign on your behalf, and hold no fragment of your key. This is social consensus, not key recovery, and it works only because relying parties choose to honour it.</p>
+<p>The pre-commitment must be <strong>anchored before the loss</strong>. That is not a design wart, it is the entire security property — a rotation that could be arranged after the fact would be a way for an attacker to take your identity by convincing two of your contacts.</p>
+<pre><code>kind 30078, d = berm:recovery:v1
+  [&quot;guardian&quot;,  &quot;npub1…&quot;]
+  [&quot;guardian&quot;,  &quot;npub1…&quot;]
+  [&quot;guardian&quot;,  &quot;npub1…&quot;]
+  [&quot;threshold&quot;, &quot;2&quot;]</code></pre>
+<p>The approval prompt for this event says what it does:</p>
+<blockquote><em>Publish your recovery guardians — 3 named publicly, 2 needed to vouch for a new key</em></blockquote>
+<p>Note what that reveals: this event is public and permanent, and it names your contacts. That is the trade, and you should make it knowingly.</p>
+<h2 id="removing-a-device-is-not-revocation">Removing a device is not revocation<a class="hash" href="#removing-a-device-is-not-revocation" aria-label="link to this section">#</a></h2>
+<p>Removing a credential drops it from the registry. It does <strong>not</strong> invalidate the identity key, so a kept copy of the removed blob plus the removed authenticator still unwraps it.</p>
+<p>Genuine revocation means rotating to a new key. We say this plainly rather than implying a device has been locked out, because a user who believes a stolen laptop has been cut off when it has not is worse off than one who knows the truth.</p>
+<h2 id="the-asymmetry-worth-internalising">The asymmetry worth internalising<a class="hash" href="#the-asymmetry-worth-internalising" aria-label="link to this section">#</a></h2>
+<p>Everything in this system comes back from relays: your articles, your follows, your pages, your comments. Lose a node, lose a relay, lose your X account — it all comes back.</p>
+<p>The key does not. It is the one irreplaceable thing, and it is the only thing you are actually being asked to look after.</p>
+  <footer>
+    Built from a public commit. Every file's SHA-256 is in
+    <a href="manifest.json">manifest.json</a> — hash what you were served and
+    compare, rather than taking a deploy's word for it.
+  </footer>
+</main>
+</div>
+</body>
+</html>
