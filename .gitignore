@@ -73,3 +73,10 @@ bags/dispute.png
 # the repository by anyone who wants to check them.
 !public/
 !public/**
+
+# The three apps the apex serves are built artifacts too, tracked for the same
+# reason: xonly-deploy publishes what git contains.
+!link/dist/
+!link/dist/link.html
+!recovery/dist/
+!recovery/dist/recovery.html

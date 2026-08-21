@@ -32,6 +32,12 @@ const tools = [
   ['explorer/dist/who.html', 'who.html'],
   ['graph/dist/import.html', 'import.html'],
   ['prf-check/dist/prf-check.html', 'prf-check.html'],
+  // Identity lifecycle. `link` produces the handle proof and archives it;
+  // `recovery` walks every way a key is lost to a stated outcome, including
+  // [NOT RECOVERABLE]. The front page promises no reset exists — this is where
+  // that promise is spelled out rather than left as a line of copy.
+  ['link/dist/link.html', 'link.html'],
+  ['recovery/dist/recovery.html', 'recovery.html'],
 ];
 for (const [src, dst] of tools) cpSync(resolve(root, src), join(out, dst));
 

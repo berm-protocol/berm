@@ -12,7 +12,8 @@
  * so in words, because "Posted to X ✓" would be a claim nothing can support.
  */
 
-import { createLocalSigner } from './sdk/local-signer.js';
+import { createLocalSigner, isLocalOrigin } from './sdk/local-signer.js';
+import { setup } from '../../sdk/src/connect.js';
 import type { XnsbSdk } from './sdk/types.js';
 import { buildIntent, headroom, X_LIMIT, weightedLength } from './intent.js';
 import { buildPostEvent, describePostForApproval, STATE_LABEL, type PostState } from './nostr.js';
@@ -38,6 +39,33 @@ const params = new URLSearchParams(location.search);
 const RELAYS = (params.get('relays') ?? 'ws://localhost:7447,ws://localhost:7448')
   .split(',').map((s) => s.trim()).filter(Boolean);
 const DOMAIN = params.get('domain') ?? 'xonly.ai';
+
+/**
+ * WHICH SIGNER — ask the SDK, do not decide here.
+ *
+ * `connect.ts` knows the tier order: an extension the user already has comes
+ * first because we should touch nothing, then our own signer origin, then a
+ * bunker they already run. Hard-wiring one backend here would take tier 0 away
+ * from anyone with Alby installed.
+ *
+ * Tier 1 is offered only because this app names a signer origin explicitly.
+ * `detect()` reports it unavailable otherwise, and that stays true until the
+ * origin serves the signer rather than a placeholder.
+ *
+ * On localhost the dev signer wins: a raw key in localStorage is right for a
+ * test loop and wrong for a person. `createDevSigner` throws anywhere else by
+ * design, so a deployed build reaching for it dies on boot — the branch is
+ * explicit rather than a try/catch around that.
+ */
+function chooseSigner(appName: string): XnsbSdk {
+  const params = new URLSearchParams(location.search);
+  const override = params.get('signer');
+  if (isLocalOrigin() && !override) {
+    return createLocalSigner({ relays: RELAYS, approve: requestApproval, displayName: 'You' });
+  }
+  const signerOrigin = override ?? 'https://signer.xonly.ai';
+  return setup({ relays: RELAYS, appName, signer: { signerOrigin } });
+}
 
 /**
  * Permalink for a post: `/@handle/slug`.
@@ -228,7 +256,7 @@ function requestApproval(summary: string): Promise<boolean> {
 
 on($('#connect'), 'click', async () => {
   try {
-    signer = createLocalSigner({ relays: RELAYS, approve: requestApproval, displayName: 'You' });
+    signer = chooseSigner('xonly post');
     const session = await signer.connect();
     npub = session.npub;
     $('#who').textContent = `${npub}  ·  ${session.custody}`;
