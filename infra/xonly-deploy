@@ -1,0 +1,108 @@
+#!/usr/bin/env bash
+#
+# xonly deploy — pull, verify, swap.
+#
+# Three hosts, three trees, one command. Modelled on bermlaunch-deploy, with two
+# additions that host-specific bundles require:
+#
+#   1. CSP HASH AGREEMENT. Both apps ship as one self-contained file and are
+#      served under `script-src 'self' 'sha256-…'`. If the Caddyfile's hash and
+#      the bundle disagree, the browser refuses the script and the page is blank
+#      — a silent, total failure that looks like a styling bug. So this script
+#      recomputes the hash from the bytes it is about to publish and refuses to
+#      swap if the served policy does not contain it.
+#
+#   2. NO EMPTY SITE. Same rule bermlaunch-deploy holds: a missing tree is a
+#      refusal, never an accidental takedown.
+#
+set -euo pipefail
+. /etc/xonly.env
+
+if [ -z "${GIT_REMOTE:-}" ]; then
+  echo "GIT_REMOTE is not set. Edit /etc/xonly.env first." >&2
+  exit 2
+fi
+
+SRC=/srv/xonly/src
+CADDY=/etc/caddy/Caddyfile
+
+if [ ! -d "$SRC/.git" ]; then
+  echo "==> first clone"
+  rm -rf "$SRC"
+  sudo -u berm git clone --branch "$GIT_BRANCH" "$GIT_REMOTE" "$SRC"
+else
+  echo "==> fetch"
+  sudo -u berm git -C "$SRC" fetch --prune origin "$GIT_BRANCH"
+  sudo -u berm git -C "$SRC" reset --hard "origin/$GIT_BRANCH"
+  sudo -u berm git -C "$SRC" clean -fdx
+fi
+
+COMMIT=$(git -C "$SRC" rev-parse --short HEAD)
+echo "==> at $COMMIT"
+
+# host<TAB>source file<TAB>csp file  — an empty source means "not built yet".
+publish_one() {
+  local host="$1" src_file="$2" csp_file="$3"
+  local dst="/srv/xonly/$host"
+
+  if [ ! -f "$SRC/$src_file" ]; then
+    echo "    $host: no $src_file at $COMMIT — leaving the current site alone"
+    return 0
+  fi
+
+  if [ -n "$csp_file" ]; then
+    if [ ! -f "$SRC/$csp_file" ]; then
+      echo "    $host: $src_file present but $csp_file missing — refusing" >&2
+      return 1
+    fi
+    # The hash the served policy must contain, recomputed from these exact bytes.
+    local want
+    want=$(grep -o "'sha256-[A-Za-z0-9+/=]*'" "$SRC/$csp_file" | head -1)
+    if [ -z "$want" ]; then
+      echo "    $host: $csp_file pins no script hash — refusing" >&2
+      return 1
+    fi
+    if ! grep -qF "$want" "$CADDY"; then
+      echo "    $host: Caddyfile does not carry $want" >&2
+      echo "           the bundle and the served CSP disagree, so the page would be blank." >&2
+      echo "           Update $CADDY from $SRC/$csp_file and rerun." >&2
+      return 1
+    fi
+  fi
+
+  install -d -o berm -g berm "$dst.new"
+  install -o berm -g berm -m 644 "$SRC/$src_file" "$dst.new/index.html"
+  rm -rf "$dst.old"
+  [ -e "$dst" ] && mv "$dst" "$dst.old"
+  mv "$dst.new" "$dst"
+  rm -rf "$dst.old"
+  echo "    $host: published $(basename "$src_file")"
+}
+
+echo "==> publish"
+publish_one signer "signer/dist/xonly-signer.html" "signer/dist/csp.txt"
+publish_one editor "editor/dist/xonly-editor.html" "editor/dist/csp.txt"
+
+# The apex is a directory of assets, not one file, so it follows the
+# bermlaunch pattern instead.
+if [ -d "$SRC/${PUBLISH_DIR:-public}" ]; then
+  PUB=/srv/xonly/public
+  rm -rf "$PUB.new" "$PUB.old"
+  cp -a "$SRC/${PUBLISH_DIR:-public}" "$PUB.new"
+  chown -R berm:berm "$PUB.new"
+  [ -e "$PUB" ] && mv "$PUB" "$PUB.old"
+  mv "$PUB.new" "$PUB"
+  rm -rf "$PUB.old"
+  echo "    public: published tree"
+else
+  echo "    public: no ${PUBLISH_DIR:-public}/ at $COMMIT — leaving the current site alone"
+fi
+
+caddy validate --config "$CADDY"
+systemctl reload caddy
+echo "==> live at $COMMIT"
+
+for h in xonly.ai signer.xonly.ai editor.xonly.ai; do
+  printf '    %-20s ' "$h"
+  curl -sS -o /dev/null -w '%{http_code}\n' "https://$h/" || true
+done
