@@ -15,7 +15,8 @@ import { docToNip23, docToMarkdown, articleCoordinate } from './targets/nostr-30
 import { docToNodePage, cardMeta } from './targets/node-page.js';
 import { docToDraftJs, buildDraftPayload, publishXArticle, X_API } from './targets/x-article.js';
 import { cardToDataUrl } from './og/card-image.js';
-import { createLocalSigner } from './sdk/local-signer.js';
+import { createLocalSigner, isLocalOrigin } from './sdk/local-signer.js';
+import { createBrokerSigner } from '../../sdk/src/backends/broker.js';
 import { UserDeclinedError } from './sdk/types.js';
 import type { XnsbSdk, Session, SignedEvent } from './sdk/types.js';
 
@@ -792,12 +793,31 @@ function renderBadge(): void {
    ══════════════════════════════════════════════════════════════════════ */
 
 function boot(): void {
-  sdk = createLocalSigner({
-    relays: RELAYS,
-    approve: requestApproval,
-    displayName: 'You',
-    handle: localStorage.getItem('berm_dev_handle') ?? undefined,
-  });
+  /*
+   * WHICH SIGNER.
+   *
+   * Off localhost there is exactly one answer: the broker, talking to
+   * signer.xonly.ai in a top-level popup. `createDevSigner` throws anywhere but
+   * localhost by design, so a deployed build that reached for it would die on
+   * boot — which is the correct outcome and the reason this branch is explicit
+   * rather than a try/catch.
+   *
+   * On localhost the dev signer stays, because a raw key in localStorage is the
+   * right tool for a test loop and the wrong tool for a person.
+   */
+  const signerOrigin = new URLSearchParams(location.search).get('signer') ?? undefined;
+  sdk = isLocalOrigin() && !signerOrigin
+    ? createLocalSigner({
+        relays: RELAYS,
+        approve: requestApproval,
+        displayName: 'You',
+        handle: localStorage.getItem('berm_dev_handle') ?? undefined,
+      })
+    : createBrokerSigner({
+        relays: RELAYS,
+        signerOrigin,
+        appName: 'xonly editor',
+      });
   (window as any).berm = sdk;
 
   const title = $('title') as HTMLTextAreaElement;

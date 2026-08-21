@@ -1,0 +1,128 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>xonly signer</title>
+<style>
+:root{--bg:#0d0f12;--fg:#e8e6e3;--mut:#8b8f96;--line:#23262b;--card:#14171b;--acc:#d9a441;--bad:#e0645c}
+@media(prefers-color-scheme:light){:root{--bg:#faf9f7;--fg:#16181c;--mut:#5f646c;--line:#e2e0dc;--card:#fff;--acc:#9a6b00;--bad:#b8332a}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.55 ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;padding:2rem 1.25rem 4rem}
+main{max-width:38rem;margin:0 auto}
+h1{font-size:1.05rem;font-weight:600;letter-spacing:.02em;margin:0 0 .25rem}
+h2{font-size:1.3rem;margin:0 0 .6rem;line-height:1.25}
+p{margin:0 0 .9rem}
+.muted{color:var(--mut);font-size:.9rem}
+.brand{display:flex;align-items:baseline;gap:.6rem;border-bottom:1px solid var(--line);padding-bottom:.9rem;margin-bottom:1.6rem}
+.brand span{color:var(--mut);font-size:.82rem}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:1.25rem;margin:0 0 1rem}
+button{font:inherit;padding:.6rem 1rem;border-radius:8px;border:1px solid var(--line);background:var(--acc);color:#111;cursor:pointer;font-weight:600}
+@media(prefers-color-scheme:light){button{color:#fff}}
+button:disabled{opacity:.4;cursor:not-allowed}
+button.ghost{background:transparent;color:var(--fg);font-weight:400}
+input,textarea{font:inherit;width:100%;padding:.6rem .7rem;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--fg);margin:0 0 .5rem}
+textarea{min-height:5.5rem;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.82rem;resize:vertical}
+label{display:block;font-size:.86rem;color:var(--mut);margin:0 0 .3rem}
+code,pre{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+pre{background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:.7rem;overflow:auto;font-size:.78rem;max-height:11rem;margin:0}
+.mono-break{font-family:ui-monospace,Menlo,monospace;font-size:.78rem;word-break:break-all;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:.7rem;display:block}
+.row{display:flex;gap:.6rem;flex-wrap:wrap;align-items:center}
+.grant{display:flex;justify-content:space-between;align-items:center;gap:1rem;border:1px solid var(--line);border-radius:8px;padding:.7rem;margin:0 0 .5rem}
+.warn{border-left:3px solid var(--bad);padding-left:.8rem;color:var(--fg)}
+.scrim{position:fixed;inset:0;background:rgba(0,0,0,.72);display:flex;align-items:center;justify-content:center;padding:1.25rem;z-index:10}
+.scrim .card{max-width:34rem;width:100%;margin:0;max-height:88vh;overflow:auto}
+[hidden]{display:none!important}
+</style>
+
+<main>
+  <div class="brand"><h1>xonly signer</h1><span>signer.xonly.ai</span></div>
+
+  <section id="screen-start">
+    <div class="card">
+      <h2>Your key, in your hands</h2>
+      <p>This page makes a Nostr identity and hands you the only copy. We do not keep it, we cannot reset it, and nobody can sign as you without it.</p>
+      <p class="muted">If you already have a signer extension or a bunker, use that instead — it is better than this, and applications should offer it first.</p>
+      <div class="row"><button id="go-create">Create a new identity</button><button class="ghost" id="go-unlock">I already have a key file</button></div>
+    </div>
+  </section>
+
+  <section id="screen-create" hidden>
+    <div class="card">
+      <h2>Choose a passphrase</h2>
+      <p>Your key is encrypted with this and nothing else. There is no reset, no recovery, and no support address that can help — that is what makes it yours.</p>
+      <label for="create-pass">Passphrase</label>
+      <input id="create-pass" type="password" autocomplete="new-password" spellcheck="false">
+      <label for="create-pass2">Again</label>
+      <input id="create-pass2" type="password" autocomplete="new-password" spellcheck="false">
+      <p class="muted" id="create-note"></p>
+      <p class="muted" id="create-match"></p>
+      <div class="row"><button id="create-go" disabled>Create my key</button><button class="ghost" id="back-1">Back</button></div>
+      <p class="muted" id="create-status"></p>
+    </div>
+  </section>
+
+  <section id="screen-saved" hidden>
+    <div class="card">
+      <h2>Save this file now</h2>
+      <p class="warn">This is the only copy. If you lose it, the identity is gone — along with anything it was ever entitled to. Nobody can issue you another.</p>
+      <label>Your public name</label>
+      <code class="mono-break" id="saved-npub"></code>
+      <label style="margin-top:.9rem">Your encrypted key file</label>
+      <code class="mono-break" id="saved-file"></code>
+      <div class="row" style="margin-top:.9rem"><button id="download">Download the file</button><button class="ghost" id="copy-file">Copy it</button></div>
+      <p class="muted" id="saved-status"></p>
+      <div class="row" style="margin-top:.6rem"><button id="saved-continue" disabled>I have saved it — continue</button></div>
+    </div>
+  </section>
+
+  <section id="screen-unlock" hidden>
+    <div class="card">
+      <h2>Unlock your key</h2>
+      <p>Paste the file or choose it from disk. It is decrypted here in this tab and never sent anywhere.</p>
+      <label for="unlock-file">Key file (<code>ncryptsec1…</code>)</label>
+      <textarea id="unlock-file" spellcheck="false" placeholder="ncryptsec1…"></textarea>
+      <input id="unlock-pick" type="file" accept=".txt,.ncryptsec,text/plain">
+      <label for="unlock-pass" style="margin-top:.6rem">Passphrase</label>
+      <input id="unlock-pass" type="password" autocomplete="current-password" spellcheck="false">
+      <div class="row"><button id="unlock-go" disabled>Unlock</button><button class="ghost" id="back-2">Back</button></div>
+      <p class="muted" id="unlock-status"></p>
+    </div>
+  </section>
+
+  <section id="screen-session" hidden>
+    <div class="card">
+      <h2>Unlocked</h2>
+      <label>Signed-in as</label>
+      <code class="mono-break" id="session-npub"></code>
+      <p class="muted" id="session-custody" style="margin-top:.8rem"></p>
+      <div class="row"><button class="ghost" id="lock">Lock and forget the key</button></div>
+    </div>
+    <div class="card">
+      <h2>Standing permissions</h2>
+      <div id="grant-list"></div>
+    </div>
+  </section>
+</main>
+
+<div class="scrim" id="approval" hidden>
+  <div class="card">
+    <h2><span id="ap-who"></span> wants you to sign</h2>
+    <code class="mono-break" id="ap-origin"></code>
+    <p class="warn" id="ap-unknown" hidden style="margin-top:.8rem">We have never seen this site before. That is not proof of anything bad — but nothing vouches for it either.</p>
+    <div id="ap-human-wrap" style="margin-top:.9rem"><label>What it says this is for</label><p id="ap-human"></p></div>
+    <p class="warn" id="ap-noexplain" hidden style="margin-top:.8rem">This application did not explain what it is asking for. Read the request below before you decide.</p>
+    <label style="margin-top:.5rem">Request</label>
+    <p class="muted" id="ap-method" style="margin:0 0 .4rem"></p>
+    <pre id="ap-raw"></pre>
+    <div id="ap-grant-wrap" style="margin-top:.9rem">
+      <label for="ap-grant">Remember this decision</label>
+      <select id="ap-grant" style="font:inherit;padding:.5rem;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--fg);width:100%">
+        <option value="0">Just this once</option>
+        <option value="900000">For 15 minutes, this site and this kind only</option>
+        <option value="3600000">For 1 hour, this site and this kind only</option>
+      </select>
+    </div>
+    <div class="row" style="margin-top:1rem"><button id="ap-approve">Approve</button><button class="ghost" id="ap-decline">Decline</button></div>
+  </div>
+</div>
+
+<script>/*BUNDLE*/</script>
