@@ -1,112 +1,247 @@
 ---
 d: docs/why
-title: The garden around the wall
-summary: Why Berm exists, what a berm actually is, and the one thing every previous answer to this problem got wrong.
-t: [berm, story]
+title: Why Berm?
+summary: Use the platform. Keep what is yours.
 nav: 0
-x_article: full
+x_article: none
 ---
 
-# The garden around the wall
+# Why Berm?
 
-Every platform makes the same offer, and it is a good one. Bring the people who
-want to hear from you. We will handle the hosting, the search, the feed, the
-spam, the abuse reports, the bill. You will never think about any of it again.
+## Use the platform. Keep what is yours.
 
-Almost everyone takes the offer, because the alternative is a website nobody
-visits. That is not weakness. It is arithmetic.
+The internet keeps teaching the same lesson in different forms:
 
-The cost is invisible for years, and then it is total. **Your account is not
-where your identity is kept — your account *is* your identity.** The name, the
-work, the archive, and every person who chose to hear from you exist as rows in
-somebody else's database, joined to a single primary key. When that key is
-revoked, none of it degrades. It vanishes.
+we build relationships inside systems we do not control.
 
-Not locked out. *Gone.* There are people who signed up to something a decade ago
-with an account they have since lost, and there is no path back that anyone can
-offer them, because there is nothing left to point at. The work did not move
-somewhere else. It stopped existing.
+A creator builds an audience on a social platform. A community forms around an
+account. An application lets people “sign in with” that platform. Over time, the
+platform account quietly stops being just a useful account and becomes the root
+of identity for everything built around it.
 
-## What everyone gets wrong about the answer
+If the account disappears, changes hands, is restricted, or the platform changes
+its rules, every dependent application inherits that fragility.
 
-The usual response is: **leave.** Own your own site. Build your mailing list.
-Come to our platform, which is better and will not do that to you.
+Berm starts from a different assumption:
 
-Nobody leaves. The reason is not laziness or lock-in psychology — it is that the
-people are inside. Telling someone to abandon the audience they spent years
-earning is not advice, it is a dare. And the platform that promises never to do
-that to you is one funding round away from a new policy.
+> **A platform can be where a relationship is proven without becoming the owner
+> of the identity behind that relationship.**
 
-The second response is to ask to be let further in. Build on the API. Become a
-partner. Get the good rate limits. That works right up until the terms change on
-a Tuesday, and every dead client of every dead API died exactly that way.
+## The name
 
-Both answers accept the same premise: that there are two places, inside the wall
-and nowhere.
+In fortification, a berm is the strip of ground at the edge of a wall.
 
-## What a berm is
+It is close enough to the fortress to be useful. But it is not the fortress.
 
-In fortification, a **berm** is the strip of level ground at the foot of a wall,
-between the wall itself and the ditch. It is not inside. It is not out in the
-open field. It is the ground where you can actually stand and build, close enough
-to the wall to matter and outside it enough to be yours.
+That is the metaphor.
 
-That is the third place, and it is the whole idea.
+The wall is not the enemy. Walls make gardens useful: people are already inside,
+and leaving the audience you spent years building is not a practical answer.
+A berm is useful ground at the edge — close enough to the platform to matter,
+outside it enough to remain yours.
 
-**You do not leave X. You do not ask X for permission.** You keep posting exactly
-where you post now, to exactly the people you reach now. What changes is where
-*you* are kept.
+Platforms such as X are extraordinarily useful fortresses of distribution:
+people are already there, conversation already happens there, public history is
+there, and social context is there.
 
-## What actually changes
+Berm does not ask people to abandon those places.
 
-Your identity becomes a key you hold. Not an account someone issues you — a key,
-the way a house key is yours whether or not the locksmith is still in business.
+It creates a layer at the edge.
 
-Your X handle becomes a **claim attached to that key**, published by you and
-checkable by anyone. It is a label on your identity rather than the thing your
-identity is made of. If the handle goes, the identity does not go with it.
+Use X.
 
-Your work gets signed and stored on an open network of relays. Anyone can host a
-copy. Nobody can delete the copies they do not hold, and nobody can quietly
-change one, because a signature that has been tampered with stops verifying and
-says so.
+Prove that an X account belongs with your portable identity.
 
-X stays what it is good at: **the place you are seen.** It simply stops being the
-place you exist. Those were always two different jobs, and only one of them
-needed to be rented.
+Then carry the resulting evidence somewhere else.
 
-## What this does not do
+## The inversion
 
-The honest limits, because a story that leaves them out is an advertisement.
+The conventional model is:
 
-**It will not get you reach.** X decides who sees your links, and posts with
-links do worse than posts without them. Nothing here changes that, and anyone
-selling you the opposite is selling you something. What it protects is your
-audience *after* a policy change, not your distribution before one.
+```text
+platform account
+    ↓
+identity
+    ↓
+applications
+```
 
-**Writing an X Article still needs X's permission.** Reading and identity are
-yours. Publishing into the garden remains the garden's business.
+If the platform account is the identity root, every application downstream is
+borrowing identity from the platform.
 
-**The easiest way in is not yet the safest.** The passkey on-ramp — the one that
-takes a few seconds and requires no wallet, no extension, no seed phrase — depends
-on a domain name staying in honest hands. That is a real dependency, we did not
-notice it for a long time, and [it has its own
-section](docs/custody#what-tier-1-costs) rather than a footnote. The exits exist
-and work today; the front door is still being rebuilt.
+Berm inverts it:
 
-## The part worth remembering
+```text
+portable identity (`npub`)
+    ↓
+verified relationship to X
+    ↓
+portable signed evidence
+    ↓
+applications
+```
 
-The wall is not the enemy. Walls are the reason gardens work at all — they keep
-the noise out and make the place worth visiting. Nobody here is trying to knock
-one down, and a project that spent its energy on that would deserve to fail.
+The X account remains useful and important. It simply stops being the thing that
+owns the rest of the user's identity.
 
-The problem was never that the garden has a wall. It is that there was nowhere to
-stand when the gate closed.
+## What “portable” means here
 
-Now there is.
+Portable does not mean “every platform and every chain is already integrated.”
 
----
+It means the root and the evidence are not private facts trapped inside one
+application's database.
 
-Next: [Start here](docs/start) if you want to publish something in ten minutes,
-or [Concepts](docs/concepts) if you want to know how the pieces fit before you
-touch anything.
+Today, Berm's current concrete external-account method is for X.
+
+A successful X binding has one canonical six-field result:
+
+```text
+npub
+accountId
+handle
+postId
+textHash
+methodHash
+```
+
+The immutable X `accountId` is the uniqueness key. The handle is display
+metadata.
+
+The permanent law is:
+
+```text
+(namespace, accountId) → at most one npub
+npub                   → zero, one, or many external accounts
+```
+
+So one X account cannot become two different Berm identities. But one Berm
+identity can accumulate additional verified external relationships over time as
+new methods are published.
+
+That is how portability grows without pretending unsupported integrations
+already exist.
+
+## Public proof instead of private assertion
+
+Berm does not ask an application to accept:
+
+```text
+verified = true
+```
+
+because some server said so.
+
+The method is public.
+
+The evidence is signed.
+
+Validators independently observe public material and sign what they derived.
+
+Applications publish the policy under which they accept that evidence.
+
+Those are different roles:
+
+```text
+subject       → signs a claim
+validator     → signs an observation
+application   → applies an acceptance policy
+```
+
+They are deliberately not collapsed into one trusted database.
+
+## Why that matters for communities
+
+A social community is normally represented as a collection of platform-native
+objects:
+
+followers, handles, group membership, posts.
+
+Those are useful, but they are rented from the platform.
+
+Berm adds a second layer: portable identities plus independently checkable
+relationships and participation evidence.
+
+That does not copy a platform's entire social graph into Berm.
+
+It lets applications remember important relationships in a form that is not
+owned exclusively by the platform or the application.
+
+## xonly.ai: a practical implementation
+
+xonly.ai provides a practical implementation and signing surface. It is not the
+issuer or owner of the portable identity, and hosting does not confer protocol
+authority.
+
+## BermLaunch: the first economic application
+
+BermLaunch is the first place where we are applying that idea economically.
+
+The launchpad has campaign-specific law: community stages, campaign positions,
+destinations, fee-sharing rules, launch contracts and market state.
+
+Those facts belong to BermLaunch.
+
+They are **not** silently stuffed into the portable identity binding.
+
+The separation is:
+
+```text
+Berm Protocol
+    portable identity + public external-account evidence
+
+BermLaunch
+    campaign participation + community contract + launch economics
+```
+
+That means a person can participate in a BermLaunch campaign without BermLaunch
+becoming the permanent owner of the identity they used to participate.
+
+It also means a community can begin around one application while being built on
+identity/evidence that is designed to remain useful outside that application.
+
+## Why the Canary matters
+
+**Canary on a Berm** is intended to be the first real BermLaunch campaign.
+
+The token is not the protocol.
+
+The campaign is not the protocol.
+
+The point of the Canary is to make the abstract boundary visible:
+
+- a person keeps a portable identity;
+- an X relationship is publicly proven;
+- BermLaunch accepts that evidence under campaign policy;
+- the person receives one campaign position under public campaign rules;
+- the application can later disappear without retroactively becoming the owner
+  of the identity proof.
+
+That is a much more concrete demonstration than another identity diagram.
+
+## What Berm does not claim
+
+Berm does not claim:
+
+- that X cannot restrict or delete an X account;
+- that Berm restores access to a lost social account;
+- that all platforms are already supported;
+- that all chains are already supported;
+- that validator instances controlled by one operator are organizationally
+  independent;
+- that applications lose the right to define their own acceptance policies.
+
+The aim is narrower and, we think, more useful:
+
+> **Use centralized platforms where they are useful without making them the
+> permanent root of every relationship built around them.**
+
+## The edge should remain yours
+
+A good boundary is not a wall against the world.
+
+It is a place from which you can use the world without surrendering everything
+behind it.
+
+That is the idea behind Berm.
+
+Next: [Current standard](docs/current-standard) for the exact pinned method and its limits.

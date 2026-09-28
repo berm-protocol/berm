@@ -2,9 +2,12 @@
 import { chromium } from 'playwright';
 import { createServer } from 'node:http';
 import { readFileSync, existsSync } from 'node:fs';
-import { join, extname } from 'node:path';
+import { dirname, join, extname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { launch } from '../scripts/chromium.mjs';
 
-const ROOT = '/home/claude/xnsb/public';
+const here = dirname(fileURLToPath(import.meta.url));
+const ROOT = resolve(here, '../public');
 const CSP = readFileSync(join(ROOT, 'csp.txt'), 'utf8').trim();
 const TYPES = { '.html': 'text/html; charset=utf-8', '.json': 'application/json', '.js': 'text/javascript', '.mjs': 'text/javascript', '.css': 'text/css' };
 
@@ -18,7 +21,7 @@ const srv = createServer((q, res) => {
 }).listen(0);
 const port = srv.address().port;
 
-const browser = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium-1194/chrome-linux/chrome' });
+const browser = await launch(chromium);
 let pass = 0, fail = 0;
 const t = (n, c) => { if (c) { pass++; console.log(`  ok   ${n}`); } else { fail++; console.log(`  FAIL ${n}`); } };
 

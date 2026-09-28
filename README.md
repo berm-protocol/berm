@@ -1,172 +1,169 @@
-<div align="center">
+# Berm Protocol
 
-# Berm
+> **Use the platforms. Keep the identity and relationships you build around them.**
 
-**X as the on-ramp. Not the custodian.**
+Berm Protocol is an application-neutral public verification layer for portable
+identity and verifiable relationships.
 
-User-held identity for apps that welcome users from X — with no API key, no
-developer app, and nothing anyone can revoke.
+Today, the concrete public method binds an X account to a user-controlled Nostr
+identity (`npub`) using a public proof, deterministic verification rules, signed
+validator observations, and application acceptance policy.
 
-*The protocol is sovereign. The default passkey tier is
-[not, and we say why](https://docs.xonly.ai/custody#what-tier-1-costs).*
+The X account is a relationship attached to the identity. It is **not** the
+identity root.
 
-[The story](https://docs.xonly.ai/why) · [Docs](https://docs.xonly.ai) ·
-[Quickstart](https://docs.xonly.ai/start) · [Security](SECURITY.md) ·
-[Limits](https://docs.xonly.ai/limits)
+That distinction is the point.
 
-</div>
+## Why “Berm”?
 
----
+In fortification, a berm is the strip of ground at the edge of a wall: close
+enough to the fortress to matter, but outside it enough to remain its own ground.
 
-In fortification, a **berm** is the strip of level ground at the foot of a wall —
-not inside it, not out in the open field. Close enough to the wall to matter, and
-outside it enough to be yours. That is the whole idea;
-[why](https://docs.xonly.ai/why) is the long version.
+Online platforms are enormously useful fortresses. They provide distribution,
+audience, conversation and discovery. But if the platform account itself is the
+identity, the platform also becomes the custodian of the relationship between a
+person and every application built on top of it.
 
-> **Berm** is the protocol. **XOnly** (`xonly.ai`) is where it is hosted,
-> documented and improved. Anyone can implement Berm without touching either.
+Berm reverses that dependency.
 
-## The inversion
+Use the platform. Prove the relationship publicly. Keep the portable identity
+outside the platform.
 
-Almost every app that uses X as a login treats X as the **custodian**: the
-account *is* the identity, so when the account dies the user dies with it.
-People who signed up to something years ago with an X account they have since
-lost are simply gone — not locked out, gone, with no path back anyone can offer.
+**[Read “Why Berm?” →](docs/WHY_BERM.md)**
 
-```
-conventional        the identity IS the X account
-                    X can revoke it, therefore X owns your users
+## The model in one line
 
-Berm                the identity is a key the user holds
-                    the X handle is a CLAIM attached to it
-                    X can revoke the claim; the identity is untouched
-```
-
-An app built on this holds **no X credential at all**. There is nothing for a
-policy change to take away, because nothing was issued.
-
-## Ten minutes
-
-```html
-<script src="berm-sdk.global.min.js" integrity="sha256-…" crossorigin></script>
-<script>
-  const sdk = Berm.install({ signer: { signerOrigin: 'https://signer.xonly.ai' } });
-
-  const session = await sdk.connect();            // may prompt, may be declined
-  const event   = await sdk.signEvent({ kind: 1, created_at: now(), tags: [], content: 'hello' });
-  const receipt = await sdk.publish(event);       // ≥2 relays, or it did not publish
-</script>
+```text
+portable npub
+  → public proof
+  → deterministic Berm method
+  → signed observations and evidence
+  → application policy
+  → portable verified relationship
 ```
 
-That is the whole integration. No registration, no key to obtain, no quota.
+An application may disappear. A frontend may change. A social account may be
+renamed or later become inaccessible. The signed evidence and the portable
+identity do not have to become private database rows that only one company can
+interpret.
 
-## What is here
+## What Berm does today
 
-**The protocol**
+For the current X method:
 
-| Directory | | Checked by |
-|---|---|---|
-| [`crypto/`](crypto) | Identity derivation from WebAuthn PRF, frozen vectors, the v1 quarantine | 119 tests |
-| [`sdk/`](sdk) | `window.berm` — four backends, one interface | 34 tests + browser E2E |
-| [`spec/`](spec) | The normative document. MUST / SHOULD / MUST NOT | — |
-| [`nips/`](nips) | Drafts for `nostr-protocol/nips` | discussion stage |
-| [`chain/`](chain) | Optional anchor that makes hosts disposable — and never a required lookup | 23 tests + 32 EVM checks |
+1. A person controls an `npub`.
+2. The person publishes the required proof from an X account.
+3. A validator independently reads the public X publication.
+4. The public method derives one canonical six-field binding.
+5. The subject signs the claim; validators sign observations.
+6. An application applies an explicit acceptance policy.
+7. The resulting evidence can be carried, mirrored and independently checked.
 
-**Things a user touches**
+The permanent identity law is asymmetric:
 
-| Directory | | Checked by |
-|---|---|---|
-| [`post/`](post) | Composer for X — weighted counting, refuses rather than truncates, hash-committed cards | 68 tests + 44 browser checks |
-| [`editor/`](editor) | Long-form editor, three publish targets, tables and art X cannot render | browser E2E |
-| [`landing/`](landing) | Where a card click lands. Verified / unverified / mismatch, fetched live | 89 tests + 31 browser checks |
-| [`link/`](link) | Handle claim → proof post → third-party archive | browser E2E |
-| [`recovery/`](recovery) | *"If you lost this device right now, what would happen?"* | browser E2E |
-| [`explorer/`](explorer) | `/who` — resolve any identity, see what is actually proven | browser E2E |
-| [`graph/`](graph) | X archive import, encrypted follow sets, reader-blind social proof | 24 tests + 24 browser assertions |
-
-**Things an operator runs**
-
-| Directory | | Checked by |
-|---|---|---|
-| [`wordpress/`](wordpress) | The node. Pure-PHP BIP-340 — no GMP, no BCMath, any shared host | 15 official vectors |
-| [`node-pages/`](node-pages) | A node publishes only what it verified, and refuses to truncate | 18 tests + 17 relay checks |
-| [`signer-log/`](signer-log) | Build attestations, so a swapped signer is detectable | 20 tests |
-| [`bags/`](bags) | Fee continuity for Bags launches, and the dispute screen that is the point of it | 181 tests + 26 browser checks |
-| [`infra/`](infra) | The two servers, the cloud-init that builds them, and the four mistakes that cost a morning | runbook + Caddyfile guard |
-| [`docs/`](docs) | Published as signed Nostr events, through the protocol it documents | conformance-checked |
-
-## Verify it yourself
-
-```bash
-node scripts/verify-all.mjs --fast    # unit suites, ~1 min
-node scripts/verify-all.mjs           # everything, needs Chromium
+```text
+(namespace, immutable accountId) → at most one npub
+npub                             → zero, one, or many external accounts
 ```
 
-Twenty-two groups, one entry point. CI calls exactly this command — a pipeline
-with its own command list goes green while the repo is broken.
+A mutable handle is display metadata. The immutable platform account identifier
+is the uniqueness key.
 
-Every claim on the docs site has a command behind it. A few worth running:
+## Current standard
 
-```bash
-cd crypto && npm run vectors:generate && git diff --exit-code vectors/
-```
-Rebuilds the frozen identity vectors from scratch. Every input is itself the
-SHA-256 of a fixed public string, so anyone gets identical bytes. A non-empty
-diff means a derivation changed — which means every existing identity changed.
+| | |
+|---|---|
+| Protocol predecessor / authority lineage | **R13-A REISSUE R4** |
+| Current pinned method-successor implementation checkpoint | **R8** |
+| Current X method | **`berm.external_account_binding.x/2`** |
+| Method hash | `sha256:a95319d8664b16ca355b3d82bc8c4d5bb6007c8aed65116a74447f79b0e5e193` |
+| Normative vector count | **97** |
+| Vector set hash | `sha256:0ced853da13b3378b4e138883398ecd7831e27b00c2f03ee759af9668a45e6c5` |
+| Observation window | `0 <= observedAt - postCreatedAt < 300000 ms` |
 
-```bash
-cd crypto && npm test -- negative
-```
-Computes a victim's private key from public data using the **v1** derivation we
-shipped and then killed, and brute-forces a six-digit PIN in about nine seconds.
-It does not argue that v1 was broken. It computes it.
+**R8 is not “Berm Protocol v8.”** It is the implementation-lane label for the
+current X-method successor.
 
-```bash
-cd chain && npm run verify
-```
-Compiles the anchor contract, disassembles the **bytecode** — not the source — to
-prove there is no owner, no upgrade path and no `SELFDESTRUCT`, then deploys it
-into a real EVM and tries to take it over.
+Read the exact current identities, hashes and standing in
+[CURRENT_STANDARD.md](docs/CURRENT_STANDARD.md) and
+[CURRENT_STANDARD.json](CURRENT_STANDARD.json).
 
-## Four decisions worth knowing about
+## Protocol, implementation, application
 
-**One relay is not published.** `receipt.success` is true only at two or more
-acceptances. A single relay is a single point of failure wearing the costume of
-a success message.
+These roles are intentionally separate.
 
-**Relay responses are verified in the SDK, not by you.** A relay is an untrusted
-party that can return anything. The test proving forged events are dropped first
-proves the hostile relay really sent one — otherwise it would pass because
-nothing happened.
+### Berm Protocol
 
-**A claim can never render as verified.** A NIP-39 `i` tag is a self-assertion.
-`profile.ts` is structurally incapable of producing `verified`, because a
-browser has no CORS-open way to check a proof post. Only a node can upgrade it.
+Defines the public language: methods, evidence shapes, verification rules,
+validator observations and application-policy boundaries.
 
-**The dev signer refuses to run in production.** It throws off localhost rather
-than warning. Every dev mode that merely warns eventually ships, and this one
-leaks a private key when it does.
+### xonly.ai
 
-## What this does not do
+A practical Berm implementation and user-facing identity/signing surface. It is
+not the source of Berm identity authority.
 
-- **The default tier is not sovereign.** WebAuthn binds credentials to an RP ID
-  derived from the signer origin, so whoever controls that DNS name can obtain the
-  identity key of every tier-1 user who authenticates afterwards — no break-in
-  required. Tiers 0 and 2 have no such dependency, and the protocol runs with the
-  tier-1 signer permanently gone. Full statement in
-  [custody](https://docs.xonly.ai/custody#what-tier-1-costs).
-- **Sovereignty is not distribution.** X cannot touch your users or your data.
-  X absolutely controls whether anyone sees you.
-- **Writing into X is still borrowed.** Publishing an X Article needs X's API and
-  stays revocable. Design it as a feature that degrades, not a dependency.
-- **The anchor is deployed nowhere.** `chain/` compiles, executes and is
-  adversarially tested, but no chain has been chosen and no address exists.
-- **A lost key with no backup is gone.** Permanently. No reset, no support queue.
-  That is the cost of nobody being able to seize it.
+### BermLaunch
 
-Full list: [docs/limits](https://docs.xonly.ai/limits).
+The first economic application using Berm identity/evidence. BermLaunch applies
+campaign-specific rules after identity evidence has been accepted. It does not
+turn a campaign position, wallet, cohort or token fact into part of the portable
+X-account binding.
 
-## License
+This separation is what lets a community or relationship survive beyond one
+frontend, one application, or eventually one platform.
 
-MIT. See [CONTRIBUTING.md](CONTRIBUTING.md) to get started and
-[SECURITY.md](SECURITY.md) before reporting anything sensitive.
+## Read the protocol
+
+| Page | What it explains |
+|---|---|
+| [Why Berm?](docs/WHY_BERM.md) | the idea, the boundary metaphor, and why portability matters |
+| [Current Standard](docs/CURRENT_STANDARD.md) | exact current method, hashes, lineage and standing |
+| [Identity Model](docs/IDENTITY_MODEL.md) | `npub` root, external accounts and cardinality |
+| [X Verification](docs/X_VERIFICATION.md) | proof line, five-minute law and six-field result |
+| [Validators & Federation](docs/VALIDATORS_AND_FEDERATION.md) | methods, validators, operators and honest independence |
+| [Evidence & Receipts](docs/EVIDENCE_AND_RECEIPTS.md) | who signs what |
+| [Application Policies](docs/APPLICATION_POLICIES.md) | how applications decide which evidence they accept |
+| [Portability & Reconstruction](docs/PORTABILITY_AND_RECONSTRUCTION.md) | how a third party rebuilds a verdict |
+| [Methods & Versioning](docs/METHODS_AND_VERSIONING.md) | method identity and supersession |
+| [Technical Reference](docs/TECHNICAL_REFERENCE.md) | exact anchors and implementation references |
+
+## What Berm is not
+
+Berm is not:
+
+- a hosted identity court;
+- an OAuth dependency disguised as sovereignty;
+- a claim that X, Reddit, Telegram, every wallet and every chain are already
+  supported today;
+- a claim that two validator machines controlled by one operator are two
+  independent organizations;
+- a replacement for application-specific rules.
+
+Each new external platform or proof type needs its own published method and
+deterministic verifier.
+
+## Historical repository content
+
+This repository preserves earlier Berm experiments and implementation work for
+provenance.
+
+**Do not assume an older directory or README-era implementation is the current
+protocol standard merely because it remains in Git history or in the working
+tree.**
+
+The active public documentation is the Current Standard and the pages linked
+above. Exact hashes and explicit standing decide what is current.
+
+## BermLaunch and the Canary
+
+BermLaunch is where this abstraction becomes visible to ordinary users.
+
+A supporter can have one portable identity, prove an external account
+relationship, join a campaign under public rules, and keep evidence of that
+relationship without making the launchpad or the social platform the permanent
+owner of the identity.
+
+**Canary on a Berm** is the first BermLaunch campaign intended to exercise that
+idea in a real economic application.
+
+It is an application of Berm Protocol, not a new definition of Berm Protocol.

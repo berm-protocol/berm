@@ -2,18 +2,23 @@
 import { chromium } from 'playwright';
 import { createServer } from 'node:http';
 import { readFileSync } from 'node:fs';
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { launch } from '../scripts/chromium.mjs';
 
-import { readFileSync as rf } from 'node:fs';
 // The CSP the build emits — the one that will actually be served.
-const CSP_SIGNER = rf('/home/claude/xnsb/signer/dist/csp.txt', 'utf8').trim();
-const CSP_EDITOR = rf('/home/claude/xnsb/editor/dist/csp.txt', 'utf8').trim();
+const here = dirname(fileURLToPath(import.meta.url));
+const signerDist = resolve(here, 'dist');
+const editorDist = resolve(here, '../editor/dist');
+const CSP_SIGNER = readFileSync(resolve(signerDist, 'csp.txt'), 'utf8').trim();
+const CSP_EDITOR = readFileSync(resolve(editorDist, 'csp.txt'), 'utf8').trim();
 
 const cases = [
-  ['signer', '/home/claude/xnsb/signer/dist/xonly-signer.html', CSP_SIGNER, '#go-create'],
-  ['editor', '/home/claude/xnsb/editor/dist/xonly-editor.html', CSP_EDITOR, 'body'],
+  ['signer', resolve(signerDist, 'xonly-signer.html'), CSP_SIGNER, '#go-create'],
+  ['editor', resolve(editorDist, 'xonly-editor.html'), CSP_EDITOR, 'body'],
 ];
 
-const browser = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium-1194/chrome-linux/chrome' });
+const browser = await launch(chromium);
 for (const [name, file, csp, probe] of cases) {
   const html = readFileSync(file, 'utf8');
   const srv = createServer((_q, res) => {

@@ -29,6 +29,25 @@ const readme = readFileSync(join(ROOT, 'README.md'), 'utf8');
 let bad = 0;
 const fail = (m) => { console.error(`FAIL  ${m}`); bad++; };
 
+// The protocol publication README replaces the historical implementation
+// package table. Check its actual documentation claims and links instead.
+if (readme.startsWith('# Berm Protocol\n')) {
+  const standard = JSON.parse(readFileSync(join(ROOT, 'CURRENT_STANDARD.json'), 'utf8'));
+  const current = standard.currentXMethodImplementation;
+  for (const value of [current.methodId, current.methodHash, current.vectorSetHash]) {
+    if (!readme.includes(value)) fail(`README omits current standard ${value}`);
+  }
+  if (current.vectorCount !== 97 || !/97/.test(readme)) fail('current vector count disagrees');
+  const links = [...readme.matchAll(/\]\(([^)]+)\)/g)].map(m => m[1]);
+  for (const target of links) {
+    if (/^https?:/.test(target) || target.startsWith('#')) continue;
+    if (!existsSync(join(ROOT, target.split('#')[0]))) fail(`missing documentation link ${target}`);
+  }
+  if (!links.length) fail('README has no documentation links');
+  console.log(bad ? `${bad} README problem(s)` : 'README: current protocol claims and documentation links agree');
+  process.exit(bad ? 1 : 0);
+}
+
 /* 1 — linked directories exist ------------------------------------------- */
 
 // `[`crypto/`](crypto)` — the link target, not the label. A label can say

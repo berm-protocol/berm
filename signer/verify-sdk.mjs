@@ -12,6 +12,7 @@ import { createServer } from 'node:http';
 import { readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { launch } from '../scripts/chromium.mjs';
 import { verifyEvent } from 'nostr-tools/pure';
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -46,8 +47,7 @@ const s1 = srv(SIGNER_PORT, signerHtml), s2 = srv(CLIENT_PORT, clientHtml);
 let pass = 0, fail = 0;
 const t = (n, c) => { if (c) { pass++; console.log(`  ok   ${n}`); } else { fail++; console.log(`  FAIL ${n}`); } };
 
-const EXEC = process.env.CHROMIUM_PATH ?? '/opt/pw-browsers/chromium-1194/chrome-linux/chrome';
-const browser = await chromium.launch({ executablePath: EXEC });
+const browser = await launch(chromium);
 const ctx = await browser.newContext();
 const page = await ctx.newPage();
 page.on('console', (m) => { if (m.type() === 'error') console.log('   [client]', m.text()); });

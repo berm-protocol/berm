@@ -22,7 +22,7 @@ ENV
 clones anonymously and holds **no credential at all** — nothing to leak if the
 box is compromised, nothing to rotate, nothing to revoke. `berm-protocol` also
 disables deploy keys at the organisation level, so the SSH route is unavailable
-anyway; the provisioned `/home/berm/DEPLOY_KEY.pub` is left unused, which is the
+anyway; the provisioned `$HOME/DEPLOY_KEY.pub` is left unused, which is the
 right outcome rather than a workaround.
 
 Only a private repository would need a credential here, and then a fine-grained

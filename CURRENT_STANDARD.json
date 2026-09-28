@@ -1,0 +1,119 @@
+{
+  "schema": "berm.protocol.current_standard.documentation_projection.v1",
+  "role": "DOCUMENTATION_PROJECTION_ONLY",
+  "statement": "This file is a documentation projection of founder-pinned artifacts. It is not a new protocol authority, it does not create or change any method, hash or version, and it does not itself authorize deployment, genesis, live X activity, publication or release.",
+  "asOf": "2026-09-26",
+  "protocolAuthority": {
+    "role": "PREDECESSOR_PROTOCOL_AUTHORITY_LINEAGE",
+    "lineage": "R13-A REISSUE R4",
+    "artifact": "OPUS_BERM_PROTOCOL_R13_A_REISSUE_R4_DETERMINISTIC_PUBLIC_LANGUAGE_CANDIDATE_R5_20260828.zip",
+    "sha256": "d47176e2e0d6809b768404c25f069103ac4c4a1bda6f70d9528544e9251784ff",
+    "bytes": 384638,
+    "standing": "FOUNDER_PINNED_R13_A_REISSUE_R4_PROTOCOL_AUTHORITY",
+    "filenameNote": "The filename retains historical CANDIDATE_R5 wording; the external founder pin controls standing and changed no bytes.",
+    "historicalMethodAtR4": {
+      "methodId": "berm.external_account_binding.x/1",
+      "methodHash": "sha256:221d7348a6d9e1f4214ae31ffd21071350d098f48f128081e844545d2af88e04",
+      "vectorCount": 89,
+      "vectorSetHash": "sha256:e70b2e6fdf65d06be65d3ebe22d5a4d6832a736809e976ae4029246402e61c68",
+      "status": "SUPERSEDED_AS_CURRENT_X_METHOD_BY_R8"
+    }
+  },
+  "currentXMethodImplementation": {
+    "role": "CURRENT_PINNED_METHOD_SUCCESSOR_IMPLEMENTATION_CHECKPOINT",
+    "lane": "R8",
+    "methodId": "berm.external_account_binding.x/2",
+    "methodHash": "sha256:a95319d8664b16ca355b3d82bc8c4d5bb6007c8aed65116a74447f79b0e5e193",
+    "vectorSetHash": "sha256:0ced853da13b3378b4e138883398ecd7831e27b00c2f03ee759af9668a45e6c5",
+    "vectorCount": 97,
+    "immutableR8Anchor": {
+      "artifact": "CODEX_BERM_METHOD_SUCCESSOR_HANDLE_BOUND_PROOF_LINE_R8.zip",
+      "sha256": "50c8d54d41fb5395c166c02704b129f14082a69acddef34ba7b5a9a19d233a25"
+    },
+    "founderPin": {
+      "artifact": "R8_DUAL_REPOSITORY_CORRECTED_IMPLEMENTATION_FOUNDER_PIN_R1_20260905.zip",
+      "sha256": "fef6c8fa131fc00caa048f2a1fde255b09070bfe3c3d70dfb0fef39138dbf8de",
+      "bytes": 11312664
+    },
+    "standing": "FOUNDER_ACCEPTED_AND_PINNED__R8_DUAL_REPOSITORY_CORRECTED_IMPLEMENTATION_CHECKPOINT",
+    "namingNote": "R8 is an implementation lane label. It is not a protocol version number.",
+    "proofLineGrammar": "^Berm Protocol: @[a-z0-9_]{1,15} permanently binds to npub1[02-9ac-hj-np-z]{58} #bermprotocol$"
+  },
+  "acquisition": {
+    "id": "berm.acquisition.x-direct-status/1",
+    "hash": "sha256:46fbed235696decc92e298e55e3a4ee1ebd5e61d169cd3462265cb3ff5c98f1d",
+    "note": "Intake profile: canonical https://x.com/{handle}/status/{postId} locator, closed refusal order, local normalization only, zero redirects. Hashed separately from the method."
+  },
+  "transport": {
+    "id": "berm.transport.x-syndication-via-same-origin-proxy/2",
+    "bridgeSha256": "7e208b3b192f1d2d3caa503a6d3b54fac1c8c533dba9ce1d1c11464a9dce11bf",
+    "publicCredentialFreeLaw": true,
+    "note": "Validators independently acquire the publicly served X publication. Verification does not depend on user OAuth, private cookies, developer credentials, or BermLaunch holding privileged X credentials."
+  },
+  "producer": {
+    "producerLaw": {
+      "id": "berm.composer_producer_law/2",
+      "hash": "sha256:ed9e25056cbdec7d14fa568a731513eef5255c5febed061573afee4db1143aaa"
+    },
+    "bermlaunchComposerProfile": {
+      "id": "bermlaunch.composer.support-v1/2",
+      "hash": "sha256:0db5286615d9c822a6d721a697cf5f5a43162b51175010b1efe44c4936188b19",
+      "activation": "ACTIVATION_PENDING_ONE_REAL_X_COMPOSER_SMOKE"
+    }
+  },
+  "identityLaw": {
+    "portableRoot": "npub",
+    "positiveBindingFields": ["npub", "accountId", "handle", "postId", "textHash", "methodHash"],
+    "observationWindow": "0 <= observedAt - postCreatedAt < 300000 ms",
+    "observationWindowMs": 300000,
+    "observationWindowShape": "HALF_OPEN__LOWER_INCLUSIVE__UPPER_EXCLUSIVE",
+    "mandatoryOneHourFinality": false,
+    "externalAccountCardinality": "(namespace, accountId) -> at most one npub",
+    "identityCardinality": "npub -> zero, one, or many external accounts",
+    "campaignPositionLaw": "(campaignId, npub) -> at most one campaign position",
+    "accountKey": "accountId",
+    "handleRole": "descriptive / presentation at observation time; not the identity key",
+    "campaignFieldsInBinding": false
+  },
+  "evidenceRoles": {
+    "ExternalBindingClaim": "signed by the subject npub",
+    "BindingObservation": "signed by a validator-instance key",
+    "ValidatorAuthorization": "signed by an operator npub",
+    "ApplicationAcceptancePolicy": "signed by an application",
+    "BindingAcceptanceReceipt": "signed by an application; optional; an application decision, not the identity proof",
+    "publicNostrKindAllocated": false
+  },
+  "federation": {
+    "methodIsNotValidator": true,
+    "sameOperatorInstancesCountAsOneOperator": true,
+    "externalIndependentOperatorExists": false
+  },
+  "roles": {
+    "bermProtocol": "public verification layer; application neutral",
+    "bermlaunch": "application consuming Berm Protocol evidence; not the issuer or owner of Berm identity",
+    "xonlyAi": "infrastructure host; not an identity authority",
+    "website": "explanatory; not final authority"
+  },
+  "authorization": {
+    "deploymentAuthorized": false,
+    "genesisAuthorized": false,
+    "liveXAuthorized": false,
+    "publicationAuthorized": false,
+    "releaseAuthorized": false
+  },
+  "notCurrent": [
+    {
+      "id": "berm.external_account_binding.x/1",
+      "standing": "HISTORICAL_R4_METHOD__SUPERSEDED_AS_CURRENT"
+    },
+    {
+      "id": "berm.acquisition.x-public-syndication/1",
+      "hash": "sha256:f0e98475445bc90e656e054f4a0b9f4ca2d16a0708855b929fe1cc4c8d72e70c",
+      "standing": "FOUNDER_DIRECTED_CORRECTION_CANDIDATE__NOT_PINNED"
+    },
+    {
+      "id": "privileged X API statuses/show with Bearer token (genesis-prep R1, HEAD 381274173b4375fe603ce1983e4e071815173997)",
+      "standing": "QUARANTINED__REJECTED_DESIGN__NEVER_A_BASE"
+    }
+  ]
+}
