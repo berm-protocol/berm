@@ -1,0 +1,119 @@
+{
+  "version": "R8-LANE-B-HANDLE-BOUND-CANDIDATE",
+  "methodId": "berm.external_account_binding.x/2",
+  "acquisitionId": "berm.acquisition.x-direct-status/1",
+  "directPredecessor": {
+    "name": "OPUS_BERM_PROTOCOL_AND_BERMLAUNCH_FIVE_MINUTE_CONVERGENCE_R13_A_REISSUE_R3_20260826.zip",
+    "sha256": "cad85793d214246bb9124b8ac9aee0dfdf019a1e4896ed8ec46efe04f990b170",
+    "standing": "CURRENT PROTOCOL AUTHORITY — retained until the founder pins an R4",
+    "methodId": "berm.external_account_binding.x/1"
+  },
+  "lineOrigin": {
+    "name": "OPUS_BERM_IDENTITY_METHOD_AND_OBSERVATION_R12_20260826.zip",
+    "sha256": "1ba5c54bd5a0eec8b235a8ff92193e26b18fb5df8db0f8ae0e9d38bfc33bc5af",
+    "bytes": 943534,
+    "standing": "CANDIDATE — not approved, not canonical, not frozen",
+    "methodId": "berm.handle_verifier/7"
+  },
+  "controllingOrder": {
+    "name": "GPT_TO_OPUS_BERM_PROTOCOL_R13A_R4_EXACT_REISSUE_AUTHORING_ORDER_R1_20260828.zip",
+    "sha256": "7c7d35d934b91add847755f365c8355166329c42818632aabf7ce0a0e49e1873",
+    "bytes": 256068,
+    "manifestEntries": 8,
+    "standing": "CURRENT — the founder-pinned order controlling the R4 delta"
+  },
+  "repairReview": {
+    "name": "GPT_CODEX_BERM_PROTOCOL_R13A_R4_CANDIDATE_R4_PREPIN_CONFORMANCE_R1_20260828.zip",
+    "sha256": "c3be44ad8c52f4b34e3e6ef15203f1d60ca0d4af016553d518e1258f12465cbc",
+    "result": "PREPIN_DETERMINISM_GATE_PASS — 89/89 independent method, 58/58 independent Java Stage A",
+    "findings": {
+      "packagingTranscript": 1
+    },
+    "standing": "CURRENT — the transcript finding reproduced against the reviewed bytes before repair"
+  },
+  "subjectRepaired": {
+    "name": "OPUS_BERM_PROTOCOL_R13_A_REISSUE_R4_DETERMINISTIC_PUBLIC_LANGUAGE_CANDIDATE_R4_20260828.zip",
+    "sha256": "9c2f0a6ef4cc990d1d1ac1de37448caf908e7a4f2d3e6922bd738cf33fcac1fa",
+    "bytes": 391432,
+    "standing": "CANDIDATE — packaging-only repair applied, superseded by these bytes"
+  },
+  "standing": "CANDIDATE — no anchor here is approved, frozen or canonical",
+  "anchors": [
+    {
+      "anchor": "methodSpecHash",
+      "identity": "berm.external_account_binding.x/2",
+      "file": "method/spec/METHODSPEC_CANONICAL.md",
+      "value": "sha256:a95319d8664b16ca355b3d82bc8c4d5bb6007c8aed65116a74447f79b0e5e193",
+      "reason": "SHA-256 of the hashed method document. It covers the derivation, the six-field positive result and the HALF-OPEN FIVE-MINUTE WINDOW. Changing the 300000 ms bound CHANGES this hash — which is what HANDLE-VERIFICATION.md §19.6 requires of a constant that decides a binding. Changing the URL admission rule does NOT change it: the intake profile is separately identified, because given a capture the URL decides nothing about the binding (FD-BP-07)."
+    },
+    {
+      "anchor": "acquisitionProfileHash",
+      "identity": "berm.acquisition.x-direct-status/1",
+      "file": "method/spec/ACQUISITION_PROFILE.md",
+      "value": "sha256:46fbed235696decc92e298e55e3a4ee1ebd5e61d169cd3462265cb3ff5c98f1d",
+      "reason": "The intake and transport rule, hashed under its own identity. It decides WHICH capture is taken, which is why it is hashed at all. An application policy names both this and the method hash."
+    },
+    {
+      "anchor": "vectorSetHash",
+      "identity": "berm.external_account_binding.x/2",
+      "value": "sha256:0ced853da13b3378b4e138883398ecd7831e27b00c2f03ee759af9668a45e6c5",
+      "derivedFrom": "method/VECTORS/*.json as an ordered list of filename:hash pairs — no single file backs it, which is why it carries no `file` and is verified by recomputing the set rather than by digesting one path",
+      "reason": "97 normative vectors deterministically regenerated from the frozen 89-vector corpus plus eight R8 successor cases."
+    },
+    {
+      "anchor": "genericBindingHash",
+      "identity": "berm.external_account_binding/1",
+      "file": "method/spec/EXTERNAL_ACCOUNT_BINDING_GENERIC.md",
+      "value": "sha256:6a8585232f8c9feaac62310e6414edc476f5c9d13c1a2537e43e812decab0862",
+      "reason": "The shape a future namespace must fit. Deliberately NOT implemented — it constrains the next method without widening X V1 by a line. VERSIONED /1 IN R4: the R3 label carried the word \"generic\" where the version segment belongs. That is not a number, so it failed the §3.1 identifier grammar. It is a real versioned artifact and the anchor already behaved like one, so it is versioned rather than exempted."
+    },
+    {
+      "anchor": "composerProducerLawHash",
+      "identity": "berm.composer_producer_law/2",
+      "value": "sha256:ed9e25056cbdec7d14fa568a731513eef5255c5febed061573afee4db1143aaa",
+      "reason": "Founder-pinned prerequisite producer law preserved separately from methodHash; the Layer-1 BermLaunch profile remains bermlaunch.composer.support-v1/2."
+    },
+    {
+      "anchor": "wire:ApplicationAcceptancePolicy",
+      "identity": "wire",
+      "file": "wire/schemas/ApplicationAcceptancePolicy.schema.json",
+      "value": "sha256:efa3e8703b8e08cd8220ff80e814df5d200ee995d57d976216910105a3d9c6d6",
+      "reason": "public wire schema; no public Nostr kind is allocated — every `kind` is a Berm-namespace string"
+    },
+    {
+      "anchor": "wire:BindingAcceptanceReceipt",
+      "identity": "wire",
+      "file": "wire/schemas/BindingAcceptanceReceipt.schema.json",
+      "value": "sha256:8464b21cff45642262a3d1e5c9cf6ef83677e44559cd9cf381693f414dc4e389",
+      "reason": "public wire schema; no public Nostr kind is allocated — every `kind` is a Berm-namespace string"
+    },
+    {
+      "anchor": "wire:BindingObservation",
+      "identity": "wire",
+      "file": "wire/schemas/BindingObservation.schema.json",
+      "value": "sha256:b3bd25eb861bc7e770c459781855a56bf6c13b3012e27e25770d19b9dc8401cb",
+      "reason": "public wire schema; no public Nostr kind is allocated — every `kind` is a Berm-namespace string"
+    },
+    {
+      "anchor": "wire:ExternalBindingClaim",
+      "identity": "wire",
+      "file": "wire/schemas/ExternalBindingClaim.schema.json",
+      "value": "sha256:e6f4426bfb1ea47d8b9ee4b899419567b6975e9b30c82d1998530314ae840246",
+      "reason": "public wire schema; no public Nostr kind is allocated — every `kind` is a Berm-namespace string"
+    },
+    {
+      "anchor": "wire:ValidatorAuthorization",
+      "identity": "wire",
+      "file": "wire/schemas/ValidatorAuthorization.schema.json",
+      "value": "sha256:1f8fa82cc57666ef9f58a84c74cf994f50c3ec877fa7a410f424f781e225931c",
+      "reason": "public wire schema; no public Nostr kind is allocated — every `kind` is a Berm-namespace string"
+    },
+    {
+      "anchor": "wire:common.defs",
+      "identity": "wire",
+      "file": "wire/schemas/common.defs.json",
+      "value": "sha256:f6065cefedb1aa889ed2c165d95142ab90d674060e4011be84806d2dc945c7bb",
+      "reason": "public wire schema; no public Nostr kind is allocated — every `kind` is a Berm-namespace string"
+    }
+  ]
+}

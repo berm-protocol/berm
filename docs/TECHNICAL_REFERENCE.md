@@ -27,39 +27,47 @@ producer law                 berm.composer_producer_law/2
 
 ## Where the bytes live in this repository
 
+The standalone developer home is `sdk/external-binding-v2/`, documented in its
+[README](../sdk/external-binding-v2/README.md). It consumes exact accepted source
+mirrors, not a second parser or a newly edited normative specification.
+
 | Path | Contents |
 |---|---|
-| `shared/berm-protocol-r13a/authority/EXACT_HASH_REGISTRY.json` | runtime hash registry (method id, method/acquisition/vector/wire anchors) |
-| `shared/berm-protocol-r13a/authority/method/spec/METHODSPEC_CANONICAL.md` | the hashed `/2` method document (SHA-256 = methodHash) |
-| `shared/berm-protocol-r13a/authority/method/spec/ACQUISITION_PROFILE.md` | the hashed acquisition profile |
-| `shared/berm-protocol-r13a/authority/wire/EVIDENCE_FOLD.md` | how a stranger folds the public artifacts |
-| `shared/berm-protocol-r13a/schemas/*.schema.json` | the five wire schemas + common definitions |
-| `shared/berm-protocol-r13a/authority/PINNED_AUTHORITY_RECEIPT.json` | the R13-A REISSUE R4 pin receipt (historical `/1` anchors) |
-| `fixtures/identity/r13a/vectors/XB-*.json` | the 97 normative vectors |
-| `packages/sdk/src/bermProtocolR13a.js` | runtime constants for the current method |
+| `spec/external-binding-v2/SOURCE_MANIFEST.json` | Complete byte hashes, upstream paths and source identities for all mirrored artifacts |
+| `spec/external-binding-v2/authority/method/spec/METHODSPEC_CANONICAL.md` | Exact current `/2` method document |
+| `spec/external-binding-v2/authority/method/spec/ACQUISITION_PROFILE.md` | Exact frozen acquisition document, recovered from the authenticated BermLaunch source |
+| `spec/external-binding-v2/authority/wire/EVIDENCE_FOLD.md` | Exact evidence-fold law |
+| `spec/external-binding-v2/schemas/` | Original wire schemas |
+| `spec/external-binding-v2/vectors/` | All 97 exact normative vectors |
+| `sdk/external-binding-v2/runtime/` | Byte-identical accepted BermLaunch verification closure; no production server or signer |
+| `sdk/external-binding-v2/example.mjs` | Disposable signed offline example with actual evidence fold and file export/readback |
 
-Some internal files still carry the word `CANDIDATE` in their own packaging
-text. Those bytes are pinned and are not rewritten; the external founder pins
-recorded in [CURRENT_STANDARD.md](CURRENT_STANDARD.md) control standing.
+Historical files that say `CANDIDATE` retain those exact bytes. The separate
+founder acceptance recorded in [CURRENT_STANDARD.md](CURRENT_STANDARD.md) does
+not rewrite their historical provenance. The R8 label is an implementation
+checkpoint, not a newly numbered protocol. Normative files and runtime mirrors
+are protected from Git line-ending conversion and checked byte-for-byte.
 
-The immutable R8 anchor, the R8 founder pin and the transport bridge are
-external artifacts. Their hashes are recorded here; their bytes are not part of
-this repository.
+The immutable R8 anchor, R8 founder-pin ZIP and transport bridge ZIP are external
+historical artifacts. Their recorded hashes do not imply those ZIPs are included.
 
 ## Verify locally
 
-```text
-node e2e/berm_protocol_r13a_authority_pins.mjs   # registry, spec files, 97-vector set hash
-node e2e/berm_protocol_docs_drift.mjs            # docs ⇄ CURRENT_STANDARD.json ⇄ runtime registry parity
-node e2e/berm_protocol_docs_route.mjs            # website /docs/ → /docs/protocol/ route and link
-```
-
-Recompute the method hash by hand:
+Run from the repository root with Node 22.6 or newer. These three commands need
+no npm packages, private work-order files, credentials or network access:
 
 ```text
-sha256sum shared/berm-protocol-r13a/authority/method/spec/METHODSPEC_CANONICAL.md
-# a95319d8664b16ca355b3d82bc8c4d5bb6007c8aed65116a74447f79b0e5e193
+node sdk/external-binding-v2/verify.mjs
+node --test sdk/external-binding-v2/test.mjs
+node sdk/external-binding-v2/example.mjs
 ```
+
+The first checks every mirrored hash, the exact method/acquisition identities and
+all 97 vectors. The second executes signed positive/tamper cases and temporary
+file export/readback. The third prints the precise disposable-example standing.
+To retain an export, supply a new destination to `example.mjs`; existing evidence
+files are never overwritten. An export's policy must be independently selected
+by its consumer, not trusted because it has a self-consistent signature.
 
 The vector set hash is SHA-256 over the UTF-8 text formed by joining, with `\n`,
 one line `XB-NNN.json:sha256:<hex>` per vector file in sorted order.
@@ -77,10 +85,14 @@ profile freezes the locator and redirect law but does not restate the public
 syndication endpoint in its own normative text. A correction candidate,
 `berm.acquisition.x-public-syndication/1`
 (`sha256:f0e98475445bc90e656e054f4a0b9f4ca2d16a0708855b929fe1cc4c8d72e70c`),
-exists and is **not pinned**. These documents describe no endpoint details beyond
-what pinned bytes state.
+exists and is **not pinned**. The existing transport implementation separately fixes anonymous HTTPS
+`cdn.syndication.twimg.com/tweet-result`, the requested post ID, `lang=en`,
+`token=x`, `Accept: application/json`, User-Agent `berm-validator/1`, zero
+redirects and a 32,768-byte body ceiling. This describes implemented transport;
+it does not amend the frozen acquisition text or promise X availability.
 
 ## Canonical repository URL
 
-The canonical public GitHub URL for these documents is not asserted here.
-It is configured at publication time.
+The repository is [berm-protocol/berm](https://github.com/berm-protocol/berm).
+This candidate has not been published; a local build does not establish what
+GitHub Pages or Xonly currently serves.

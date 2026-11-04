@@ -1,0 +1,474 @@
+{
+  "schema": "berm.external-binding.source-mirror.v1",
+  "standing": "BYTE_EXACT_MIRROR_NOT_NEW_AUTHORITY",
+  "upstreamBermLaunchHead": "55ae80f8005bc000b4c0862b443903df709a5660",
+  "upstreamBermLaunchRepresentation": "WORKING matched deployed source inventory",
+  "upstreamXonlyHead": "9ba84644824b25f236c36622d81a89010ba08f78",
+  "license": "Existing repository MIT; source provenance retained; reference signer is disposable-example-only",
+  "files": {
+    "sdk/external-binding-v2/runtime/bermProtocolR13aEvidence.js": {
+      "sha256": "16bb75312bb495a5f34e066554bdc11d3c33763b9b07a11857e8384cbbaf923e",
+      "upstreamPath": "BermLaunch/packages/sdk/src/bermProtocolR13aEvidence.js"
+    },
+    "sdk/external-binding-v2/runtime/bermProtocolR13a.js": {
+      "sha256": "6b664ffb65f9059779629f8b046a4064607fb9581ecfe01d5bf424e5a1e22239",
+      "upstreamPath": "BermLaunch/packages/sdk/src/bermProtocolR13a.js"
+    },
+    "sdk/external-binding-v2/runtime/identityCrypto.js": {
+      "sha256": "c58f2cc577b9c26c64424b24eac73418b1720ddebf8ea8c494a8430a45a79aa7",
+      "upstreamPath": "BermLaunch/packages/sdk/src/identityCrypto.js"
+    },
+    "sdk/external-binding-v2/runtime/r13aStrictJson.js": {
+      "sha256": "1878045ec382be1203b72e1b589f6f7cd7026185e7df7833357ce2589c0d1628",
+      "upstreamPath": "BermLaunch/packages/sdk/src/r13aStrictJson.js"
+    },
+    "spec/external-binding-v2/authority/EXACT_HASH_REGISTRY.json": {
+      "sha256": "2eba85570ae2b80b6d2f3aa9181aeea4382e934f069b30f478f546582f086487",
+      "upstreamPath": "BermLaunch/shared/berm-protocol-r13a/authority/EXACT_HASH_REGISTRY.json"
+    },
+    "spec/external-binding-v2/authority/PINNED_AUTHORITY_RECEIPT.json": {
+      "sha256": "055b8defcf9cdb1754b2958507ff364493e558350f18f3a68a3dbcd4693d78ca",
+      "upstreamPath": "BermLaunch/shared/berm-protocol-r13a/authority/PINNED_AUTHORITY_RECEIPT.json"
+    },
+    "spec/external-binding-v2/authority/wire/EVIDENCE_FOLD.md": {
+      "sha256": "5dd1da7d84cc8822367b11b2579da8cf253834fdc67aa4060e0d68b87bcb55c2",
+      "upstreamPath": "BermLaunch/shared/berm-protocol-r13a/authority/wire/EVIDENCE_FOLD.md"
+    },
+    "spec/external-binding-v2/authority/wire/WIRE_SCHEMAS.md": {
+      "sha256": "308adb09c25deeb9acfd41b29eb3a98b9fcf8df8ba1819caa4a938c0acb1e1d6",
+      "upstreamPath": "BermLaunch/shared/berm-protocol-r13a/authority/wire/WIRE_SCHEMAS.md"
+    },
+    "spec/external-binding-v2/authority/method/spec/ACQUISITION_PROFILE.md": {
+      "sha256": "46fbed235696decc92e298e55e3a4ee1ebd5e61d169cd3462265cb3ff5c98f1d",
+      "upstreamPath": "BermLaunch/shared/berm-protocol-r13a/authority/method/spec/ACQUISITION_PROFILE.md"
+    },
+    "spec/external-binding-v2/authority/method/spec/COMPOSER_PRODUCER_LAW.md": {
+      "sha256": "acc750120a0971d14e1fd91d29cd6e4b9229ee478a831a3860fae498adee8281",
+      "upstreamPath": "BermLaunch/shared/berm-protocol-r13a/authority/method/spec/COMPOSER_PRODUCER_LAW.md"
+    },
+    "spec/external-binding-v2/authority/method/spec/EXTERNAL_ACCOUNT_BINDING_GENERIC.md": {
+      "sha256": "6a8585232f8c9feaac62310e6414edc476f5c9d13c1a2537e43e812decab0862",
+      "upstreamPath": "BermLaunch/shared/berm-protocol-r13a/authority/method/spec/EXTERNAL_ACCOUNT_BINDING_GENERIC.md"
+    },
+    "spec/external-binding-v2/authority/method/spec/METHODSPEC_CANONICAL.md": {
+      "sha256": "a95319d8664b16ca355b3d82bc8c4d5bb6007c8aed65116a74447f79b0e5e193",
+      "upstreamPath": "BermLaunch/shared/berm-protocol-r13a/authority/method/spec/METHODSPEC_CANONICAL.md"
+    },
+    "spec/external-binding-v2/schemas/ApplicationAcceptancePolicy.schema.json": {
+      "sha256": "efa3e8703b8e08cd8220ff80e814df5d200ee995d57d976216910105a3d9c6d6",
+      "upstreamPath": "BermLaunch/shared/berm-protocol-r13a/schemas/ApplicationAcceptancePolicy.schema.json"
+    },
+    "spec/external-binding-v2/schemas/BindingAcceptanceReceipt.schema.json": {
+      "sha256": "8464b21cff45642262a3d1e5c9cf6ef83677e44559cd9cf381693f414dc4e389",
+      "upstreamPath": "BermLaunch/shared/berm-protocol-r13a/schemas/BindingAcceptanceReceipt.schema.json"
+    },
+    "spec/external-binding-v2/schemas/BindingObservation.schema.json": {
+      "sha256": "b3bd25eb861bc7e770c459781855a56bf6c13b3012e27e25770d19b9dc8401cb",
+      "upstreamPath": "BermLaunch/shared/berm-protocol-r13a/schemas/BindingObservation.schema.json"
+    },
+    "spec/external-binding-v2/schemas/common.defs.json": {
+      "sha256": "f6065cefedb1aa889ed2c165d95142ab90d674060e4011be84806d2dc945c7bb",
+      "upstreamPath": "BermLaunch/shared/berm-protocol-r13a/schemas/common.defs.json"
+    },
+    "spec/external-binding-v2/schemas/ExternalBindingClaim.schema.json": {
+      "sha256": "e6f4426bfb1ea47d8b9ee4b899419567b6975e9b30c82d1998530314ae840246",
+      "upstreamPath": "BermLaunch/shared/berm-protocol-r13a/schemas/ExternalBindingClaim.schema.json"
+    },
+    "spec/external-binding-v2/schemas/ValidatorAuthorization.schema.json": {
+      "sha256": "1f8fa82cc57666ef9f58a84c74cf994f50c3ec877fa7a410f424f781e225931c",
+      "upstreamPath": "BermLaunch/shared/berm-protocol-r13a/schemas/ValidatorAuthorization.schema.json"
+    },
+    "spec/external-binding-v2/vectors/XB-001.json": {
+      "sha256": "c020ff5c428c054cda01fc0fd8e7059504a289839b4cb52605f26580634b1f4a",
+      "upstreamPath": "Xonly/services/xonly-r4-adapter/test/fixtures/r4/method/VECTORS/XB-001.json"
+    },
+    "spec/external-binding-v2/vectors/XB-002.json": {
+      "sha256": "57eaa2d7b36042af0e0ffa35bb28593b4b43e68e86fdfbdfded2f44cc5cfcc36",
+      "upstreamPath": "Xonly/services/xonly-r4-adapter/test/fixtures/r4/method/VECTORS/XB-002.json"
+    },
+    "spec/external-binding-v2/vectors/XB-003.json": {
+      "sha256": "1a7671a5e290d1de1bf04aad9d66000a1e3cd77e69dcf8a19c7e2c5c9c5ed0a0",
+      "upstreamPath": "Xonly/services/xonly-r4-adapter/test/fixtures/r4/method/VECTORS/XB-003.json"
+    },
+    "spec/external-binding-v2/vectors/XB-004.json": {
+      "sha256": "c6dfaaabf438f781a69ae072c3dd517bbe43ce05be59154445fcf29000d18050",
+      "upstreamPath": "Xonly/services/xonly-r4-adapter/test/fixtures/r4/method/VECTORS/XB-004.json"
+    },
+    "spec/external-binding-v2/vectors/XB-005.json": {
+      "sha256": "c48667cd2fb0260d308e15aec7c675ca97b5bda120fc46bea5f2dbbfdee51b43",
+      "upstreamPath": "Xonly/services/xonly-r4-adapter/test/fixtures/r4/method/VECTORS/XB-005.json"
+    },
+    "spec/external-binding-v2/vectors/XB-006.json": {
+      "sha256": "c0bae9a12d467d603a6bdf825295d3d28a2f5a39038020eabc4dd2d4ec4ca126",
+      "upstreamPath": "Xonly/services/xonly-r4-adapter/test/fixtures/r4/method/VECTORS/XB-006.json"
+    },
+    "spec/external-binding-v2/vectors/XB-007.json": {
+      "sha256": "d3e877b82d06e0d6e5b9c23120d973ac1214cc0995531ba62faabec9c8970297",
+      "upstreamPath": "Xonly/services/xonly-r4-adapter/test/fixtures/r4/method/VECTORS/XB-007.json"
+    },
+    "spec/external-binding-v2/vectors/XB-008.json": {
+      "sha256": "50d45bb62002307d18a285c795a299a6a19c288968d640c49bf1eedfe1d444f7",
+      "upstreamPath": "Xonly/services/xonly-r4-adapter/test/fixtures/r4/method/VECTORS/XB-008.json"
+    },
+    "spec/external-binding-v2/vectors/XB-009.json": {
+      "sha256": "2593e20d70f3437781c5dfa45b400a102049f4e6c5fae89324f433a52a1a7056",
+      "upstreamPath": "Xonly/services/xonly-r4-adapter/test/fixtures/r4/method/VECTORS/XB-009.json"
+    },
+    "spec/external-binding-v2/vectors/XB-010.json": {
+      "sha256": "ee2a609d657f405d162640312b10948105e3124fed6a729f5bc131afaa48ff4e",
+      "upstreamPath": "Xonly/services/xonly-r4-adapter/test/fixtures/r4/method/VECTORS/XB-010.json"
+    },
+    "spec/external-binding-v2/vectors/XB-011.json": {
+      "sha256": "a186584dd2010e7d6a79f1e68b6497ca58786c019fd8e973d8453587da8eba2c",
+      "upstreamPath": "Xonly/services/xonly-r4-adapter/test/fixtures/r4/method/VECTORS/XB-011.json"
+    },
+    "spec/external-binding-v2/vectors/XB-012.json": {
+      "sha256": "504f4dea63b5afd00ce72b2c0a6e5fd9007eae45f2a99abf42d2ec397d93f999",
+      "upstreamPath": "Xonly/services/xonly-r4-adapter/test/fixtures/r4/method/VECTORS/XB-012.json"
+    },
+    "spec/external-binding-v2/vectors/XB-013.json": {
+      "sha256": "8b9d64ad9e69107ab9ce854343b0b06f2ddcc5309b0b18bb45b8d3388724e934",
+      "upstreamPath": "Xonly/services/xonly-r4-adapter/test/fixtures/r4/method/VECTORS/XB-013.json"
+    },
+    "spec/external-binding-v2/vectors/XB-014.json": {
+      "sha256": "a23df4fccd7cb3d4d6622489d361e8a337d1caaebff64ba4dae3394d4ecb4ce5",
+      "upstreamPath": "Xonly/services/xonly-r4-adapter/test/fixtures/r4/method/VECTORS/XB-014.json"
+    },
+    "spec/external-binding-v2/vectors/XB-015.json": {
+      "sha256": "854e6580e13e4b9e1f1e1e7fac20dcb406af1f6e925972c7839b98f31671e738",
+      "upstreamPath": "Xonly/services/xonly-r4-adapter/test/fixtures/r4/method/VECTORS/XB-015.json"
+    },
+    "spec/external-binding-v2/vectors/XB-016.json": {
+      "sha256": "474d6c0eb237644eac7da9b592ee49b2dfd0b9e6542b9811b39f51c315581836",
+      "upstreamPath": "Xonly/services/xonly-r4-adapter/test/fixtures/r4/method/VECTORS/XB-016.json"
+    },
+    "spec/external-binding-v2/vectors/XB-017.json": {
+      "sha256": "ec2218145aa661076a4ca1a1bd403c9aaab26f530e5e0394a5efd0763d114baf",
+      "upstreamPath": "Xonly/services/xonly-r4-adapter/test/fixtures/r4/method/VECTORS/XB-017.json"
+    },
+    "spec/external-binding-v2/vectors/XB-018.json": {
+      "sha256": "ea52a20cbe1a6e5e7a3284db2e05d5a1e07cf6a31d8f9ad6962c9c3db85f92f9",
+      "upstreamPath": "Xonly/services/xonly-r4-adapter/test/fixtures/r4/method/VECTORS/XB-018.json"
+    },
+    "spec/external-binding-v2/vectors/XB-019.json": {
+      "sha256": "f8156cd2ca66e1fc8d1a4e62bdadd0de278f9dd9723da56b266913ac493e46b8",
+      "upstreamPath": "Xonly/services/xonly-r4-adapter/test/fixtures/r4/method/VECTORS/XB-019.json"
+    },
+    "spec/external-binding-v2/vectors/XB-020.json": {
+      "sha256": "90a0552c37de74a0d403dfd2b49f0ff15bd58844a740fb71f1cc1a228bb956ab",
+      "upstreamPath": "Xonly/services/xonly-r4-adapter/test/fixtures/r4/method/VECTORS/XB-020.json"
+    },
+    "spec/external-binding-v2/vectors/XB-021.json": {
+      "sha256": "f2bc6e5c71b71b89a2f56d82b04178d81076fc81e5f7930a65699bb165380897",
+      "upstreamPath": "Xonly/services/xonly-r4-adapter/test/fixtures/r4/method/VECTORS/XB-021.json"
+    },
+    "spec/external-binding-v2/vectors/XB-022.json": {
+      "sha256": "6e3e0620ca6e748a3ebed90cab90c3faad62d318732746c7691970cb2f7bf673",
+      "upstreamPath": "Xonly/services/xonly-r4-adapter/test/fixtures/r4/method/VECTORS/XB-022.json"
+    },
+    "spec/external-binding-v2/vectors/XB-023.json": {
+      "sha256": "d06a48bcbf79d16c5f77acdd20f45f9468acfc2dfe47fa7d73f42ecf0a3bec95",
+      "upstreamPath": "Xonly/services/xonly-r4-adapter/test/fixtures/r4/method/VECTORS/XB-023.json"
+    },
+    "spec/external-binding-v2/vectors/XB-024.json": {
+      "sha256": "8ccce285ce7262b608c208e276e73d3dbe2d589830136f8ab0669b1b268f217f",
+      "upstreamPath": "Xonly/services/xonly-r4-adapter/test/fixtures/r4/method/VECTORS/XB-024.json"
+    },
+    "spec/external-binding-v2/vectors/XB-025.json": {
+      "sha256": "efb16dd170dff134ef3b3d0bc0557214eb38ffa02e3d667dd389bde03ea77da0",
+      "upstreamPath": "Xonly/services/xonly-r4-adapter/test/fixtures/r4/method/VECTORS/XB-025.json"
+    },
+    "spec/external-binding-v2/vectors/XB-026.json": {
+      "sha256": "f71df55b540ad50571827ace185e3ae517574850d1e4920dce1639de0d772583",
+      "upstreamPath": "Xonly/services/xonly-r4-adapter/test/fixtures/r4/method/VECTORS/XB-026.json"
+    },
+    "spec/external-binding-v2/vectors/XB-027.json": {
+      "sha256": "b7ce74a280ae26b0e4f4f2d086b57c30e2b9c3a82d0a069eca19f6abad4a9e2d",
+      "upstreamPath": "Xonly/services/xonly-r4-adapter/test/fixtures/r4/method/VECTORS/XB-027.json"
+    },
+    "spec/external-binding-v2/vectors/XB-028.json": {
+      "sha256": "335cc32684b097aca025cb30d550bf84d6c5d0175122e570cb51ef789e6de9fa",
+      "upstreamPath": "Xonly/services/xonly-r4-adapter/test/fixtures/r4/method/VECTORS/XB-028.json"
+    },
+    "spec/external-binding-v2/vectors/XB-029.json": {
+      "sha256": "0397c421f160b118b0b71b9a9c503e65a0db82521a5300082af6ed6a023793db",
+      "upstreamPath": "Xonly/services/xonly-r4-adapter/test/fixtures/r4/method/VECTORS/XB-029.json"
+    },
+    "spec/external-binding-v2/vectors/XB-030.json": {
+      "sha256": "608f305b2844ce5ce014c75410e45cb1965c017a69d3282c82b3dfe71a79a26a",
+      "upstreamPath": "Xonly/services/xonly-r4-adapter/test/fixtures/r4/method/VECTORS/XB-030.json"
+    },
+    "spec/external-binding-v2/vectors/XB-031.json": {
+      "sha256": "68d9dfebe9d530951da26e043fdbb9f844b20a3713d1e666920ebc706b39588e",
+      "upstreamPath": "Xonly/services/xonly-r4-adapter/test/fixtures/r4/method/VECTORS/XB-031.json"
+    },
+    "spec/external-binding-v2/vectors/XB-032.json": {
+      "sha256": "6e97bc6fde765f0ea71889772beacd70cd40c7d561a2aa45eabda7cfcf874124",
+      "upstreamPath": "Xonly/services/xonly-r4-adapter/test/fixtures/r4/method/VECTORS/XB-032.json"
+    },
+    "spec/external-binding-v2/vectors/XB-033.json": {
+      "sha256": "63f874a00b700681c355232c0f45482f7b5a36bbf9f35494b0bec68033f5d559",
+      "upstreamPath": "Xonly/services/xonly-r4-adapter/test/fixtures/r4/method/VECTORS/XB-033.json"
+    },
+    "spec/external-binding-v2/vectors/XB-034.json": {
+      "sha256": "69966b281e228bf9a4d4c1c28658e7f98d25abe4f77cf67da7d509e13879bbce",
+      "upstreamPath": "Xonly/services/xonly-r4-adapter/test/fixtures/r4/method/VECTORS/XB-034.json"
+    },
+    "spec/external-binding-v2/vectors/XB-035.json": {
+      "sha256": "f230b903a796f2952d37c694a21918872c561c16e62b901dd56f23f373feb240",
+      "upstreamPath": "Xonly/services/xonly-r4-adapter/test/fixtures/r4/method/VECTORS/XB-035.json"
+    },
+    "spec/external-binding-v2/vectors/XB-036.json": {
+      "sha256": "821382f4166c293dfe21eb9bd12d5cbed092cd344cd6551a84e65143ce2e9073",
+      "upstreamPath": "Xonly/services/xonly-r4-adapter/test/fixtures/r4/method/VECTORS/XB-036.json"
+    },
+    "spec/external-binding-v2/vectors/XB-037.json": {
+      "sha256": "d9595c722168f1c76dc2c73a4d701298e4638e2b15e0d4916be66a09d7d63679",
+      "upstreamPath": "Xonly/services/xonly-r4-adapter/test/fixtures/r4/method/VECTORS/XB-037.json"
+    },
+    "spec/external-binding-v2/vectors/XB-038.json": {
+      "sha256": "d58805024f7e42dc7c9c4bcbaf23d4fb49c68db9d3b2d282c643bfe069ecf5fc",
+      "upstreamPath": "Xonly/services/xonly-r4-adapter/test/fixtures/r4/method/VECTORS/XB-038.json"
+    },
+    "spec/external-binding-v2/vectors/XB-039.json": {
+      "sha256": "9f99270cf49be4a6e97d099379c9919f32876bef02e69bba2b5dbed4dba493e1",
+      "upstreamPath": "Xonly/services/xonly-r4-adapter/test/fixtures/r4/method/VECTORS/XB-039.json"
+    },
+    "spec/external-binding-v2/vectors/XB-040.json": {
+      "sha256": "571dc9fc7b9d497ed9d0575d61939e475bac60c61e0ccdb385d08ae3a96c0c55",
+      "upstreamPath": "Xonly/services/xonly-r4-adapter/test/fixtures/r4/method/VECTORS/XB-040.json"
+    },
+    "spec/external-binding-v2/vectors/XB-041.json": {
+      "sha256": "b3fc13df2854a1e5c6d9634c05811c68ee87890d05f2f948a8d621f77974fabf",
+      "upstreamPath": "Xonly/services/xonly-r4-adapter/test/fixtures/r4/method/VECTORS/XB-041.json"
+    },
+    "spec/external-binding-v2/vectors/XB-042.json": {
+      "sha256": "6ce020f16e20430f666f25bbd3646dc76ad91bc2b2d943cd81932bc7f7eee1a9",
+      "upstreamPath": "Xonly/services/xonly-r4-adapter/test/fixtures/r4/method/VECTORS/XB-042.json"
+    },
+    "spec/external-binding-v2/vectors/XB-043.json": {
+      "sha256": "692883094813955a28611599d3125fd7116abcd63713d10d37d5a032e429b218",
+      "upstreamPath": "Xonly/services/xonly-r4-adapter/test/fixtures/r4/method/VECTORS/XB-043.json"
+    },
+    "spec/external-binding-v2/vectors/XB-044.json": {
+      "sha256": "71eb1684dc77d99b2de8dddcac89e1f38d05f3b5bf905ae12ea1be275359ac12",
+      "upstreamPath": "Xonly/services/xonly-r4-adapter/test/fixtures/r4/method/VECTORS/XB-044.json"
+    },
+    "spec/external-binding-v2/vectors/XB-045.json": {
+      "sha256": "60fee4a7038d51c43529deb72029d171eaf818d3f0760e083198e7c950719c37",
+      "upstreamPath": "Xonly/services/xonly-r4-adapter/test/fixtures/r4/method/VECTORS/XB-045.json"
+    },
+    "spec/external-binding-v2/vectors/XB-046.json": {
+      "sha256": "b38095d1577bfb0694717dfff555da2931faf52f4eac54adae5ae08e820bc3f5",
+      "upstreamPath": "Xonly/services/xonly-r4-adapter/test/fixtures/r4/method/VECTORS/XB-046.json"
+    },
+    "spec/external-binding-v2/vectors/XB-047.json": {
+      "sha256": "1c337c5179909617f9db269f888a1e5b633ce5da54a180d7d2e64a87ee0a4047",
+      "upstreamPath": "Xonly/services/xonly-r4-adapter/test/fixtures/r4/method/VECTORS/XB-047.json"
+    },
+    "spec/external-binding-v2/vectors/XB-048.json": {
+      "sha256": "662cebc4baeaee4ee7d72baf36fa01a2f29884cbac74e04ff5f1ab30e5ca1f2f",
+      "upstreamPath": "Xonly/services/xonly-r4-adapter/test/fixtures/r4/method/VECTORS/XB-048.json"
+    },
+    "spec/external-binding-v2/vectors/XB-049.json": {
+      "sha256": "9f81f6412eb2b2abacda327ed2bc6f2d0de2342061fb93e2c89f8e6a5e8c3635",
+      "upstreamPath": "Xonly/services/xonly-r4-adapter/test/fixtures/r4/method/VECTORS/XB-049.json"
+    },
+    "spec/external-binding-v2/vectors/XB-050.json": {
+      "sha256": "94f588521bc47224174729172a22a81e34c5f791bf449b4ca4f59b431b1e3277",
+      "upstreamPath": "Xonly/services/xonly-r4-adapter/test/fixtures/r4/method/VECTORS/XB-050.json"
+    },
+    "spec/external-binding-v2/vectors/XB-051.json": {
+      "sha256": "3136b0cf3380e14760b694cc488ef686359b9646570d0434f203df3846b5ebbc",
+      "upstreamPath": "Xonly/services/xonly-r4-adapter/test/fixtures/r4/method/VECTORS/XB-051.json"
+    },
+    "spec/external-binding-v2/vectors/XB-052.json": {
+      "sha256": "6fb7b1a5da32f65c9b803aba20d9541b8fc7e5d503f5b56b26edae709745c9f8",
+      "upstreamPath": "Xonly/services/xonly-r4-adapter/test/fixtures/r4/method/VECTORS/XB-052.json"
+    },
+    "spec/external-binding-v2/vectors/XB-053.json": {
+      "sha256": "02db39b6e44d2c4429ff3066dd416fa30a6b9ddb1124d33e36aaece088070069",
+      "upstreamPath": "Xonly/services/xonly-r4-adapter/test/fixtures/r4/method/VECTORS/XB-053.json"
+    },
+    "spec/external-binding-v2/vectors/XB-054.json": {
+      "sha256": "4bed355ee5a41448b3519792c98f4e1a091f52f7d58405ffc17698a31d651232",
+      "upstreamPath": "Xonly/services/xonly-r4-adapter/test/fixtures/r4/method/VECTORS/XB-054.json"
+    },
+    "spec/external-binding-v2/vectors/XB-055.json": {
+      "sha256": "4aafd9838cc35cd25d552792560f02a5f6bf404db060f3c024c8c63081fea89f",
+      "upstreamPath": "Xonly/services/xonly-r4-adapter/test/fixtures/r4/method/VECTORS/XB-055.json"
+    },
+    "spec/external-binding-v2/vectors/XB-056.json": {
+      "sha256": "d9b3b25bb4cd28a9f8928726a4b6d8582c9ba110a5f6b3d132ed439b344ec7b6",
+      "upstreamPath": "Xonly/services/xonly-r4-adapter/test/fixtures/r4/method/VECTORS/XB-056.json"
+    },
+    "spec/external-binding-v2/vectors/XB-057.json": {
+      "sha256": "797bc91c711ccc1a326a1ba712647ea8511a38d2244f4e7a858c101f639d354f",
+      "upstreamPath": "Xonly/services/xonly-r4-adapter/test/fixtures/r4/method/VECTORS/XB-057.json"
+    },
+    "spec/external-binding-v2/vectors/XB-058.json": {
+      "sha256": "cc8e4de214c60678ab186b722cae397a807c1e0742f55489015bc9ad231a5c97",
+      "upstreamPath": "Xonly/services/xonly-r4-adapter/test/fixtures/r4/method/VECTORS/XB-058.json"
+    },
+    "spec/external-binding-v2/vectors/XB-059.json": {
+      "sha256": "97b8a714611c21eac07f43dde46cef245fab9467b5f0fab92091d7bb86d47e11",
+      "upstreamPath": "Xonly/services/xonly-r4-adapter/test/fixtures/r4/method/VECTORS/XB-059.json"
+    },
+    "spec/external-binding-v2/vectors/XB-060.json": {
+      "sha256": "bc3f7f2e5122a0e1a04b6b37c0fdd08173e2adb8832a4ce391b633be06c32ea2",
+      "upstreamPath": "Xonly/services/xonly-r4-adapter/test/fixtures/r4/method/VECTORS/XB-060.json"
+    },
+    "spec/external-binding-v2/vectors/XB-061.json": {
+      "sha256": "fbaa91fa64a0b17ae79ec37cd57d90627a418fad76d4772e533ce56ab44fdf68",
+      "upstreamPath": "Xonly/services/xonly-r4-adapter/test/fixtures/r4/method/VECTORS/XB-061.json"
+    },
+    "spec/external-binding-v2/vectors/XB-062.json": {
+      "sha256": "67064bc746a53113b6e83e0174cd1201ce21e2daa9c0335ffcc91efff20c3f87",
+      "upstreamPath": "Xonly/services/xonly-r4-adapter/test/fixtures/r4/method/VECTORS/XB-062.json"
+    },
+    "spec/external-binding-v2/vectors/XB-063.json": {
+      "sha256": "17bec58de5b346b909ce04a254e0de0999831875144464e1bf16b64063307998",
+      "upstreamPath": "Xonly/services/xonly-r4-adapter/test/fixtures/r4/method/VECTORS/XB-063.json"
+    },
+    "spec/external-binding-v2/vectors/XB-064.json": {
+      "sha256": "466d8089be12fc405660ed8e5a1a85ed6132198e31d571d0f717478ba64a6cc2",
+      "upstreamPath": "Xonly/services/xonly-r4-adapter/test/fixtures/r4/method/VECTORS/XB-064.json"
+    },
+    "spec/external-binding-v2/vectors/XB-065.json": {
+      "sha256": "9d502f803e7157ae6fb3bacf32a5b968aea1daaac7338a5b069f0e02ac6d9772",
+      "upstreamPath": "Xonly/services/xonly-r4-adapter/test/fixtures/r4/method/VECTORS/XB-065.json"
+    },
+    "spec/external-binding-v2/vectors/XB-066.json": {
+      "sha256": "84b2df02f27ae5f4b9e10f755a5e26d3f158e3d6ed70fdf04bd0857a940cb716",
+      "upstreamPath": "Xonly/services/xonly-r4-adapter/test/fixtures/r4/method/VECTORS/XB-066.json"
+    },
+    "spec/external-binding-v2/vectors/XB-067.json": {
+      "sha256": "2739e5816ff96bc709974ee4546fef910d4e58a7a97938317b2cf6ecf125da82",
+      "upstreamPath": "Xonly/services/xonly-r4-adapter/test/fixtures/r4/method/VECTORS/XB-067.json"
+    },
+    "spec/external-binding-v2/vectors/XB-068.json": {
+      "sha256": "e50d92cb17d3f29acdc6f911aa3aaf6e40bfbd499eea5da3ee5611899923e267",
+      "upstreamPath": "Xonly/services/xonly-r4-adapter/test/fixtures/r4/method/VECTORS/XB-068.json"
+    },
+    "spec/external-binding-v2/vectors/XB-069.json": {
+      "sha256": "dcda3d0d6064a9a9fae4d0bd7da052fb1e60f9944721dc086668919302976a4b",
+      "upstreamPath": "Xonly/services/xonly-r4-adapter/test/fixtures/r4/method/VECTORS/XB-069.json"
+    },
+    "spec/external-binding-v2/vectors/XB-070.json": {
+      "sha256": "cf816c608da3c8f8552fe2cb5a6cf02a9651bbbd674d8fa308ae3a55a3728cc6",
+      "upstreamPath": "Xonly/services/xonly-r4-adapter/test/fixtures/r4/method/VECTORS/XB-070.json"
+    },
+    "spec/external-binding-v2/vectors/XB-071.json": {
+      "sha256": "4c0634be6aa2e1f51d9c230359146e3ef78535dad2d554a79ca3e20c0aea4f50",
+      "upstreamPath": "Xonly/services/xonly-r4-adapter/test/fixtures/r4/method/VECTORS/XB-071.json"
+    },
+    "spec/external-binding-v2/vectors/XB-072.json": {
+      "sha256": "b72fdd593577f29729d329249e1872d0f776cf5a71a4ad0a3ee0112aa5d4c4af",
+      "upstreamPath": "Xonly/services/xonly-r4-adapter/test/fixtures/r4/method/VECTORS/XB-072.json"
+    },
+    "spec/external-binding-v2/vectors/XB-073.json": {
+      "sha256": "cf156e2771d634c066d21f3443c5cd6996d5e295e331497bff1f3654fe5bd9be",
+      "upstreamPath": "Xonly/services/xonly-r4-adapter/test/fixtures/r4/method/VECTORS/XB-073.json"
+    },
+    "spec/external-binding-v2/vectors/XB-074.json": {
+      "sha256": "620aaf93b3dc6aae37e9cf5e27288822ef2272a816921bfc74def20786d1c917",
+      "upstreamPath": "Xonly/services/xonly-r4-adapter/test/fixtures/r4/method/VECTORS/XB-074.json"
+    },
+    "spec/external-binding-v2/vectors/XB-075.json": {
+      "sha256": "40a82201b0cf69c2de8917307af444b87ca5bebabc172e92401fdfacde250d86",
+      "upstreamPath": "Xonly/services/xonly-r4-adapter/test/fixtures/r4/method/VECTORS/XB-075.json"
+    },
+    "spec/external-binding-v2/vectors/XB-076.json": {
+      "sha256": "ba184c6e842875bfe50b4980f3b77dd17a129171809591acf5e3ef5d9c1bfb3d",
+      "upstreamPath": "Xonly/services/xonly-r4-adapter/test/fixtures/r4/method/VECTORS/XB-076.json"
+    },
+    "spec/external-binding-v2/vectors/XB-077.json": {
+      "sha256": "3a37586945fa317361697992080f30b8970f37f4d90a0e8240620cef0c92dd9d",
+      "upstreamPath": "Xonly/services/xonly-r4-adapter/test/fixtures/r4/method/VECTORS/XB-077.json"
+    },
+    "spec/external-binding-v2/vectors/XB-078.json": {
+      "sha256": "8da45b097c79ed4bfd254f23426e6b45f59ee3758892ccb4425c08f7e0576d63",
+      "upstreamPath": "Xonly/services/xonly-r4-adapter/test/fixtures/r4/method/VECTORS/XB-078.json"
+    },
+    "spec/external-binding-v2/vectors/XB-079.json": {
+      "sha256": "0221a1f360f577b0e0262f66fd224752acb3d1abeb331f0ac965e1cad25efd1f",
+      "upstreamPath": "Xonly/services/xonly-r4-adapter/test/fixtures/r4/method/VECTORS/XB-079.json"
+    },
+    "spec/external-binding-v2/vectors/XB-080.json": {
+      "sha256": "1f4e43a06ac64f8b1cb3e3bab3c9bf371792b135c36947457c0de82614b958e4",
+      "upstreamPath": "Xonly/services/xonly-r4-adapter/test/fixtures/r4/method/VECTORS/XB-080.json"
+    },
+    "spec/external-binding-v2/vectors/XB-081.json": {
+      "sha256": "41e5b1899f50b4145eca1be602cff83d5efb4525fc61b10b4008025eae435b28",
+      "upstreamPath": "Xonly/services/xonly-r4-adapter/test/fixtures/r4/method/VECTORS/XB-081.json"
+    },
+    "spec/external-binding-v2/vectors/XB-082.json": {
+      "sha256": "f238e2bda0e5d33db1b03497a3403efd10a4c899bc388cc76eb938f62c2af300",
+      "upstreamPath": "Xonly/services/xonly-r4-adapter/test/fixtures/r4/method/VECTORS/XB-082.json"
+    },
+    "spec/external-binding-v2/vectors/XB-083.json": {
+      "sha256": "4b25edb7a374cecb9faae91c1677de3898e8556f81131a5c6b6b37437f2ccb96",
+      "upstreamPath": "Xonly/services/xonly-r4-adapter/test/fixtures/r4/method/VECTORS/XB-083.json"
+    },
+    "spec/external-binding-v2/vectors/XB-084.json": {
+      "sha256": "5d155a4ce77be8dbff2817d78bf1ee289158928152ec9cb8b4a5ace5d05f3a39",
+      "upstreamPath": "Xonly/services/xonly-r4-adapter/test/fixtures/r4/method/VECTORS/XB-084.json"
+    },
+    "spec/external-binding-v2/vectors/XB-085.json": {
+      "sha256": "563e2ead37f38f70d317f850ac02162f93e8b17327f1d57e68e2ed6206009500",
+      "upstreamPath": "Xonly/services/xonly-r4-adapter/test/fixtures/r4/method/VECTORS/XB-085.json"
+    },
+    "spec/external-binding-v2/vectors/XB-086.json": {
+      "sha256": "4bb34a7395f7b8f4038cf463222fdb2e86eba9c1fdf465bb7c25714f9b076089",
+      "upstreamPath": "Xonly/services/xonly-r4-adapter/test/fixtures/r4/method/VECTORS/XB-086.json"
+    },
+    "spec/external-binding-v2/vectors/XB-087.json": {
+      "sha256": "fb22096c00b7c4a809135136b4dcb260c443e4466bccb8bef3234627a0b2f3c7",
+      "upstreamPath": "Xonly/services/xonly-r4-adapter/test/fixtures/r4/method/VECTORS/XB-087.json"
+    },
+    "spec/external-binding-v2/vectors/XB-088.json": {
+      "sha256": "c96675c45248531b520de4351d92843350f9a90ffc2f46655dd829d3e61d4c24",
+      "upstreamPath": "Xonly/services/xonly-r4-adapter/test/fixtures/r4/method/VECTORS/XB-088.json"
+    },
+    "spec/external-binding-v2/vectors/XB-089.json": {
+      "sha256": "aa68dec6297fb0c3e59f08126a7a8bfc05f759fd213d40381957b4b0e315f867",
+      "upstreamPath": "Xonly/services/xonly-r4-adapter/test/fixtures/r4/method/VECTORS/XB-089.json"
+    },
+    "spec/external-binding-v2/vectors/XB-090.json": {
+      "sha256": "cc001d245ac4d01aaab4f8a221ccdf2ef89a054e2a57edd85bb3f83ba4b5fdd1",
+      "upstreamPath": "Xonly/services/xonly-r4-adapter/test/fixtures/r4/method/VECTORS/XB-090.json"
+    },
+    "spec/external-binding-v2/vectors/XB-091.json": {
+      "sha256": "c0ffcc4bc527e39b4589136a25345a532289fa9ab86b899afc05df01de33b410",
+      "upstreamPath": "Xonly/services/xonly-r4-adapter/test/fixtures/r4/method/VECTORS/XB-091.json"
+    },
+    "spec/external-binding-v2/vectors/XB-092.json": {
+      "sha256": "b1ea473211836499f80a63f002f989d72db5327d77c75ba5ca271c9628a0c68f",
+      "upstreamPath": "Xonly/services/xonly-r4-adapter/test/fixtures/r4/method/VECTORS/XB-092.json"
+    },
+    "spec/external-binding-v2/vectors/XB-093.json": {
+      "sha256": "b07ad6d4662bff6c375891598f9c3f48c516fe01babfee104b9d8006840ce75d",
+      "upstreamPath": "Xonly/services/xonly-r4-adapter/test/fixtures/r4/method/VECTORS/XB-093.json"
+    },
+    "spec/external-binding-v2/vectors/XB-094.json": {
+      "sha256": "a287982418b5dd46f9b95632763d89d3e410163053a21a7f9bcae8070ae33fd0",
+      "upstreamPath": "Xonly/services/xonly-r4-adapter/test/fixtures/r4/method/VECTORS/XB-094.json"
+    },
+    "spec/external-binding-v2/vectors/XB-095.json": {
+      "sha256": "66a3f0ce10773016ecfce55632a62f9038d179f12bb1321d72133e156c649184",
+      "upstreamPath": "Xonly/services/xonly-r4-adapter/test/fixtures/r4/method/VECTORS/XB-095.json"
+    },
+    "spec/external-binding-v2/vectors/XB-096.json": {
+      "sha256": "e44e552cc3796bed04dd2bf2a3377a8144ed315d00360f2d25f74e65345a3b06",
+      "upstreamPath": "Xonly/services/xonly-r4-adapter/test/fixtures/r4/method/VECTORS/XB-096.json"
+    },
+    "spec/external-binding-v2/vectors/XB-097.json": {
+      "sha256": "b9f6a24216c66ad880c9149ea962b2455c918139088dc27fe3d8f490e9b7a279",
+      "upstreamPath": "Xonly/services/xonly-r4-adapter/test/fixtures/r4/method/VECTORS/XB-097.json"
+    },
+    "sdk/external-binding-v2/test/fixture-secp256k1.mjs": {
+      "sha256": "de145273589356779e36421ad16b4e2addbf0ec6b5895ac95f680b99326f2735",
+      "upstreamPath": "Xonly/services/xonly-r4-adapter/src/r4/reference/secp256k1.mjs"
+    }
+  }
+}

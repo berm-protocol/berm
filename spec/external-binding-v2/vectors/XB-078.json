@@ -1,0 +1,22 @@
+{
+  "id": "XB-078",
+  "capture": {
+    "status": 200,
+    "redirects": 0,
+    "body": {
+      "utf8": "{\"text\":\"proving control of my key\\n\\nBerm Protocol: @alice permanently binds to npub1r5jzkv3egpr5u42uvd48z7rls6xefxaz4xct00k9enfa4c0galmqmcn7ex #bermprotocol\\n\\n— berm\",\"id_str\":\"1900000000000000000\",\"user\":{\"id_str\":\"44196397\",\"screen_name\":\"alice\"}}"
+    }
+  },
+  "expectedNpub": "npub1r5jzkv3egpr5u42uvd48z7rls6xefxaz4xct00k9enfa4c0galmqmcn7ex",
+  "purpose": "observedAt at exactly 2^53-1 is inside the admitted range",
+  "observedAt": 9007199254740991,
+  "branch": "observedat_safe_max",
+  "expect": {
+    "ok": false,
+    "code": "observation_outside_window"
+  },
+  "note": "ADMITTED as a number and refused on time — the range test passes, the window test does not. Separating the two is the point: an implementation reporting bad_observed_at here has the wrong bound",
+  "methodId": "berm.external_account_binding.x/2",
+  "methodHash": "sha256:a95319d8664b16ca355b3d82bc8c4d5bb6007c8aed65116a74447f79b0e5e193",
+  "vectorHash": "sha256:bfaefa4465ef8f77de035177c3d8ffc8456e914c83c361c403e09b93ad6f0dca"
+}

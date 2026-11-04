@@ -1,0 +1,21 @@
+{
+  "id": "XB-022",
+  "capture": {
+    "status": 200,
+    "redirects": 0,
+    "body": {
+      "utf8": "{\"__proto__\":{\"text\":\"npub1r5jzkv3egpr5u42uvd48z7rls6xefxaz4xct00k9enfa4c0galmqmcn7ex\"},\"id_str\":\"1900000000000000000\",\"user\":{\"id_str\":\"44196397\",\"screen_name\":\"alice\"}}"
+    }
+  },
+  "expectedNpub": "npub1r5jzkv3egpr5u42uvd48z7rls6xefxaz4xct00k9enfa4c0galmqmcn7ex",
+  "purpose": "a `__proto__` member injecting an inherited `text`",
+  "expect": {
+    "ok": false,
+    "code": "prototype_member"
+  },
+  "note": "R13-A REISSUE R1 returned a POSITIVE BINDING for this exact body — the response has NO own `text` member, and `'text' in doc` consulted the prototype the attacker supplied. Two defences now: null-prototype containers, and `__proto__` refused as a member name.",
+  "observedAt": 1741830275949,
+  "methodId": "berm.external_account_binding.x/2",
+  "methodHash": "sha256:a95319d8664b16ca355b3d82bc8c4d5bb6007c8aed65116a74447f79b0e5e193",
+  "vectorHash": "sha256:e42e4a2928f7206a9bc3ae83cde6c499fb6ddd6a1c36efb42c64aecc11bb83f8"
+}

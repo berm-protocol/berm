@@ -9,6 +9,11 @@ x_article: none
 
 # SDK reference
 
+This is the generic Nostr event SDK, not the restricted external-binding claim
+signer. Its event-signing session does not grant current Berm claim-signing
+permission. For `/2` method and evidence verification, use the
+[current binding developer quickstart](developer-current.md).
+
 `@berm/sdk` — the `window.berm` surface.
 
 Every method is **async**, **approvable** and **failable**, because the

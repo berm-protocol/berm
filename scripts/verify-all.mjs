@@ -34,6 +34,11 @@ const ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
  * if a declaration stops covering reality, so this list cannot quietly rot.
  */
 const GROUPS = [
+  { name: 'external-binding-v2', dir: '.', why: 'exact current method, signed evidence, fresh developer example and source drift', steps: [
+    ['node', ['sdk/external-binding-v2/verify.mjs']],
+    ['node', ['--test', 'sdk/external-binding-v2/test.mjs']],
+    ['node', ['scripts/check-protocol-docs.mjs']],
+  ]},
   { name: 'crypto', dir: 'crypto', why: 'identity derivation, vectors, the v1 quarantine', steps: [
     ['npm', ['ci', '--no-audit', '--no-fund']],
     ['npm', ['run', 'typecheck']],

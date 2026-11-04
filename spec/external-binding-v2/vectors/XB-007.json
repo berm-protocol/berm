@@ -1,0 +1,20 @@
+{
+  "id": "XB-007",
+  "capture": {
+    "status": 200,
+    "redirects": 0,
+    "body": {
+      "utf8": "{\"text\":\"proving control of my key\\n\\nBerm Protocol: @alice permanently binds to npub1r5jzkv3egpr5u42uvd48z7rls6xefxaz4xct00k9enfa4c0galmqmcn7ex #bermprotocol\\n\\n— berm\",\"id_str\":\"1900000000000000000\",\"user\":{\"id_str\":\"44196397\",\"screen_name\":\"alice\"}}"
+    }
+  },
+  "expectedNpub": "npub1r5jzkv3egpr5u42uvd48z7rls6xefxaz4xct00k9enfa4c0galmqmcn7ex",
+  "purpose": "observedAt is negative",
+  "observedAt": -1,
+  "expect": {
+    "ok": false,
+    "code": "bad_observed_at"
+  },
+  "methodId": "berm.external_account_binding.x/2",
+  "methodHash": "sha256:a95319d8664b16ca355b3d82bc8c4d5bb6007c8aed65116a74447f79b0e5e193",
+  "vectorHash": "sha256:dae53ac0a8a6e35e63f0a0dab10efdb5e859c8096f5b67effba337f40a58183c"
+}

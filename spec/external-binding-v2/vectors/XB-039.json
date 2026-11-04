@@ -1,0 +1,22 @@
+{
+  "id": "XB-039",
+  "capture": {
+    "status": 200,
+    "redirects": 0,
+    "body": {
+      "utf8": "{\"text\":\"see xnpub1r5jzkv3egpr5u42uvd48z7rls6xefxaz4xct00k9enfa4c0galmqmcn7exy\",\"id_str\":\"1900000000000000000\",\"user\":{\"id_str\":\"44196397\",\"screen_name\":\"alice\"}}"
+    }
+  },
+  "expectedNpub": "npub1r5jzkv3egpr5u42uvd48z7rls6xefxaz4xct00k9enfa4c0galmqmcn7ex",
+  "purpose": "the npub appears only inside a longer token, never as a line",
+  "branch": "npub_inside_token",
+  "expect": {
+    "ok": false,
+    "code": "npub_absent"
+  },
+  "note": "distinguishing this from absence is what lets a UI explain the real mistake",
+  "observedAt": 1741830275949,
+  "methodId": "berm.external_account_binding.x/2",
+  "methodHash": "sha256:a95319d8664b16ca355b3d82bc8c4d5bb6007c8aed65116a74447f79b0e5e193",
+  "vectorHash": "sha256:c5d4e40e4e612cf4337a7d6bff582cff63e74fe975ce95f882bbad08d3e169f0"
+}

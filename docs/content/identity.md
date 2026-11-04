@@ -1,13 +1,33 @@
 ---
 d: docs/identity
 title: Identity and X
-summary: How a handle becomes a claim, why the proof must be archived, and what happens the day the account dies.
+summary: Current signed Berm binding and the separately preserved historical NIP-39 archive workflow.
 t: [berm, identity, x]
 nav: 5
 x_article: adapted
 ---
 
 # Identity and X
+
+## Current external account binding
+
+The current method is [the pinned /2 standard](current-standard.md). It derives
+an exact six-field binding from the fixed public proof line and raw X capture,
+then checks the user's signed subject claim, role-authorized observations and
+an independently selected application policy. A public URL, two relay accepts
+or an archive snapshot alone cannot establish this verdict.
+
+Use the [standalone current-method quickstart](developer-current.md) to execute
+its actual verifier and signed evidence fold. The public Xonly Link integration
+is a separately reviewed application; this documentation does not certify its
+production installation or expand its claim signer's origin permissions.
+
+## Historical NIP-39 and archive workflow
+
+The remainder of this page records the older generic SDK workflow. Its
+`verified` terminology is the legacy renderer's state, NOT the current Berm
+`/2` application acceptance verdict. Preserve original records without silently
+upgrading them or declaring that their historical evidence never existed.
 
 X is on the **authentication** path and never on the **correctness** path. Every
 design decision here follows from that sentence, and the test for any proposed

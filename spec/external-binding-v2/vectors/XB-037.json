@@ -1,0 +1,21 @@
+{
+  "id": "XB-037",
+  "capture": {
+    "status": 200,
+    "redirects": 0,
+    "body": {
+      "utf8": "{\"text\":\"my key is npub18fq5sn6kt4jxkuneszrca9vu5w4trw9lcmxafklza8c00ls9psfsn40ehv\",\"id_str\":\"1900000000000000000\",\"user\":{\"id_str\":\"44196397\",\"screen_name\":\"alice\"}}"
+    }
+  },
+  "expectedNpub": "npub1r5jzkv3egpr5u42uvd48z7rls6xefxaz4xct00k9enfa4c0galmqmcn7ex",
+  "purpose": "a DIFFERENT npub appears in prose — absent, not accepted",
+  "branch": "npub_other_in_prose",
+  "expect": {
+    "ok": false,
+    "code": "npub_absent"
+  },
+  "observedAt": 1741830275949,
+  "methodId": "berm.external_account_binding.x/2",
+  "methodHash": "sha256:a95319d8664b16ca355b3d82bc8c4d5bb6007c8aed65116a74447f79b0e5e193",
+  "vectorHash": "sha256:ec0f85482c32b2e6d8ae798dc28242f4de7dbe2d224376d1435762eaa90a7475"
+}

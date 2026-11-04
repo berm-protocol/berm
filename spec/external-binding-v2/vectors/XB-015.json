@@ -1,0 +1,21 @@
+{
+  "id": "XB-015",
+  "capture": {
+    "status": 200,
+    "redirects": 0,
+    "body": {
+      "base64": "//79"
+    }
+  },
+  "expectedNpub": "npub1r5jzkv3egpr5u42uvd48z7rls6xefxaz4xct00k9enfa4c0galmqmcn7ex",
+  "purpose": "the body is not valid UTF-8",
+  "expect": {
+    "ok": false,
+    "code": "body_not_utf8"
+  },
+  "note": "a lone 0xff can never begin a UTF-8 sequence; decoding is fatal, not lossy",
+  "observedAt": 1741830275949,
+  "methodId": "berm.external_account_binding.x/2",
+  "methodHash": "sha256:a95319d8664b16ca355b3d82bc8c4d5bb6007c8aed65116a74447f79b0e5e193",
+  "vectorHash": "sha256:d8fb5f1b9efd4ac83135d3aa2d076abbfab77566a315f7a4bcda97146f5f38c0"
+}

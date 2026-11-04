@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://berm.protocol/schemas/BindingObservation/1",
+  "title": "BindingObservation \u2014 one validator states what its own fetch derived",
+  "description": "Signed by the VALIDATOR-INSTANCE key. It says: I fetched this post, I ran this method over what came back, and this is the binding I derived. It does NOT claim universal acceptance, and no field in it can. Acceptance is an application's decision under its own published policy.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "kind",
+    "namespace",
+    "binding",
+    "bindingHash",
+    "observedAt",
+    "methodId",
+    "methodHash",
+    "acquisitionId",
+    "acquisitionHash",
+    "validatorKey",
+    "authorizationRef",
+    "sig"
+  ],
+  "properties": {
+    "kind": {
+      "const": "berm.binding_observation/1"
+    },
+    "namespace": {
+      "$ref": "https://berm.protocol/schemas/common.defs/1#/$defs/namespace"
+    },
+    "binding": {
+      "$ref": "https://berm.protocol/schemas/common.defs/1#/$defs/binding"
+    },
+    "bindingHash": {
+      "$ref": "https://berm.protocol/schemas/common.defs/1#/$defs/sha256"
+    },
+    "captureHash": {
+      "$ref": "https://berm.protocol/schemas/common.defs/1#/$defs/sha256",
+      "$comment": "OPTIONAL signed provenance/audit metadata, and OUTSIDE ACCEPTANCE (R13R-B06, GPT-R4DR-B01, GPT-R4DR-R2-02). Absence is structurally admissible: an observation omitting it is fully conforming and is accepted on identical terms. When present it IS signed, because `sig` is the only member the artifact projection omits. It is not in the binding and not in bindingHash. Presence, absence, equality and inequality never affect acceptance or any validator-independence claim. V1 acceptance is bindingHash equality and nothing else. R13-A's fold required capture hashes to DIFFER, which added a second comparison law to the acceptance path and contradicted its own statement that honest validators merely SHOULD differ. A reader may compare capture hashes and draw conclusions; no acceptance outcome may depend on it. See EVIDENCE_FOLD.md section 4."
+    },
+    "observedAt": {
+      "type": "integer",
+      "minimum": 0,
+      "$comment": "the value this validator passed to the method. A CLAIM about its own clock, believable to nobody as objective time \u2014 MethodSpec section 11.2."
+    },
+    "methodId": {
+      "$ref": "https://berm.protocol/schemas/common.defs/1#/$defs/methodId"
+    },
+    "methodHash": {
+      "$ref": "https://berm.protocol/schemas/common.defs/1#/$defs/sha256"
+    },
+    "acquisitionId": {
+      "$ref": "https://berm.protocol/schemas/common.defs/1#/$defs/methodId"
+    },
+    "acquisitionHash": {
+      "$ref": "https://berm.protocol/schemas/common.defs/1#/$defs/sha256"
+    },
+    "validatorKey": {
+      "$ref": "https://berm.protocol/schemas/common.defs/1#/$defs/xonlyKey"
+    },
+    "authorizationRef": {
+      "$ref": "https://berm.protocol/schemas/common.defs/1#/$defs/artifactId",
+      "$comment": "the artifactId of the ValidatorAuthorization this key observes under"
+    },
+    "sig": {
+      "$ref": "https://berm.protocol/schemas/common.defs/1#/$defs/signature"
+    }
+  },
+  "$comment": "captureHash IS OPTIONAL (GPT-R4DR-B01). The R4 candidate carried it in `required`, which contradicts the controlling authoring order \u00a74.9: it remains optional provenance and is never an acceptance or independence gate. A mandatory Stage-A member IS an acceptance gate whatever the prose beside it says. The property stays declared with its sha256 format; when present it is signed, because `sig` is the only member the artifact projection omits. Presence, absence, equality and inequality all stay outside acceptance."
+}

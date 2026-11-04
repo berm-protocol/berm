@@ -1,0 +1,21 @@
+{
+  "id": "XB-036",
+  "capture": {
+    "status": 200,
+    "redirects": 0,
+    "body": {
+      "utf8": "{\"text\":\"no key here\",\"id_str\":\"1900000000000000000\",\"user\":{\"id_str\":\"44196397\",\"screen_name\":\"alice\"}}"
+    }
+  },
+  "expectedNpub": "npub1r5jzkv3egpr5u42uvd48z7rls6xefxaz4xct00k9enfa4c0galmqmcn7ex",
+  "purpose": "the npub does not appear in the text at all",
+  "branch": "npub_nowhere",
+  "expect": {
+    "ok": false,
+    "code": "npub_absent"
+  },
+  "observedAt": 1741830275949,
+  "methodId": "berm.external_account_binding.x/2",
+  "methodHash": "sha256:a95319d8664b16ca355b3d82bc8c4d5bb6007c8aed65116a74447f79b0e5e193",
+  "vectorHash": "sha256:8408ce4ff54037aae4451264b6896151a8e3b89c099e57df7bdf0f5f6023aabe"
+}

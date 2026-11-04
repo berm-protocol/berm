@@ -1,7 +1,7 @@
 ---
 d: docs/start
 title: Start here
-summary: A signed, published event in ten minutes. No X developer app, no API key, nothing anyone can revoke.
+summary: Run the current binding quickstart or build and test the separate generic Nostr event SDK locally.
 t: [berm, quickstart]
 nav: 1
 x_article: none
@@ -9,24 +9,24 @@ x_article: none
 
 # Start here
 
-Ten minutes, one HTML file, no accounts to create.
+For current X-account binding, begin with the
+[current binding developer quickstart](developer-current.md). The example below
+is the separate generic Nostr event SDK, not proof of a current Berm binding.
 
-## 1. Get the SDK
+## 1. Build the existing SDK locally
+
+From a fresh repository checkout with Node 22.6 or newer:
 
 ```bash
-npm install @berm/sdk
+npm --prefix sdk ci --no-audit --no-fund
+npm --prefix sdk run bundle
+npm --prefix sdk run example:verify
 ```
 
-Or drop the browser build in and skip the build step entirely:
-
-```html
-<script src="https://docs.xonly.ai/dist/berm-sdk.global.min.js"
-        integrity="sha256-…" crossorigin="anonymous"></script>
-```
-
-The integrity hash is printed by `npm run bundle` and published with every
-release. Use it. A project whose whole claim is "public and verifiable" should
-not be asking you to load an unchecked script.
+The bundled file is `sdk/dist/berm-sdk.global.js`. Serve those verified bytes
+from your own application origin. Do not use a placeholder integrity string or
+assume an unpublished CDN/package URL exists. `example:verify` uses disposable
+local relays; its receipt is not public publication authority.
 
 ## 2. Connect, sign, publish
 

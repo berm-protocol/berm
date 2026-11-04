@@ -63,7 +63,13 @@ credentials, or BermLaunch holding privileged X credentials.
 | Producer law | `berm.composer_producer_law/2` | `sha256:ed9e25056cbdec7d14fa568a731513eef5255c5febed061573afee4db1143aaa` |
 | BermLaunch composer profile | `bermlaunch.composer.support-v1/2` | `sha256:0db5286615d9c822a6d721a697cf5f5a43162b51175010b1efe44c4936188b19` |
 
-The BermLaunch composer X adapter remains `ACTIVATION_PENDING_ONE_REAL_X_COMPOSER_SMOKE`.
+The recorded support composer status is
+`ACTIVATION_PENDING_ONE_REAL_X_COMPOSER_SMOKE`. The November 4 installed-source
+check retains that exact status; the successful cohort-card renderer deployment
+is not evidence of a real X composer smoke. Application community cards and
+support text profiles are separate from this generic identity method. The
+September 26 `CURRENT_STANDARD.json` remains the historical documentation
+projection, not a current deployment-status API.
 
 ## Identity law
 
@@ -95,5 +101,7 @@ publication       NOT AUTHORIZED
 release / tag     NOT AUTHORIZED
 ```
 
-Each of these requires a separate, explicit founder act.
+These are the authority boundaries of that historical protocol-documentation
+checkpoint. They do not reverse later separately approved BermLaunch deployments.
+This documentation alignment candidate grants none of those live effects.
 

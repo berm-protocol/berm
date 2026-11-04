@@ -1,0 +1,20 @@
+{
+  "id": "XB-017",
+  "capture": {
+    "status": 200,
+    "redirects": 0,
+    "body": {
+      "utf8": "{\"text\":\"a\"} {\"text\":\"b\"}"
+    }
+  },
+  "expectedNpub": "npub1r5jzkv3egpr5u42uvd48z7rls6xefxaz4xct00k9enfa4c0galmqmcn7ex",
+  "purpose": "trailing content after a complete value is not an unambiguous parse",
+  "expect": {
+    "ok": false,
+    "code": "json_parse_failed"
+  },
+  "observedAt": 1741830275949,
+  "methodId": "berm.external_account_binding.x/2",
+  "methodHash": "sha256:a95319d8664b16ca355b3d82bc8c4d5bb6007c8aed65116a74447f79b0e5e193",
+  "vectorHash": "sha256:769fc96720254b551b6aaecf29d65d842fd10b9ac941ddcac8f4712818288211"
+}

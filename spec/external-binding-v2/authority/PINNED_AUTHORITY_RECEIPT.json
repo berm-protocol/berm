@@ -1,0 +1,44 @@
+{
+  "schema": "bermlaunch.berm_protocol.r13a.reissue_r4.pin_receipt.v1",
+  "founderPinnedAt": "2026-08-28",
+  "authority": {
+    "filename": "OPUS_BERM_PROTOCOL_R13_A_REISSUE_R4_DETERMINISTIC_PUBLIC_LANGUAGE_CANDIDATE_R5_20260828.zip",
+    "sha256": "d47176e2e0d6809b768404c25f069103ac4c4a1bda6f70d9528544e9251784ff",
+    "bytes": 384638,
+    "standing": "EXACT_R13_A_REISSUE_R4_PROTOCOL_AUTHORITY"
+  },
+  "anchors": {
+    "methodId": "berm.external_account_binding.x/1",
+    "methodHash": "sha256:221d7348a6d9e1f4214ae31ffd21071350d098f48f128081e844545d2af88e04",
+    "acquisitionId": "berm.acquisition.x-direct-status/1",
+    "acquisitionHash": "sha256:46fbed235696decc92e298e55e3a4ee1ebd5e61d169cd3462265cb3ff5c98f1d",
+    "vectorSetHash": "sha256:e70b2e6fdf65d06be65d3ebe22d5a4d6832a736809e976ae4029246402e61c68",
+    "genericBindingHash": "sha256:6a8585232f8c9feaac62310e6414edc476f5c9d13c1a2537e43e812decab0862",
+    "composerProducerLawHash": "sha256:acc750120a0971d14e1fd91d29cd6e4b9229ee478a831a3860fae498adee8281"
+  },
+  "receiptBookkeepingCorrection": {
+    "added": 1,
+    "removed": 1,
+    "changed": 9,
+    "changesPinnedBytes": false,
+    "changesNormativeAnchor": false
+  },
+  "integrationAuthority": {
+    "authorized": true,
+    "scope": "bounded Codex BermLaunch integration and convergence round",
+    "implementationLineage": {
+      "reviewedR2Head": "f89dd3e3485d2c5dbb0c07f68ad949f30a70617a",
+      "reviewedR2Tree": "5cde293c950ca9f72661c8227cd737c27870a8ae",
+      "localConformanceCandidateStanding": "PATCH_EVIDENCE_ONLY"
+    },
+    "deterministicComposerIncluded": true,
+    "v1OpenGraphIncluded": true
+  },
+  "notAuthorized": [
+    "deployment",
+    "production mutation",
+    "release",
+    "real X post publication",
+    "composer activation without the separately authorized real-X smoke"
+  ]
+}

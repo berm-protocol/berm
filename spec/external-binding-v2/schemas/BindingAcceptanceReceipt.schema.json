@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://berm.protocol/schemas/BindingAcceptanceReceipt/1",
+  "title": "BindingAcceptanceReceipt \u2014 an application records its own decision",
+  "description": "OPTIONAL. Records that a particular application accepted a particular bindingHash under a particular policy version. It is an APPLICATION DECISION and is not the source of the identity proof: delete every receipt and the observations still prove exactly what they proved before.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "kind",
+    "application",
+    "bindingHash",
+    "policyHash",
+    "observationRefs",
+    "acceptedAt",
+    "notice",
+    "applicationKey",
+    "sig"
+  ],
+  "properties": {
+    "kind": {
+      "const": "berm.binding_acceptance_receipt/1"
+    },
+    "application": {
+      "type": "string",
+      "minLength": 1
+    },
+    "bindingHash": {
+      "$ref": "https://berm.protocol/schemas/common.defs/1#/$defs/sha256"
+    },
+    "policyHash": {
+      "$ref": "https://berm.protocol/schemas/common.defs/1#/$defs/artifactId",
+      "$comment": "artifactId of the ApplicationAcceptancePolicy this decision was made under. It is a REFERENCE, and it is covered by this receipt's signature \u2014 changing it invalidates both the signature and the receipt's own artifactId."
+    },
+    "observationRefs": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "https://berm.protocol/schemas/common.defs/1#/$defs/artifactId"
+      },
+      "$comment": "artifactIds of the exact observations this decision rested on, so a reader who disagrees can reproduce it"
+    },
+    "acceptedAt": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "notice": {
+      "const": "This is an application decision under its own published policy. It is not the source of the identity proof and confers no protocol standing.",
+      "$comment": "A const string, so the disclaimer cannot be dropped while the artifact still validates."
+    },
+    "applicationKey": {
+      "$ref": "https://berm.protocol/schemas/common.defs/1#/$defs/xonlyKey"
+    },
+    "sig": {
+      "$ref": "https://berm.protocol/schemas/common.defs/1#/$defs/signature"
+    }
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "id": "XB-096",
+  "capture": {
+    "status": 200,
+    "redirects": 0,
+    "body": {
+      "utf8": "{\"text\":\"Berm Protocol: @alice permanently binds to Npub1r5jzkv3egpr5u42uvd48z7rls6xefxaz4xct00k9enfa4c0galmqmcn7ex #bermprotocol\",\"id_str\":\"1900000000000000000\",\"user\":{\"id_str\":\"44196397\",\"screen_name\":\"alice\"}}"
+    }
+  },
+  "expectedNpub": "npub1r5jzkv3egpr5u42uvd48z7rls6xefxaz4xct00k9enfa4c0galmqmcn7ex",
+  "purpose": "autocapitalised npub prefix is refused",
+  "branch": "r8_uppercase_npub_first_character",
+  "expect": {
+    "ok": false,
+    "code": "npub_absent"
+  },
+  "note": "R8 handle-bound proof-line successor coverage; generated mechanically from the frozen XB-001 capture.",
+  "observedAt": 1741830275949,
+  "methodId": "berm.external_account_binding.x/2",
+  "methodHash": "sha256:a95319d8664b16ca355b3d82bc8c4d5bb6007c8aed65116a74447f79b0e5e193",
+  "vectorHash": "sha256:d632bcd0d35c48bef4393def193eb5512718e161452c8987f74d5aa2d6735f2e"
+}

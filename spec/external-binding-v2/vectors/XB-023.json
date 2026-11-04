@@ -1,0 +1,21 @@
+{
+  "id": "XB-023",
+  "capture": {
+    "status": 200,
+    "redirects": 0,
+    "body": {
+      "utf8": "{\"text\":\"Berm Protocol: @alice permanently binds to npub1r5jzkv3egpr5u42uvd48z7rls6xefxaz4xct00k9enfa4c0galmqmcn7ex #bermprotocol\",\"id_str\":\"1900000000000000000\",\"user\":{\"__proto__\":{\"screen_name\":\"mallory\"},\"id_str\":\"44196397\"}}"
+    }
+  },
+  "expectedNpub": "npub1r5jzkv3egpr5u42uvd48z7rls6xefxaz4xct00k9enfa4c0galmqmcn7ex",
+  "purpose": "a `__proto__` member NESTED inside the user object",
+  "expect": {
+    "ok": false,
+    "code": "prototype_member"
+  },
+  "note": "refused at every depth — a polluted `user` could otherwise supply an inherited handle while the response carried none",
+  "observedAt": 1741830275949,
+  "methodId": "berm.external_account_binding.x/2",
+  "methodHash": "sha256:a95319d8664b16ca355b3d82bc8c4d5bb6007c8aed65116a74447f79b0e5e193",
+  "vectorHash": "sha256:9caf1a1a8a31efbd05c1aecc6b57c166dbc80e62b4b7309d02ecfd040eda4024"
+}

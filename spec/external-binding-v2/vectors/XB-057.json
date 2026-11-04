@@ -1,0 +1,29 @@
+{
+  "id": "XB-057",
+  "capture": {
+    "status": 200,
+    "redirects": 0,
+    "body": {
+      "utf8": "{\"text\":\"Berm Protocol: @alice permanently binds to npub1r5jzkv3egpr5u42uvd48z7rls6xefxaz4xct00k9enfa4c0galmqmcn7ex #bermprotocol\\ntrailing\",\"id_str\":\"1900000000000000000\",\"user\":{\"id_str\":\"44196397\",\"screen_name\":\"alice\"}}"
+    }
+  },
+  "expectedNpub": "npub1r5jzkv3egpr5u42uvd48z7rls6xefxaz4xct00k9enfa4c0galmqmcn7ex",
+  "purpose": "U+000A after the npub DOES terminate a line — the matrix control",
+  "branch": "non_lf_control_u000a",
+  "expect": {
+    "binding": {
+      "npub": "npub1r5jzkv3egpr5u42uvd48z7rls6xefxaz4xct00k9enfa4c0galmqmcn7ex",
+      "accountId": "44196397",
+      "handle": "alice",
+      "postId": "1900000000000000000",
+      "textHash": "sha256:20cd53d2cc9a4b4aa810d4911c619a75a466afd12c5589042f4b9e253582c78c",
+      "methodHash": "sha256:a95319d8664b16ca355b3d82bc8c4d5bb6007c8aed65116a74447f79b0e5e193"
+    },
+    "bindingHash": "sha256:7b520fa87e3d7e7bd32fce8d90b6551eb74e7ef34bcab2a8514d3f5a3a585de9"
+  },
+  "note": "the one separator that IS a separator. Without this control the matrix above would also pass an implementation that never splits at all",
+  "observedAt": 1741830275949,
+  "methodId": "berm.external_account_binding.x/2",
+  "methodHash": "sha256:a95319d8664b16ca355b3d82bc8c4d5bb6007c8aed65116a74447f79b0e5e193",
+  "vectorHash": "sha256:4468e34cb149fe2c4a2063ab0f56856846f3d283454bf3e03e1a01365ea8941c"
+}

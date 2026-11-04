@@ -1,0 +1,21 @@
+{
+  "id": "XB-029",
+  "capture": {
+    "status": 200,
+    "redirects": 0,
+    "body": {
+      "utf8": "{\"text\":\"Berm Protocol: @alice permanently binds to npub1r5jzkv3egpr5u42uvd48z7rls6xefxaz4xct00k9enfa4c0galmqmcn7ex #bermprotocol\",\"id_str\":\"1900000000000000000\"}"
+    }
+  },
+  "expectedNpub": "npub1r5jzkv3egpr5u42uvd48z7rls6xefxaz4xct00k9enfa4c0galmqmcn7ex",
+  "purpose": "no user object, so no authoritative account id",
+  "expect": {
+    "ok": false,
+    "code": "no_account_id"
+  },
+  "note": "the account id is NEVER taken from caller input — its absence is a failure, not an invitation to accept a supplied one",
+  "observedAt": 1741830275949,
+  "methodId": "berm.external_account_binding.x/2",
+  "methodHash": "sha256:a95319d8664b16ca355b3d82bc8c4d5bb6007c8aed65116a74447f79b0e5e193",
+  "vectorHash": "sha256:9c285b5d4f69ae6cfa4014c6914374dc79dd421f36dfb8d4cf6aecd597ab68e2"
+}

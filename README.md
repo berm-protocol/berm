@@ -14,6 +14,23 @@ identity root.
 
 That distinction is the point.
 
+## Verify the current method locally
+
+See the [standalone developer quickstart](sdk/external-binding-v2/README.md).
+It includes exact method/specification bytes, 97 reference vectors and a complete
+signed offline example using the accepted verifier. No private BermLaunch
+checkout, wallet, network or production credentials are required.
+
+```sh
+node sdk/external-binding-v2/verify.mjs
+node --test sdk/external-binding-v2/test.mjs
+node sdk/external-binding-v2/example.mjs
+```
+
+The example proves local verification and portable evidence, not public validator
+operation. Installing a verifier does not create operator standing or authorize
+publication. Xonly hosts the separately reviewed browser-signing integration.
+
 ## Why “Berm”?
 
 In fortification, a berm is the strip of ground at the edge of a wall: close

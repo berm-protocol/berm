@@ -1,0 +1,21 @@
+{
+  "id": "XB-018",
+  "capture": {
+    "status": 200,
+    "redirects": 0,
+    "body": {
+      "utf8": "{\"text\":\"Berm Protocol: @alice permanently binds to npub1r5jzkv3egpr5u42uvd48z7rls6xefxaz4xct00k9enfa4c0galmqmcn7ex #bermprotocol\",\"id_str\":\"1900000000000000000\",\"id_str\":\"20\",\"user\":{\"id_str\":\"44196397\",\"screen_name\":\"alice\"}}"
+    }
+  },
+  "expectedNpub": "npub1r5jzkv3egpr5u42uvd48z7rls6xefxaz4xct00k9enfa4c0galmqmcn7ex",
+  "purpose": "a duplicate member — the LAST one silently wins under JSON.parse",
+  "expect": {
+    "ok": false,
+    "code": "duplicate_member"
+  },
+  "note": "the member that decides identity must not be overwritable by a second member the parser never mentions",
+  "observedAt": 1741830275949,
+  "methodId": "berm.external_account_binding.x/2",
+  "methodHash": "sha256:a95319d8664b16ca355b3d82bc8c4d5bb6007c8aed65116a74447f79b0e5e193",
+  "vectorHash": "sha256:18ff80e8e68d31d5e823d08f5b705f7e5cfcbbeeff67d548466df186435eea59"
+}

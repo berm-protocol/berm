@@ -1,0 +1,29 @@
+{
+  "id": "XB-068",
+  "capture": {
+    "status": 200,
+    "redirects": 0,
+    "body": {
+      "utf8": "{\"text\":\"proving control of my key\\n\\nBerm Protocol: @alice permanently binds to npub1r5jzkv3egpr5u42uvd48z7rls6xefxaz4xct00k9enfa4c0galmqmcn7ex #bermprotocol\\n\\n— berm\",\"id_str\":\"1900000000000000000\",\"user\":{\"id_str\":\"18446744073709551615\",\"screen_name\":\"alice\"}}"
+    }
+  },
+  "expectedNpub": "npub1r5jzkv3egpr5u42uvd48z7rls6xefxaz4xct00k9enfa4c0galmqmcn7ex",
+  "purpose": "the largest admitted account id — uint64 max binds",
+  "branch": "grammar_accountid_uint64_max",
+  "expect": {
+    "binding": {
+      "npub": "npub1r5jzkv3egpr5u42uvd48z7rls6xefxaz4xct00k9enfa4c0galmqmcn7ex",
+      "accountId": "18446744073709551615",
+      "handle": "alice",
+      "postId": "1900000000000000000",
+      "textHash": "sha256:04c6542ceb6e101b5c02687f25c1f017e88daecfcedfb9dea03c9f4abfa70747",
+      "methodHash": "sha256:a95319d8664b16ca355b3d82bc8c4d5bb6007c8aed65116a74447f79b0e5e193"
+    },
+    "bindingHash": "sha256:93027448681d806a234ef630d106234ea7638e6cbc1c2041afe3e2a8ca4da5e2"
+  },
+  "note": "the vector on the admitted side of the bound. Without it an implementation that refused ALL long ids would still pass the one above",
+  "observedAt": 1741830275949,
+  "methodId": "berm.external_account_binding.x/2",
+  "methodHash": "sha256:a95319d8664b16ca355b3d82bc8c4d5bb6007c8aed65116a74447f79b0e5e193",
+  "vectorHash": "sha256:8cca2bd872bb5c81efab755f1cbe1a7731b34c8a8324577664b8f3ec6b875d81"
+}

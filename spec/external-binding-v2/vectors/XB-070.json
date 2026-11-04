@@ -1,0 +1,29 @@
+{
+  "id": "XB-070",
+  "capture": {
+    "status": 200,
+    "redirects": 0,
+    "body": {
+      "utf8": "{\"text\":\"proving control of my key\\n\\nBerm Protocol: @alice permanently binds to npub1r5jzkv3egpr5u42uvd48z7rls6xefxaz4xct00k9enfa4c0galmqmcn7ex #bermprotocol\\n\\n— berm\",\"id_str\":\"1900000000000000000\",\"user\":{\"id_str\":\"44196397\",\"screen_name\":\"alice\"}}"
+    }
+  },
+  "expectedNpub": "npub1r5jzkv3egpr5u42uvd48z7rls6xefxaz4xct00k9enfa4c0galmqmcn7ex",
+  "purpose": "a fractional tail that DECODES to an admitted integer binds",
+  "observedAt": 1741830275949.0000000001,
+  "branch": "observedat_fractional_tail",
+  "expect": {
+    "binding": {
+      "npub": "npub1r5jzkv3egpr5u42uvd48z7rls6xefxaz4xct00k9enfa4c0galmqmcn7ex",
+      "accountId": "44196397",
+      "handle": "alice",
+      "postId": "1900000000000000000",
+      "textHash": "sha256:04c6542ceb6e101b5c02687f25c1f017e88daecfcedfb9dea03c9f4abfa70747",
+      "methodHash": "sha256:a95319d8664b16ca355b3d82bc8c4d5bb6007c8aed65116a74447f79b0e5e193"
+    },
+    "bindingHash": "sha256:fd2d0b631ad0e35f802b00ecdfcff32bdf32776e165a79afe078e4f30d9c4b98"
+  },
+  "note": "binary64 rounds the tail away — it is far below half an ULP at this magnitude — so the decoded value IS a mathematical integer and binds. An exact-decimal or arbitrary-precision decode refuses it instead. §2.3.1 forbids that path: the integer test is on the DECODED value, never the lexical form",
+  "methodId": "berm.external_account_binding.x/2",
+  "methodHash": "sha256:a95319d8664b16ca355b3d82bc8c4d5bb6007c8aed65116a74447f79b0e5e193",
+  "vectorHash": "sha256:b396a2e6af510e030a958b6f59c75492aebe703760df20f1fe1c69212b4a8415"
+}

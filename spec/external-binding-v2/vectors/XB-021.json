@@ -1,0 +1,28 @@
+{
+  "id": "XB-021",
+  "capture": {
+    "status": 200,
+    "redirects": 0,
+    "body": {
+      "utf8": "{\"text\":\"Berm Protocol: @alice permanently binds to npub1r5jzkv3egpr5u42uvd48z7rls6xefxaz4xct00k9enfa4c0galmqmcn7ex #bermprotocol\\n\\ud83d\\ude00\",\"id_str\":\"1900000000000000000\",\"user\":{\"id_str\":\"44196397\",\"screen_name\":\"alice\"}}"
+    }
+  },
+  "expectedNpub": "npub1r5jzkv3egpr5u42uvd48z7rls6xefxaz4xct00k9enfa4c0galmqmcn7ex",
+  "purpose": "a correctly PAIRED surrogate escape is admitted and hashed exactly",
+  "expect": {
+    "binding": {
+      "npub": "npub1r5jzkv3egpr5u42uvd48z7rls6xefxaz4xct00k9enfa4c0galmqmcn7ex",
+      "accountId": "44196397",
+      "handle": "alice",
+      "postId": "1900000000000000000",
+      "textHash": "sha256:cbe899741bf2dde2fe30bf19ab7cc07dec24f5310589a71601b5ed4a840e9faf",
+      "methodHash": "sha256:a95319d8664b16ca355b3d82bc8c4d5bb6007c8aed65116a74447f79b0e5e193"
+    },
+    "bindingHash": "sha256:1a3e7a6560f164158bc56d8b02bc9411375d977b80d6da0d94c1e27b4567ad09"
+  },
+  "note": "the rule refuses UNPAIRED surrogates, not astral characters — a proof post containing an emoji must still bind",
+  "observedAt": 1741830275949,
+  "methodId": "berm.external_account_binding.x/2",
+  "methodHash": "sha256:a95319d8664b16ca355b3d82bc8c4d5bb6007c8aed65116a74447f79b0e5e193",
+  "vectorHash": "sha256:5b5d379b675f5c6fe8578e29817aa0a4a218eae9449b13a0422b915e11f564c2"
+}

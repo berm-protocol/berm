@@ -1,0 +1,21 @@
+{
+  "id": "XB-066",
+  "capture": {
+    "status": 200,
+    "redirects": 0,
+    "body": {
+      "utf8": "{\"text\":\"proving control of my key\\n\\nBerm Protocol: @alice\\n permanently binds to npub1r5jzkv3egpr5u42uvd48z7rls6xefxaz4xct00k9enfa4c0galmqmcn7ex #bermprotocol\\n\\n— berm\",\"id_str\":\"1900000000000000000\",\"user\":{\"id_str\":\"44196397\",\"screen_name\":\"alice\\n\"}}"
+    }
+  },
+  "expectedNpub": "npub1r5jzkv3egpr5u42uvd48z7rls6xefxaz4xct00k9enfa4c0galmqmcn7ex",
+  "purpose": "handle with a TRAILING LINE FEED is refused — full-string match",
+  "branch": "grammar_handle_trailing_lf",
+  "expect": {
+    "ok": false,
+    "code": "bad_handle"
+  },
+  "observedAt": 1741830275949,
+  "methodId": "berm.external_account_binding.x/2",
+  "methodHash": "sha256:a95319d8664b16ca355b3d82bc8c4d5bb6007c8aed65116a74447f79b0e5e193",
+  "vectorHash": "sha256:5b31df1af977a2cd986fbe7fe717a36d0ca6900ec32ec608494aa906fb5d6135"
+}

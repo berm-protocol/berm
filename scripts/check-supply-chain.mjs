@@ -9,6 +9,7 @@
  * is a grep with a reason attached.
  */
 
+import { createHash } from 'node:crypto';
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { dirname, extname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -147,6 +148,16 @@ const files = [...walk(ROOT)].filter((f) => SOURCE.has(extname(f)));
     const rel = norm(relative(ROOT, f));
     const src = readFileSync(f, 'utf8');
     if (!KEY.test(src)) continue;
+
+    // One byte-exact normative negative vector deliberately changes the public
+    // npub HRP to nsec without a valid secret-key checksum. This is NOT key
+    // material. Permit only this exact path/hash and refusal expectation.
+    if (rel === 'spec/external-binding-v2/vectors/XB-087.json'
+        && createHash('sha256').update(readFileSync(f)).digest('hex') === 'fb22096c00b7c4a809135136b4dcb260c443e4466bccb8bef3234627a0b2f3c7') {
+      const vector = JSON.parse(src);
+      if (vector.id === 'XB-087' && vector.branch === 'npub_wrong_hrp'
+          && vector.expect.ok === false && vector.expect.code === 'bad_expected_npub') continue;
+    }
 
     if (rel !== VECTORS) {
       // Test fixtures generate keys at runtime. A literal nsec anywhere else is

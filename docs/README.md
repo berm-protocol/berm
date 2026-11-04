@@ -1,6 +1,6 @@
-# docs.xonly.ai — content
+# Berm documentation content
 
-Ten pages, written to be published as signed Nostr events. See
+Thirteen pages built locally for static publication; no publication is implied. See
 [PUBLISHING.md](PUBLISHING.md) for how a page becomes an event and what the node
 is allowed to cache.
 
@@ -22,6 +22,8 @@ node check.mjs      # frontmatter, unique d tags, dead links, X Article rules
 | 8 | `docs/security` | Threat model, and the design we killed | adapted |
 | 9 | `docs/limits` | What this does not do | full |
 | 10 | `docs/verify` | Every claim, and the command that checks it | none |
+| 11 | `docs/current-standard` | Exact current method and historical authority | none |
+| 12 | `docs/developer-current` | Executable standalone binding verification | none |
 
 Roughly 7,000 words. Short on purpose — a developer decides in the first
 screen, and pages nobody finishes are pages nobody acts on.

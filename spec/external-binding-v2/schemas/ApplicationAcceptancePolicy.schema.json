@@ -1,0 +1,147 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://berm.protocol/schemas/ApplicationAcceptancePolicy/1",
+  "title": "ApplicationAcceptancePolicy \u2014 one application's own rules, not Berm law",
+  "description": "Published by an application. This is where the comparison rule lives, and it is the ONLY place it lives: the method decides a binding alone (MethodSpec section 9), and how many matching observations an application wants is that application's business. Two applications may accept the same binding under different policies and neither is wrong. It carries NO policyHash member: a policy that hashed itself would need a self-referential projection, and the exclusion that made one possible also removed the receipt's policyHash REFERENCE from its own signature. A reader computes policyHash = artifactId(policy).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "kind",
+    "application",
+    "policyVersion",
+    "acceptedMethods",
+    "acceptedValidators",
+    "matching",
+    "observationWindowMs",
+    "applicationKey",
+    "sig"
+  ],
+  "properties": {
+    "kind": {
+      "const": "berm.application_acceptance_policy/1"
+    },
+    "application": {
+      "type": "string",
+      "minLength": 1
+    },
+    "policyVersion": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "campaignId": {
+          "type": "string"
+        },
+        "projectId": {
+          "type": "string"
+        }
+      },
+      "$comment": "OPTIONAL. Absent means the policy applies to the whole application."
+    },
+    "acceptedMethods": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "methodId",
+          "methodHash",
+          "acquisitionId",
+          "acquisitionHash"
+        ],
+        "properties": {
+          "methodId": {
+            "$ref": "https://berm.protocol/schemas/common.defs/1#/$defs/methodId"
+          },
+          "methodHash": {
+            "$ref": "https://berm.protocol/schemas/common.defs/1#/$defs/sha256"
+          },
+          "acquisitionId": {
+            "$ref": "https://berm.protocol/schemas/common.defs/1#/$defs/methodId"
+          },
+          "acquisitionHash": {
+            "$ref": "https://berm.protocol/schemas/common.defs/1#/$defs/sha256"
+          }
+        }
+      },
+      "$comment": "Acceptance is expressed over METHOD HASHES. Never over hostnames, never over operator names, never over a Berm-maintained list. A policy that named a hostname would make DNS part of its trust model."
+    },
+    "acceptedValidators": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "operatorNpub",
+          "validatorKey",
+          "authorizationRef"
+        ],
+        "properties": {
+          "operatorNpub": {
+            "$ref": "https://berm.protocol/schemas/common.defs/1#/$defs/npub"
+          },
+          "validatorKey": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "authorizationRef": {
+            "$ref": "https://berm.protocol/schemas/common.defs/1#/$defs/sha256"
+          }
+        }
+      }
+    },
+    "matching": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "rule",
+        "requiredKeys",
+        "distinctOperatorsRequired"
+      ],
+      "properties": {
+        "rule": {
+          "const": "all_required_keys_identical_binding_hash",
+          "$comment": "CLOSED at one rule in V1. A threshold rule is a different rule and needs a different value here, so a policy cannot quietly become a quorum by editing a number."
+        },
+        "requiredKeys": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          }
+        },
+        "distinctOperatorsRequired": {
+          "type": "integer",
+          "minimum": 1,
+          "$comment": "How many DISTINCT operator npubs the required keys must span. At launch this is 1, and that number is the honest disclosure that the two validator instances are one operator \u2014 FD-BP-09, EVIDENCE_FOLD.md section 4."
+        }
+      }
+    },
+    "observationWindowMs": {
+      "type": "integer",
+      "const": 300000,
+      "$comment": "Restated so a policy reader sees the law the accepted method enforces. It is const because a policy CANNOT widen it: the bound is inside methodHash, and a different bound is a different method."
+    },
+    "applicationKey": {
+      "$ref": "https://berm.protocol/schemas/common.defs/1#/$defs/xonlyKey",
+      "$comment": "the application's publishing key. R13-A's policy had NO signing key and NO signature (R13R-B07), so an unsigned policy could be substituted and the fold could not tell."
+    },
+    "sig": {
+      "$ref": "https://berm.protocol/schemas/common.defs/1#/$defs/signature"
+    },
+    "genesisOperators": {
+      "type": "array",
+      "minItems": 0,
+      "items": {
+        "$ref": "https://berm.protocol/schemas/common.defs/1#/$defs/npub"
+      },
+      "$comment": "THE NARROW GENESIS EXCEPTION (F-3). An operator's own external-account binding must itself be WITNESSED by observations from already-eligible validators before its validator keys count. The first operator cannot satisfy that \u2014 nobody eligible exists yet \u2014 so each npub listed here is exempted from the witnessing requirement FOR ITS OWN OPERATOR BINDING ONLY, publicly and by name. An empty or absent list means no exception. This does not exempt anything else: the operator's claim must still verify under the key its npub encodes, and its validator keys must still satisfy every other rule."
+    }
+  }
+}

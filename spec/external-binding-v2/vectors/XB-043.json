@@ -1,0 +1,29 @@
+{
+  "id": "XB-043",
+  "capture": {
+    "status": 200,
+    "redirects": 0,
+    "body": {
+      "utf8": "{\"text\":\"Berm Protocol: @alice permanently binds to npub1r5jzkv3egpr5u42uvd48z7rls6xefxaz4xct00k9enfa4c0galmqmcn7ex #bermprotocol\\nsee npub1r5jzkv3egpr5u42uvd48z7rls6xefxaz4xct00k9enfa4c0galmqmcn7ex above\",\"id_str\":\"1900000000000000000\",\"user\":{\"id_str\":\"44196397\",\"screen_name\":\"alice\"}}"
+    }
+  },
+  "expectedNpub": "npub1r5jzkv3egpr5u42uvd48z7rls6xefxaz4xct00k9enfa4c0galmqmcn7ex",
+  "purpose": "ONE proof line alongside the same npub embedded in prose elsewhere",
+  "branch": "npub_line_plus_embedded",
+  "expect": {
+    "binding": {
+      "npub": "npub1r5jzkv3egpr5u42uvd48z7rls6xefxaz4xct00k9enfa4c0galmqmcn7ex",
+      "accountId": "44196397",
+      "handle": "alice",
+      "postId": "1900000000000000000",
+      "textHash": "sha256:87348065531cf4684f678a8fb38e6467919e59d3900f9bd394bf5949dc14a5b9",
+      "methodHash": "sha256:a95319d8664b16ca355b3d82bc8c4d5bb6007c8aed65116a74447f79b0e5e193"
+    },
+    "bindingHash": "sha256:dee539342455525ba08b0625144b0f2a43f0acb5539fbdf410fd618091c8b737"
+  },
+  "note": "only a COMPLETE LINE is identity-bearing, so the embedded occurrence creates no second proof line and no ambiguity",
+  "observedAt": 1741830275949,
+  "methodId": "berm.external_account_binding.x/2",
+  "methodHash": "sha256:a95319d8664b16ca355b3d82bc8c4d5bb6007c8aed65116a74447f79b0e5e193",
+  "vectorHash": "sha256:17c1d38c0ebedee5ec7ef8cee6ac18a4ea05c1267cbefb5614a4096dd6bdf368"
+}

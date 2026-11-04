@@ -5,3 +5,8 @@
 crypto/vectors/test-vectors.json -text linguist-generated
 
 *.png binary
+
+# Exact accepted protocol mirrors must retain original bytes on every OS.
+spec/external-binding-v2/** -text
+sdk/external-binding-v2/runtime/** -text
+sdk/external-binding-v2/test/fixture-secp256k1.mjs -text

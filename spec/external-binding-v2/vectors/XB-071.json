@@ -1,0 +1,22 @@
+{
+  "id": "XB-071",
+  "capture": {
+    "status": 200,
+    "redirects": 0,
+    "body": {
+      "base64": "77u/eyJ0ZXh0IjoicHJvdmluZyBjb250cm9sIG9mIG15IGtleVxuXG5ucHViMXI1anprdjNlZ3ByNXU0MnV2ZDQ4ejdybHM2eGVmeGF6NHhjdDAwazllbmZhNGMwZ2FsbXFtY243ZXhcblxu4oCUIGJlcm0iLCJpZF9zdHIiOiIxOTAwMDAwMDAwMDAwMDAwMDAwIiwidXNlciI6eyJpZF9zdHIiOiI0NDE5NjM5NyIsInNjcmVlbl9uYW1lIjoiYWxpY2UifX0="
+    }
+  },
+  "expectedNpub": "npub1r5jzkv3egpr5u42uvd48z7rls6xefxaz4xct00k9enfa4c0galmqmcn7ex",
+  "purpose": "a UTF-8 BOM before the JSON object is not admitted",
+  "branch": "raw_bom",
+  "expect": {
+    "ok": false,
+    "code": "json_parse_failed"
+  },
+  "note": "the BOM is valid UTF-8, so it survives the decode and must be refused by the parser rather than silently skipped as whitespace",
+  "observedAt": 1741830275949,
+  "methodId": "berm.external_account_binding.x/2",
+  "methodHash": "sha256:a95319d8664b16ca355b3d82bc8c4d5bb6007c8aed65116a74447f79b0e5e193",
+  "vectorHash": "sha256:fecb4a36f35842287e7147244f34cf4a1a264a081de4e3c06cbaeb3a31ca17ac"
+}

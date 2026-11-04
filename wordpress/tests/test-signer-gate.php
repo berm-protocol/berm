@@ -14,13 +14,22 @@
 
 define( 'XONLY_CLI', true );
 require_once __DIR__ . '/../xonly-node/includes/crypto/class-xonly-event.php';
-require_once __DIR__ . '/../xonly-node/includes/class-xonly-signer-gate.php';
+// Load the unchanged production class into an isolated test namespace. PHP's
+// namespace-local clock replaces only time(); no expiry rule or signed fixture
+// is rewritten. Production continues to load the original global class and its
+// system clock. The frozen fixture must not expire merely because CI runs later.
+$gate_source = file_get_contents( __DIR__ . '/../xonly-node/includes/class-xonly-signer-gate.php' );
+$gate_source = preg_replace( '/^<\?php\s*/', '', $gate_source, 1 );
+$gate_source = str_replace( 'declare(strict_types=1);', '', $gate_source );
+eval( 'namespace BermSignerGateFixture; use \\XOnly_Event; function time(): int { return $GLOBALS["berm_gate_fixture_now"]; } ' . $gate_source );
+class_alias( '\\BermSignerGateFixture\\XOnly_Signer_Gate', 'XOnly_Signer_Gate' );
 
 $fx = json_decode( file_get_contents( __DIR__ . '/../../signer-log/gate-fixtures.json' ), true );
 
 $origin  = $fx['origin'];
 $pinned  = array( $fx['releasePub'] => true );
 $genuine = $fx['genuine'];
+$GLOBALS['berm_gate_fixture_now'] = $genuine['created_at'] + 60;
 
 $pass = 0;
 $fail = 0;
@@ -98,6 +107,16 @@ XOnly_Signer_Gate::set_fetcher(
 );
 $r = XOnly_Signer_Gate::verify( $origin, $pinned, array( $genuine ) );
 check( 'unreachable never allows', false === $r['allow'], $r['status'] );
+
+/* ---- exact production expiry boundary, with original signature bytes ---- */
+XOnly_Signer_Gate::set_fetcher( serving( $fx['goodBody'] ) );
+$GLOBALS['berm_gate_fixture_now'] = $genuine['created_at'] + XOnly_Signer_Gate::MAX_AGE;
+$r = XOnly_Signer_Gate::verify( $origin, $pinned, array( $genuine ) );
+check( 'exact MAX_AGE remains valid', 'verified' === $r['status'] && $r['allow'], $r['status'] );
+$GLOBALS['berm_gate_fixture_now']++;
+$r = XOnly_Signer_Gate::verify( $origin, $pinned, array( $genuine ) );
+check( 'MAX_AGE plus one second refuses', 'unattested' === $r['status'] && ! $r['allow'], $r['status'] );
+$GLOBALS['berm_gate_fixture_now'] = $genuine['created_at'] + 60;
 
 /* ---- malformed origin ---- */
 $r = XOnly_Signer_Gate::verify( 'https://signer.xonly.ai/app', $pinned, array( $genuine ) );

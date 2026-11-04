@@ -1,0 +1,22 @@
+{
+  "id": "XB-072",
+  "capture": {
+    "status": 200,
+    "redirects": 0,
+    "body": {
+      "utf8": "{\"text\":\"proving control of my key\\n\\nnpub1r5jzkv3egpr5u42uvd48z7rls6xefxaz4xct00k9enfa4c0galmqmcn7ex\\n\\n— berm\",\"id_str\":\"1900000000000000000\",\"user\":{\"id_str\":\"44196397\",\"screen_name\":\"alice\"}} {\"b\":2}"
+    }
+  },
+  "expectedNpub": "npub1r5jzkv3egpr5u42uvd48z7rls6xefxaz4xct00k9enfa4c0galmqmcn7ex",
+  "purpose": "TWO complete top-level values are not one post object",
+  "branch": "raw_two_top_level",
+  "expect": {
+    "ok": false,
+    "code": "json_parse_failed"
+  },
+  "note": "a reader that stops at the first complete value would bind the first and never mention the second",
+  "observedAt": 1741830275949,
+  "methodId": "berm.external_account_binding.x/2",
+  "methodHash": "sha256:a95319d8664b16ca355b3d82bc8c4d5bb6007c8aed65116a74447f79b0e5e193",
+  "vectorHash": "sha256:dd648916045be2b44e0c94181efd168274815c356958d0c78e0d8c6a1442d66d"
+}

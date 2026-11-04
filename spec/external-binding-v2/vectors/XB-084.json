@@ -1,0 +1,22 @@
+{
+  "id": "XB-084",
+  "capture": {
+    "status": 200,
+    "redirects": 0,
+    "body": {
+      "utf8": "{\"text\":\"proving control of my key\\n\\nBerm Protocol: @alice permanently binds to npub1r5jzkv3egpr5u42uvd48z7rls6xefxaz4xct00k9enfa4c0galmqmcn7ex #bermprotocol\\n\\n— berm\",\"id_str\":\"1900000000000000000\",\"user\":{\"id_str\":\"44196397\",\"screen_name\":\"alice\"},\"unusedNumericField\":10000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000}"
+    }
+  },
+  "expectedNpub": "npub1r5jzkv3egpr5u42uvd48z7rls6xefxaz4xct00k9enfa4c0galmqmcn7ex",
+  "purpose": "an INTEGER-SHAPED literal that overflows binary64 is refused",
+  "branch": "raw_non_finite_integer_shaped",
+  "expect": {
+    "ok": false,
+    "code": "json_parse_failed"
+  },
+  "note": "THE CROSS-LANGUAGE HALF OF B05. ECMAScript decodes this to Infinity; Python's int is arbitrary precision and keeps it FINITE, so a Python implementation admitted it after the JavaScript one already refused. §2.3.1 requires the binary64 decode for EVERY number literal, integer-shaped included, and this is the vector that says so. Found by running the second-language path against the corpus after the reference was fixed",
+  "observedAt": 1741830275949,
+  "methodId": "berm.external_account_binding.x/2",
+  "methodHash": "sha256:a95319d8664b16ca355b3d82bc8c4d5bb6007c8aed65116a74447f79b0e5e193",
+  "vectorHash": "sha256:4c8f4369be3f68dd3445e727674c24bd994cf4d84e0d8b0d53b01959f448579e"
+}

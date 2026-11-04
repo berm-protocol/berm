@@ -1,0 +1,29 @@
+{
+  "id": "XB-044",
+  "capture": {
+    "status": 200,
+    "redirects": 0,
+    "body": {
+      "utf8": "{\"text\":\"Berm Protocol: @alice permanently binds to npub1r5jzkv3egpr5u42uvd48z7rls6xefxaz4xct00k9enfa4c0galmqmcn7ex #bermprotocol\",\"id_str\":\"1900000000000000000\",\"user\":{\"id_str\":\"44196397\",\"screen_name\":\"alice\"}}"
+    }
+  },
+  "expectedNpub": "npub1r5jzkv3egpr5u42uvd48z7rls6xefxaz4xct00k9enfa4c0galmqmcn7ex",
+  "purpose": "a post that is nothing but the key is one proof line",
+  "branch": "npub_alone",
+  "expect": {
+    "binding": {
+      "npub": "npub1r5jzkv3egpr5u42uvd48z7rls6xefxaz4xct00k9enfa4c0galmqmcn7ex",
+      "accountId": "44196397",
+      "handle": "alice",
+      "postId": "1900000000000000000",
+      "textHash": "sha256:b5f3074f5059113e76588e9d052110cc997140e93a71734e4fe13debd16eb086",
+      "methodHash": "sha256:a95319d8664b16ca355b3d82bc8c4d5bb6007c8aed65116a74447f79b0e5e193"
+    },
+    "bindingHash": "sha256:a66446f0bdabb3dd4b5b31976f8320521f7f7dccfc671b244e79d6d4b2932bc5"
+  },
+  "note": "start and end of text bound the only line",
+  "observedAt": 1741830275949,
+  "methodId": "berm.external_account_binding.x/2",
+  "methodHash": "sha256:a95319d8664b16ca355b3d82bc8c4d5bb6007c8aed65116a74447f79b0e5e193",
+  "vectorHash": "sha256:c31f7a04d69d6bc6df5018d0640b2622c742cc598a1c3a00ccc319965c69a9fe"
+}

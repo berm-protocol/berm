@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://berm.protocol/schemas/ExternalBindingClaim/1",
+  "title": "ExternalBindingClaim \u2014 the subject asserts the binding",
+  "description": "Signed by the SUBJECT npub. This is the user saying 'this is mine'. It establishes attribution and intent; it establishes NOTHING about whether the post exists or says what it claims. Only a validator's own fetch does that, which is why the claim and the observation are two artifacts and two signatures and are never merged.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "kind",
+    "namespace",
+    "binding",
+    "bindingHash",
+    "sig",
+    "subjectKey"
+  ],
+  "properties": {
+    "kind": {
+      "const": "berm.external_binding_claim/1"
+    },
+    "namespace": {
+      "$ref": "https://berm.protocol/schemas/common.defs/1#/$defs/namespace"
+    },
+    "binding": {
+      "$ref": "https://berm.protocol/schemas/common.defs/1#/$defs/binding"
+    },
+    "bindingHash": {
+      "$ref": "https://berm.protocol/schemas/common.defs/1#/$defs/sha256"
+    },
+    "claimedAt": {
+      "type": "integer",
+      "minimum": 0,
+      "$comment": "OPTIONAL and non-authoritative. A subject's own timestamp is a claim about a clock nobody else read."
+    },
+    "sig": {
+      "$ref": "https://berm.protocol/schemas/common.defs/1#/$defs/signature"
+    },
+    "subjectKey": {
+      "$ref": "https://berm.protocol/schemas/common.defs/1#/$defs/xonlyKey",
+      "$comment": "the x-only key the npub encodes. Present so a verifier checks the signature without re-deriving it, and REQUIRED to equal the decoded npub payload \u2014 EVIDENCE_FOLD.md section 2 step 1."
+    }
+  }
+}

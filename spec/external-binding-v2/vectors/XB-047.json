@@ -1,0 +1,22 @@
+{
+  "id": "XB-047",
+  "capture": {
+    "status": 200,
+    "redirects": 0,
+    "body": {
+      "utf8": "{\"text\":\"Berm Protocol: @alice permanently binds to npub1r5jzkv3egpr5u42uvd48z7rls6xefxaz4xct00k9enfa4c0galmqmcn7ex #bermprotocol\\r\\ntrailing\",\"id_str\":\"1900000000000000000\",\"user\":{\"id_str\":\"44196397\",\"screen_name\":\"alice\"}}"
+    }
+  },
+  "expectedNpub": "npub1r5jzkv3egpr5u42uvd48z7rls6xefxaz4xct00k9enfa4c0galmqmcn7ex",
+  "purpose": "U+000D U+000A after the npub does NOT terminate a line",
+  "branch": "non_lf_u_000d_u_000a",
+  "expect": {
+    "ok": false,
+    "code": "npub_undelimited"
+  },
+  "note": "the CRLF sequence — CR is NOT removed; a generic line splitter would accept this",
+  "observedAt": 1741830275949,
+  "methodId": "berm.external_account_binding.x/2",
+  "methodHash": "sha256:a95319d8664b16ca355b3d82bc8c4d5bb6007c8aed65116a74447f79b0e5e193",
+  "vectorHash": "sha256:1c6776abab2b04603d8706952e2a56dea5e1f99a2f43a67856b9a408d0084647"
+}

@@ -1,0 +1,22 @@
+{
+  "id": "XB-076",
+  "capture": {
+    "status": 200,
+    "redirects": 0,
+    "body": {
+      "utf8": "{\"text\":\"proving control of my key\\n\\nBerm Protocol: @alice permanently binds to npub1r5jzkv3egpr5u42uvd48z7rls6xefxaz4xct00k9enfa4c0galmqmcn7ex #bermprotocol\\n\\n— berm\",\"id_str\":\"18446744073709551615\",\"user\":{\"id_str\":\"44196397\",\"screen_name\":\"alice\"}}"
+    }
+  },
+  "expectedNpub": "npub1r5jzkv3egpr5u42uvd48z7rls6xefxaz4xct00k9enfa4c0galmqmcn7ex",
+  "purpose": "post id at EXACTLY uint64 max is admitted",
+  "branch": "uint64_post_max",
+  "expect": {
+    "ok": false,
+    "code": "observation_predates_post"
+  },
+  "note": "the ID is ADMITTED — the refusal is temporal. A uint64-max snowflake decodes to a creation time far in the FUTURE, so observedAt - postCreatedAt is negative and the post has not happened yet. A first draft of this vector expected observation_outside_window, which was wrong in a way only execution showed: both codes mean \"refused on time\" and only one is the truth about this input",
+  "observedAt": 1741830275949,
+  "methodId": "berm.external_account_binding.x/2",
+  "methodHash": "sha256:a95319d8664b16ca355b3d82bc8c4d5bb6007c8aed65116a74447f79b0e5e193",
+  "vectorHash": "sha256:7078aeb46b7d1c8f7ed45766367897ce19e009b53e18fb7762bced8ab97f52f5"
+}

@@ -1,0 +1,20 @@
+{
+  "id": "XB-011",
+  "capture": {
+    "status": 404,
+    "redirects": 0,
+    "body": {
+      "utf8": "{}"
+    }
+  },
+  "expectedNpub": "npub1r5jzkv3egpr5u42uvd48z7rls6xefxaz4xct00k9enfa4c0galmqmcn7ex",
+  "purpose": "a 404 is not a success status",
+  "expect": {
+    "ok": false,
+    "code": "status_not_success"
+  },
+  "observedAt": 1741830275949,
+  "methodId": "berm.external_account_binding.x/2",
+  "methodHash": "sha256:a95319d8664b16ca355b3d82bc8c4d5bb6007c8aed65116a74447f79b0e5e193",
+  "vectorHash": "sha256:5eeb91d5b6e80316fef65f08533b714df756b87a3de382f1548bb419a1c147e4"
+}

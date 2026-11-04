@@ -1,5 +1,10 @@
 # Contributing
 
+For current external binding, start with the [standalone quickstart](sdk/external-binding-v2/README.md).
+The complete gate needs Node 22.6+, PHP 8.1+ and the lockfile-matched Chromium.
+Install local browser dependencies with `node scripts/install-chromium.mjs`;
+no production deployment or public-key operation is part of these tests.
+
 ```bash
 git clone https://github.com/berm-protocol/berm && cd berm
 node scripts/verify-all.mjs --fast     # ~1 min, no browser needed

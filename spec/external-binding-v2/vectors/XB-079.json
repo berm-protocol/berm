@@ -1,0 +1,22 @@
+{
+  "id": "XB-079",
+  "capture": {
+    "status": 200,
+    "redirects": 0,
+    "body": {
+      "utf8": "{\"text\":\"proving control of my key\\n\\nBerm Protocol: @alice permanently binds to npub1r5jzkv3egpr5u42uvd48z7rls6xefxaz4xct00k9enfa4c0galmqmcn7ex #bermprotocol\\n\\n— berm\",\"id_str\":\"1900000000000000000\",\"user\":{\"id_str\":\"44196397\",\"screen_name\":\"alice\"}}"
+    }
+  },
+  "expectedNpub": "npub1r5jzkv3egpr5u42uvd48z7rls6xefxaz4xct00k9enfa4c0galmqmcn7ex",
+  "purpose": "observedAt at 2^53 is outside the admitted range",
+  "observedAt": 9007199254740992,
+  "branch": "observedat_safe_max_plus_1",
+  "expect": {
+    "ok": false,
+    "code": "bad_observed_at"
+  },
+  "note": "the first value binary64 can no longer represent as a distinct integer",
+  "methodId": "berm.external_account_binding.x/2",
+  "methodHash": "sha256:a95319d8664b16ca355b3d82bc8c4d5bb6007c8aed65116a74447f79b0e5e193",
+  "vectorHash": "sha256:ffe945fb13f7d7c47b677d70bb367b9a6e7ca5f5a7743293899078ac7c7591e2"
+}

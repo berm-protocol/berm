@@ -1,0 +1,86 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://berm.protocol/schemas/common.defs/1",
+  "title": "Shared definitions \u2014 every Berm public wire artifact",
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "npub": {
+      "type": "string",
+      "pattern": "^npub1[023456789acdefghjklmnpqrstuvwxyz]{58}$"
+    },
+    "accountId": {
+      "type": "string",
+      "pattern": "^[1-9][0-9]{0,19}$"
+    },
+    "handle": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_]{1,15}$"
+    },
+    "postId": {
+      "type": "string",
+      "pattern": "^[1-9][0-9]{0,19}$"
+    },
+    "namespace": {
+      "type": "string",
+      "enum": [
+        "x"
+      ],
+      "$comment": "CLOSED at one value in V1. FD-BP-02 anticipates reddit, telegram, farcaster, github and domains; each is added by a separate method with its own identity, never by widening this enum in place."
+    },
+    "methodId": {
+      "type": "string",
+      "pattern": "^berm\\.[a-z](?:[a-z0-9_-]*[a-z0-9])?(?:\\.[a-z](?:[a-z0-9_-]*[a-z0-9])?)*/[1-9][0-9]*$",
+      "$comment": "MethodSpec §3.1. The R13-A R3 pattern was ^berm\\.[a-z_.]+(\\.[a-z]+)?/[0-9]+$, which admits no HYPHEN and so REJECTED TWO OF THIS PACK'S OWN IDENTIFIERS: berm.acquisition.x-direct-status/1 and berm.transport.x-syndication-via-same-origin-proxy/2. Measured against the R4 gate: SIX OF TWELVE wire/example artifacts fail the R3 pattern on acquisitionId, and nothing in the R3 build ever compared an example to a schema. tools/verify-wire-examples.mjs now validates every example against these schemas so a schema can never again reject the artifacts it governs. The version segment also tightened from [0-9]+ to [1-9][0-9]*, which excludes /0 and leading zeros."
+    },
+    "signature": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{128}$",
+      "$comment": "BIP-340 Schnorr over secp256k1, computed on the SHA-256 of JCS(artifact with `sig` omitted) \u2014 the SAME projection as artifactId, with no further exclusions. Lowercase hex."
+    },
+    "binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "npub",
+        "accountId",
+        "handle",
+        "postId",
+        "textHash",
+        "methodHash"
+      ],
+      "properties": {
+        "npub": {
+          "$ref": "#/$defs/npub"
+        },
+        "accountId": {
+          "$ref": "#/$defs/accountId"
+        },
+        "handle": {
+          "$ref": "#/$defs/handle"
+        },
+        "postId": {
+          "$ref": "#/$defs/postId"
+        },
+        "textHash": {
+          "$ref": "#/$defs/sha256"
+        },
+        "methodHash": {
+          "$ref": "#/$defs/sha256"
+        }
+      },
+      "$comment": "EXACTLY six members. `additionalProperties:false` is the schema-level expression of FD-BP-04 \u2014 a seventh field fails validation rather than travelling quietly."
+    },
+    "artifactId": {
+      "$ref": "#/$defs/sha256",
+      "$comment": "THE ONE PROJECTION: sha256 of the JCS (RFC 8785) serialization of the artifact with `sig` omitted \u2014 AND NOTHING ELSE. Every other field of every artifact is therefore signed and hash-identified. `policyHash` is computed as artifactId(policy) and is never carried inside a policy: R13-A REISSUE R2 omitted `policyHash` universally so a policy could hash itself, which also removed the RECEIPT's policyHash reference from its own signature \u2014 a receipt could be re-pointed at a different policy with no cryptographic trace."
+    },
+    "xonlyKey": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$",
+      "$comment": "BIP-340 x-only public key, lowercase hex."
+    }
+  }
+}

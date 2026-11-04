@@ -1,0 +1,22 @@
+{
+  "id": "XB-041",
+  "capture": {
+    "status": 200,
+    "redirects": 0,
+    "body": {
+      "utf8": "{\"text\":\"Berm Protocol: @alice permanently binds to npub1r5jzkv3egpr5u42uvd48z7rls6xefxaz4xct00k9enfa4c0galmqmcn7ex #bermprotocol\\nBerm Protocol: @alice permanently binds to npub1r5jzkv3egpr5u42uvd48z7rls6xefxaz4xct00k9enfa4c0galmqmcn7ex #bermprotocol\",\"id_str\":\"1900000000000000000\",\"user\":{\"id_str\":\"44196397\",\"screen_name\":\"alice\"}}"
+    }
+  },
+  "expectedNpub": "npub1r5jzkv3egpr5u42uvd48z7rls6xefxaz4xct00k9enfa4c0galmqmcn7ex",
+  "purpose": "the same expectedNpub on TWO proof lines",
+  "branch": "npub_two_same_lines",
+  "expect": {
+    "ok": false,
+    "code": "npub_multiple"
+  },
+  "note": "proofLines is an ORDERED LIST, never a set — the same key twice is TWO proof lines. An implementation collecting distinct values into a set would accept this, which is precisely the R5.1 set-multiplicity reading that R4 does not import",
+  "observedAt": 1741830275949,
+  "methodId": "berm.external_account_binding.x/2",
+  "methodHash": "sha256:a95319d8664b16ca355b3d82bc8c4d5bb6007c8aed65116a74447f79b0e5e193",
+  "vectorHash": "sha256:f1caaa728193e073c47a9133cae98d36ca7716abda77a6bb50fd815cbd20c0fe"
+}

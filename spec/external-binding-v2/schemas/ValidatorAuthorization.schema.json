@@ -1,0 +1,67 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://berm.protocol/schemas/ValidatorAuthorization/1",
+  "title": "ValidatorAuthorization \u2014 an operator npub authorizes one validator key",
+  "description": "Signed by the OPERATOR npub, whose own external-account binding must already exist (FD-BP-09). This is a public authorization chain, not recursive validation of validators: the operator proves its identity by the same method everyone else uses, then names a dedicated, rotatable key and the exact method that key is authorized to observe under.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "kind",
+    "operatorNpub",
+    "operatorBindingHash",
+    "validatorKey",
+    "methodId",
+    "methodHash",
+    "acquisitionId",
+    "acquisitionHash",
+    "activatedAt",
+    "sig"
+  ],
+  "properties": {
+    "kind": {
+      "const": "berm.validator_authorization/1"
+    },
+    "operatorNpub": {
+      "$ref": "https://berm.protocol/schemas/common.defs/1#/$defs/npub"
+    },
+    "operatorBindingHash": {
+      "$ref": "https://berm.protocol/schemas/common.defs/1#/$defs/artifactId",
+      "$comment": "the artifactId of the operator's OWN ExternalBindingClaim \u2014 FD-BP-09 step 1"
+    },
+    "validatorKey": {
+      "$ref": "https://berm.protocol/schemas/common.defs/1#/$defs/xonlyKey",
+      "$comment": "DISTINCT from user, treasury, deploy and long-lived operator keys, and rotatable."
+    },
+    "methodId": {
+      "$ref": "https://berm.protocol/schemas/common.defs/1#/$defs/methodId"
+    },
+    "methodHash": {
+      "$ref": "https://berm.protocol/schemas/common.defs/1#/$defs/sha256"
+    },
+    "acquisitionId": {
+      "$ref": "https://berm.protocol/schemas/common.defs/1#/$defs/methodId"
+    },
+    "acquisitionHash": {
+      "$ref": "https://berm.protocol/schemas/common.defs/1#/$defs/sha256"
+    },
+    "activatedAt": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "supersededBy": {
+      "$ref": "https://berm.protocol/schemas/common.defs/1#/$defs/xonlyKey"
+    },
+    "revokedAt": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "endpoint": {
+      "type": "string",
+      "format": "uri",
+      "$comment": "EXPLICITLY NON-AUTHORITATIVE product metadata. Acceptance policy is expressed over method hashes and keys, NEVER over hostnames \u2014 a reader who resolves identity by hostname has made DNS part of the trust model."
+    },
+    "sig": {
+      "$ref": "https://berm.protocol/schemas/common.defs/1#/$defs/signature"
+    }
+  }
+}

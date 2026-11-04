@@ -1,0 +1,22 @@
+{
+  "id": "XB-040",
+  "capture": {
+    "status": 200,
+    "redirects": 0,
+    "body": {
+      "utf8": "{\"text\":\"proving npub1r5jzkv3egpr5u42uvd48z7rls6xefxaz4xct00k9enfa4c0galmqmcn7ex here\",\"id_str\":\"1900000000000000000\",\"user\":{\"id_str\":\"44196397\",\"screen_name\":\"alice\"}}"
+    }
+  },
+  "expectedNpub": "npub1r5jzkv3egpr5u42uvd48z7rls6xefxaz4xct00k9enfa4c0galmqmcn7ex",
+  "purpose": "the npub sits in prose, space-separated, but is never a whole line",
+  "branch": "npub_prose_only",
+  "expect": {
+    "ok": false,
+    "code": "npub_absent"
+  },
+  "note": "THIS EXACT TEXT WAS A POSITIVE BINDING UNDER R13-A R3, where a space-delimited occurrence satisfied the old §4.4. It is the clearest single statement of what the proof-line law changed",
+  "observedAt": 1741830275949,
+  "methodId": "berm.external_account_binding.x/2",
+  "methodHash": "sha256:a95319d8664b16ca355b3d82bc8c4d5bb6007c8aed65116a74447f79b0e5e193",
+  "vectorHash": "sha256:3bc38c640df3968bf71bfb1aa75bd6bc6e46a2c50de0815ff838ddfa6abf2421"
+}

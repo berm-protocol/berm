@@ -1,0 +1,29 @@
+{
+  "id": "XB-045",
+  "capture": {
+    "status": 200,
+    "redirects": 0,
+    "body": {
+      "utf8": "{\"text\":\"Berm Protocol: @alice permanently binds to npub1r5jzkv3egpr5u42uvd48z7rls6xefxaz4xct00k9enfa4c0galmqmcn7ex #bermprotocol\\n\",\"id_str\":\"1900000000000000000\",\"user\":{\"id_str\":\"44196397\",\"screen_name\":\"alice\"}}"
+    }
+  },
+  "expectedNpub": "npub1r5jzkv3egpr5u42uvd48z7rls6xefxaz4xct00k9enfa4c0galmqmcn7ex",
+  "purpose": "a proof line followed by a TRAILING U+000A still binds",
+  "branch": "npub_trailing_lf",
+  "expect": {
+    "binding": {
+      "npub": "npub1r5jzkv3egpr5u42uvd48z7rls6xefxaz4xct00k9enfa4c0galmqmcn7ex",
+      "accountId": "44196397",
+      "handle": "alice",
+      "postId": "1900000000000000000",
+      "textHash": "sha256:25b31f483c1fd233a13eca835cd4e10c473ffc2a449289d24490da518126d4b1",
+      "methodHash": "sha256:a95319d8664b16ca355b3d82bc8c4d5bb6007c8aed65116a74447f79b0e5e193"
+    },
+    "bindingHash": "sha256:e47930a4dff5cb8a481159d7bac75ef4cbbd801f10055207f87dcc8ccc7f2312"
+  },
+  "note": "the trailing empty field is PRESERVED by §4.4.1 item 2 and is not a proof line. Java and Ruby require an explicit -1 split limit to reach this answer; without it the empty field is dropped, which happens to agree here but does not agree in general",
+  "observedAt": 1741830275949,
+  "methodId": "berm.external_account_binding.x/2",
+  "methodHash": "sha256:a95319d8664b16ca355b3d82bc8c4d5bb6007c8aed65116a74447f79b0e5e193",
+  "vectorHash": "sha256:111dce3990c5b1fd0a1137eac84e960758d4d88eb244b8fda99fb2d1a09246b4"
+}

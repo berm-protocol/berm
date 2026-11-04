@@ -1,0 +1,29 @@
+{
+  "id": "XB-091",
+  "capture": {
+    "status": 200,
+    "redirects": 0,
+    "body": {
+      "utf8": "{\"text\":\"Berm Protocol: @alice permanently binds to npub1r5jzkv3egpr5u42uvd48z7rls6xefxaz4xct00k9enfa4c0galmqmcn7ex #bermprotocol\",\"id_str\":\"1900000000000000000\",\"user\":{\"id_str\":\"44196397\",\"screen_name\":\"Alice\"}}"
+    }
+  },
+  "expectedNpub": "npub1r5jzkv3egpr5u42uvd48z7rls6xefxaz4xct00k9enfa4c0galmqmcn7ex",
+  "purpose": "mixed-case response handle accepts the composer-folded lowercase line",
+  "branch": "r8_composer_case_fold",
+  "expect": {
+    "binding": {
+      "npub": "npub1r5jzkv3egpr5u42uvd48z7rls6xefxaz4xct00k9enfa4c0galmqmcn7ex",
+      "accountId": "44196397",
+      "handle": "Alice",
+      "postId": "1900000000000000000",
+      "textHash": "sha256:b5f3074f5059113e76588e9d052110cc997140e93a71734e4fe13debd16eb086",
+      "methodHash": "sha256:a95319d8664b16ca355b3d82bc8c4d5bb6007c8aed65116a74447f79b0e5e193"
+    },
+    "bindingHash": "sha256:ca43b870dbd3412756747133feeac080ed399a3c4afba603b58504aa5748aead"
+  },
+  "note": "R8 handle-bound proof-line successor coverage; generated mechanically from the frozen XB-001 capture.",
+  "observedAt": 1741830275949,
+  "methodId": "berm.external_account_binding.x/2",
+  "methodHash": "sha256:a95319d8664b16ca355b3d82bc8c4d5bb6007c8aed65116a74447f79b0e5e193",
+  "vectorHash": "sha256:1bc69099719ac89c0f29898cf6b8ee82162a16e537a8b8e3dbe8cf33fe3170eb"
+}

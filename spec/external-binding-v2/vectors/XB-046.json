@@ -1,0 +1,22 @@
+{
+  "id": "XB-046",
+  "capture": {
+    "status": 200,
+    "redirects": 0,
+    "body": {
+      "utf8": "{\"text\":\"NPUB1R5JZKV3EGPR5U42UVD48Z7RLS6XEFXAZ4XCT00K9ENFA4C0GALMQMCN7EX\",\"id_str\":\"1900000000000000000\",\"user\":{\"id_str\":\"44196397\",\"screen_name\":\"alice\"}}"
+    }
+  },
+  "expectedNpub": "npub1r5jzkv3egpr5u42uvd48z7rls6xefxaz4xct00k9enfa4c0galmqmcn7ex",
+  "purpose": "an UPPERCASE npub line is not a canonical proof line",
+  "branch": "npub_uppercase_line",
+  "expect": {
+    "ok": false,
+    "code": "npub_absent"
+  },
+  "note": "refused, not case-folded — §2.2 rule 1. The lowercase expectedNpub is not a substring of the uppercase text either, so this is absence",
+  "observedAt": 1741830275949,
+  "methodId": "berm.external_account_binding.x/2",
+  "methodHash": "sha256:a95319d8664b16ca355b3d82bc8c4d5bb6007c8aed65116a74447f79b0e5e193",
+  "vectorHash": "sha256:fba3fce7527e283c4c448b90a2be44452030da3c6e18c4f24bc05c861e585ae0"
+}

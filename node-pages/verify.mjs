@@ -9,6 +9,7 @@
  */
 
 import { createServer } from 'node:http';
+import { createHash } from 'node:crypto';
 import { readFileSync, existsSync, rmSync, writeFileSync } from 'node:fs';
 import { spawn, spawnSync } from 'node:child_process';
 import { dirname, join } from 'node:path';
@@ -132,7 +133,7 @@ ck('every file is hashed in the manifest',
    files.every((f) => /^[0-9a-f]{64}$/.test(manifest.files[f])));
 ck('a hash in the manifest matches the file on disk', (() => {
   const f = files[0];
-  const h = spawnSync('sha256sum', [join(HERE, 'dist', f)], { encoding: 'utf8' }).stdout.split(' ')[0];
+  const h = createHash('sha256').update(readFileSync(join(HERE, 'dist', f))).digest('hex');
   return h === manifest.files[f];
 })());
 ck('the index tells a reader to check elsewhere',

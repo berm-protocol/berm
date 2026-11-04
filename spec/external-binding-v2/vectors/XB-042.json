@@ -1,0 +1,22 @@
+{
+  "id": "XB-042",
+  "capture": {
+    "status": 200,
+    "redirects": 0,
+    "body": {
+      "utf8": "{\"text\":\"Berm Protocol: @alice permanently binds to npub1r5jzkv3egpr5u42uvd48z7rls6xefxaz4xct00k9enfa4c0galmqmcn7ex #bermprotocol\\nBerm Protocol: @alice permanently binds to npub18fq5sn6kt4jxkuneszrca9vu5w4trw9lcmxafklza8c00ls9psfsn40ehv #bermprotocol\",\"id_str\":\"1900000000000000000\",\"user\":{\"id_str\":\"44196397\",\"screen_name\":\"alice\"}}"
+    }
+  },
+  "expectedNpub": "npub1r5jzkv3egpr5u42uvd48z7rls6xefxaz4xct00k9enfa4c0galmqmcn7ex",
+  "purpose": "an expectedNpub proof line plus a DIFFERENT canonical npub proof line",
+  "branch": "npub_two_distinct_lines",
+  "expect": {
+    "ok": false,
+    "code": "npub_multiple"
+  },
+  "note": "ambiguity about which key is being claimed is refused, not resolved by taking the one that matches",
+  "observedAt": 1741830275949,
+  "methodId": "berm.external_account_binding.x/2",
+  "methodHash": "sha256:a95319d8664b16ca355b3d82bc8c4d5bb6007c8aed65116a74447f79b0e5e193",
+  "vectorHash": "sha256:40f9240c02a8df0d3ba20e021873bf071ec2b11aa70d91a121267b6e76af99ac"
+}

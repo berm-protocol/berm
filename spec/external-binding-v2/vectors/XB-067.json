@@ -1,0 +1,22 @@
+{
+  "id": "XB-067",
+  "capture": {
+    "status": 200,
+    "redirects": 0,
+    "body": {
+      "utf8": "{\"text\":\"proving control of my key\\n\\nBerm Protocol: @alice permanently binds to npub1r5jzkv3egpr5u42uvd48z7rls6xefxaz4xct00k9enfa4c0galmqmcn7ex #bermprotocol\\n\\n— berm\",\"id_str\":\"1900000000000000000\",\"user\":{\"id_str\":\"99999999999999999999\",\"screen_name\":\"alice\"}}"
+    }
+  },
+  "expectedNpub": "npub1r5jzkv3egpr5u42uvd48z7rls6xefxaz4xct00k9enfa4c0galmqmcn7ex",
+  "purpose": "an account id outside uint64 is refused — the R4 bound",
+  "branch": "grammar_accountid_uint64",
+  "expect": {
+    "ok": false,
+    "code": "bad_account_id"
+  },
+  "note": "twenty nines is correct SHAPE and is not a uint64. R3 rule 13 named no bound while rule 17 named one for postId; the boundary sweep found exactly this disagreement between two implementations",
+  "observedAt": 1741830275949,
+  "methodId": "berm.external_account_binding.x/2",
+  "methodHash": "sha256:a95319d8664b16ca355b3d82bc8c4d5bb6007c8aed65116a74447f79b0e5e193",
+  "vectorHash": "sha256:5384dc05f22a1b8ffbfd6b513143b9d89cf2a3466e283daea2710935f739049f"
+}
