@@ -1,0 +1,17 @@
+{
+  "schema": "berm.recovery_module/0.1",
+  "created_at": "2026-11-11T00:00:00.000Z",
+  "identity": {
+    "npub": "npub1synthetic",
+    "pubkey_hex": "abababababababababababababababababababababababababababababababab"
+  },
+  "recovery": {
+    "format": "nip49",
+    "ncryptsec": "ncryptsec1qqqq"
+  },
+  "derived": {
+    "evm": {
+      "address": "0xabababababababababababababababababababab"
+    }
+  }
+}

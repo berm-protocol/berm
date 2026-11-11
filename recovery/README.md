@@ -88,3 +88,10 @@ This is a clickable prototype on the dev signer, not the shipped Tier-1 signer.
 It asserts the verdict transitions across all four states, that the short
 passphrase is rejected, that both relays store a signature-valid event, that
 every loss path renders, and that the console stays clean throughout.
+
+## BRM Launch Edition 0.1 profile
+
+The existing recovery UI in this directory remains unchanged. The additional
+[BRM file profile](brm-0.1/PROFILE.md) documents Xonly's accepted encrypted file
+format and supplies structural conformance fixtures. It is not a new recovery
+UI, key store or generic wallet, and does not add an enrollment step.

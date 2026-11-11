@@ -105,3 +105,14 @@ These are the authority boundaries of that historical protocol-documentation
 checkpoint. They do not reverse later separately approved BermLaunch deployments.
 This documentation alignment candidate grants none of those live effects.
 
+
+## Current recovery profile — BRM 0.1
+
+`berm.recovery_module/0.1` describes the existing encrypted, user-owned BRM file.
+It restores the same identity and default EVM destination from one root; it is
+separate from public X evidence and application state. Recovery confirmation is
+decrypt/derive equality against the live vault, not proof of a saved-file reopen.
+No extra upload step is introduced. The current method stays
+`berm.external_account_binding.x/2`; this profile creates no `/3` or new protocol
+version. See [Recovery](docs/recovery) and the
+[exact profile](https://github.com/berm-protocol/berm/blob/main/recovery/brm-0.1/PROFILE.md).

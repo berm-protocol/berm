@@ -13,6 +13,55 @@ Read this before you need it. A recovery page that only helps *after* a loss is
 half a page — by the time you open it in anger, your options were already fixed
 by what you did or did not set up months earlier.
 
+## Berm Recovery Module 0.1
+
+**Berm Recovery Module (BRM)** is an encrypted, user-owned portable recovery file.
+The `.brm` plus its recovery password restores the same Berm/Nostr identity and
+the same BRM-derived default EVM destination on another device. It contains
+NIP-49 encrypted secret material and public identity/address metadata. One
+secp256k1 root produces both; the EVM address is not an unrelated second key.
+Keep the file private and its password separately. There is no server reset
+that recreates a lost root or password.
+
+Recovery decrypts the file, rederives npub, public key and EVM address, and checks
+each against the public metadata. Bad password or mismatched metadata fails
+closed. JSON shape validation alone does not prove cryptographic root equality.
+
+Created/exported and `BRM_RECOVERY_CONFIRMED` are different. Confirmation checks
+that the supplied BRM decrypts and matches the current vault's identity and EVM
+destination. The existing flow accepts supplied file text or in-memory BRM text.
+It does **not** prove that a file was saved or reopened, and this documentation
+adds no upload or mandatory file-reselection step. Confirmation remains local
+session state, never another `.brm` field. Existing generated-destination and
+session checks remain unchanged.
+
+An existing unlocked NIP-49 identity can be wrapped/re-encrypted into BRM without
+changing its root or npub: preservation, not identity rotation. An independently
+chosen BYO EVM destination remains available; the BRM does not hold its key or
+prove ownership of that external wallet.
+
+The private BRM is separate from public identity evidence. BRM does not prove X
+identity and does not contain X proof archives, campaign positions, financial
+claims, balances or application receipts. Recover application state separately
+from its authenticated records. The current X method remains
+`berm.external_account_binding.x/2`.
+
+Launch Edition 0.1 is not a generic wallet or signer. It includes no Solana/Zcash
+keys, passkeys, cloud sync, external-wallet seeds or OAuth credentials. The
+existing local Advanced EVM export exposes the same root controlling the Berm
+identity: explicit warning/confirmation is required, and the key must never be
+logged, sent to a server or placed in receipts.
+
+Read the [exact BRM profile](https://github.com/berm-protocol/berm/blob/main/recovery/brm-0.1/PROFILE.md),
+[closed schema](https://github.com/berm-protocol/berm/blob/main/recovery/brm-0.1/schema.json)
+and [synthetic shape vectors](https://github.com/berm-protocol/berm/blob/main/recovery/brm-0.1/shape-vectors.json).
+The schema checks the parser's exact shape, including its custom Date.parse
+format; prefix-only npub checking is not complete identity validation. See
+[Developer current](docs/developer-current) for offline commands.
+
+The remaining guidance below describes broader ecosystem custody and recovery.
+It does not add passkeys, guardians or synced credentials to the BRM file.
+
 ## The only question that matters
 
 > **If you lost this device right now, what would happen?**

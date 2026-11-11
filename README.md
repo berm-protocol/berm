@@ -31,6 +31,15 @@ The example proves local verification and portable evidence, not public validato
 operation. Installing a verifier does not create operator standing or authorize
 publication. Xonly hosts the separately reviewed browser-signing integration.
 
+## Recover your identity with BRM
+
+The **Berm Recovery Module (BRM)** is an encrypted, user-owned `.brm` file.
+With its password it restores the same Berm/Nostr identity and the same default
+EVM destination from one secp256k1 root. Public X evidence and application state
+remain separate. Read the [BRM 0.1 recovery profile](recovery/brm-0.1/PROFILE.md)
+and [recovery guide](docs/content/recovery.md). This documents the existing file
+contract; it does not change the current X `/2` method or add a new user step.
+
 ## Why “Berm”?
 
 In fortification, a berm is the strip of ground at the edge of a wall: close

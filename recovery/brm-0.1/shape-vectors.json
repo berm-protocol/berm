@@ -1,0 +1,802 @@
+{
+  "scope": "SYNTHETIC STRUCTURE ONLY. No usable encrypted secret, identity proof or recovery certification.",
+  "cases": [
+    {
+      "id": "synthetic-shape-only",
+      "shapeValid": true,
+      "value": {
+        "schema": "berm.recovery_module/0.1",
+        "created_at": "2026-11-11T00:00:00.000Z",
+        "identity": {
+          "npub": "npub1synthetic",
+          "pubkey_hex": "abababababababababababababababababababababababababababababababab"
+        },
+        "recovery": {
+          "format": "nip49",
+          "ncryptsec": "ncryptsec1qqqq"
+        },
+        "derived": {
+          "evm": {
+            "address": "0xabababababababababababababababababababab"
+          }
+        }
+      }
+    },
+    {
+      "id": "prefix-only-npub-not-cryptographic",
+      "shapeValid": true,
+      "value": {
+        "schema": "berm.recovery_module/0.1",
+        "created_at": "2026-11-11T00:00:00.000Z",
+        "identity": {
+          "npub": "npub1",
+          "pubkey_hex": "abababababababababababababababababababababababababababababababab"
+        },
+        "recovery": {
+          "format": "nip49",
+          "ncryptsec": "ncryptsec1qqqq"
+        },
+        "derived": {
+          "evm": {
+            "address": "0xabababababababababababababababababababab"
+          }
+        }
+      }
+    },
+    {
+      "id": "date-parse-year-compatible",
+      "shapeValid": true,
+      "value": {
+        "schema": "berm.recovery_module/0.1",
+        "created_at": "2026",
+        "identity": {
+          "npub": "npub1synthetic",
+          "pubkey_hex": "abababababababababababababababababababababababababababababababab"
+        },
+        "recovery": {
+          "format": "nip49",
+          "ncryptsec": "ncryptsec1qqqq"
+        },
+        "derived": {
+          "evm": {
+            "address": "0xabababababababababababababababababababab"
+          }
+        }
+      }
+    },
+    {
+      "id": "date-parse-normalized-compatible",
+      "shapeValid": true,
+      "value": {
+        "schema": "berm.recovery_module/0.1",
+        "created_at": "2026-02-30",
+        "identity": {
+          "npub": "npub1synthetic",
+          "pubkey_hex": "abababababababababababababababababababababababababababababababab"
+        },
+        "recovery": {
+          "format": "nip49",
+          "ncryptsec": "ncryptsec1qqqq"
+        },
+        "derived": {
+          "evm": {
+            "address": "0xabababababababababababababababababababab"
+          }
+        }
+      }
+    },
+    {
+      "id": "extra-top",
+      "shapeValid": false,
+      "value": {
+        "schema": "berm.recovery_module/0.1",
+        "created_at": "2026-11-11T00:00:00.000Z",
+        "identity": {
+          "npub": "npub1synthetic",
+          "pubkey_hex": "abababababababababababababababababababababababababababababababab"
+        },
+        "recovery": {
+          "format": "nip49",
+          "ncryptsec": "ncryptsec1qqqq"
+        },
+        "derived": {
+          "evm": {
+            "address": "0xabababababababababababababababababababab"
+          }
+        },
+        "extra": true
+      }
+    },
+    {
+      "id": "extra-identity",
+      "shapeValid": false,
+      "value": {
+        "schema": "berm.recovery_module/0.1",
+        "created_at": "2026-11-11T00:00:00.000Z",
+        "identity": {
+          "npub": "npub1synthetic",
+          "pubkey_hex": "abababababababababababababababababababababababababababababababab",
+          "extra": true
+        },
+        "recovery": {
+          "format": "nip49",
+          "ncryptsec": "ncryptsec1qqqq"
+        },
+        "derived": {
+          "evm": {
+            "address": "0xabababababababababababababababababababab"
+          }
+        }
+      }
+    },
+    {
+      "id": "extra-recovery",
+      "shapeValid": false,
+      "value": {
+        "schema": "berm.recovery_module/0.1",
+        "created_at": "2026-11-11T00:00:00.000Z",
+        "identity": {
+          "npub": "npub1synthetic",
+          "pubkey_hex": "abababababababababababababababababababababababababababababababab"
+        },
+        "recovery": {
+          "format": "nip49",
+          "ncryptsec": "ncryptsec1qqqq",
+          "extra": true
+        },
+        "derived": {
+          "evm": {
+            "address": "0xabababababababababababababababababababab"
+          }
+        }
+      }
+    },
+    {
+      "id": "extra-derived",
+      "shapeValid": false,
+      "value": {
+        "schema": "berm.recovery_module/0.1",
+        "created_at": "2026-11-11T00:00:00.000Z",
+        "identity": {
+          "npub": "npub1synthetic",
+          "pubkey_hex": "abababababababababababababababababababababababababababababababab"
+        },
+        "recovery": {
+          "format": "nip49",
+          "ncryptsec": "ncryptsec1qqqq"
+        },
+        "derived": {
+          "evm": {
+            "address": "0xabababababababababababababababababababab"
+          },
+          "extra": true
+        }
+      }
+    },
+    {
+      "id": "extra-derived.evm",
+      "shapeValid": false,
+      "value": {
+        "schema": "berm.recovery_module/0.1",
+        "created_at": "2026-11-11T00:00:00.000Z",
+        "identity": {
+          "npub": "npub1synthetic",
+          "pubkey_hex": "abababababababababababababababababababababababababababababababab"
+        },
+        "recovery": {
+          "format": "nip49",
+          "ncryptsec": "ncryptsec1qqqq"
+        },
+        "derived": {
+          "evm": {
+            "address": "0xabababababababababababababababababababab",
+            "extra": true
+          }
+        }
+      }
+    },
+    {
+      "id": "missing-schema",
+      "shapeValid": false,
+      "value": {
+        "created_at": "2026-11-11T00:00:00.000Z",
+        "identity": {
+          "npub": "npub1synthetic",
+          "pubkey_hex": "abababababababababababababababababababababababababababababababab"
+        },
+        "recovery": {
+          "format": "nip49",
+          "ncryptsec": "ncryptsec1qqqq"
+        },
+        "derived": {
+          "evm": {
+            "address": "0xabababababababababababababababababababab"
+          }
+        }
+      }
+    },
+    {
+      "id": "missing-created_at",
+      "shapeValid": false,
+      "value": {
+        "schema": "berm.recovery_module/0.1",
+        "identity": {
+          "npub": "npub1synthetic",
+          "pubkey_hex": "abababababababababababababababababababababababababababababababab"
+        },
+        "recovery": {
+          "format": "nip49",
+          "ncryptsec": "ncryptsec1qqqq"
+        },
+        "derived": {
+          "evm": {
+            "address": "0xabababababababababababababababababababab"
+          }
+        }
+      }
+    },
+    {
+      "id": "missing-identity",
+      "shapeValid": false,
+      "value": {
+        "schema": "berm.recovery_module/0.1",
+        "created_at": "2026-11-11T00:00:00.000Z",
+        "recovery": {
+          "format": "nip49",
+          "ncryptsec": "ncryptsec1qqqq"
+        },
+        "derived": {
+          "evm": {
+            "address": "0xabababababababababababababababababababab"
+          }
+        }
+      }
+    },
+    {
+      "id": "missing-recovery",
+      "shapeValid": false,
+      "value": {
+        "schema": "berm.recovery_module/0.1",
+        "created_at": "2026-11-11T00:00:00.000Z",
+        "identity": {
+          "npub": "npub1synthetic",
+          "pubkey_hex": "abababababababababababababababababababababababababababababababab"
+        },
+        "derived": {
+          "evm": {
+            "address": "0xabababababababababababababababababababab"
+          }
+        }
+      }
+    },
+    {
+      "id": "missing-derived",
+      "shapeValid": false,
+      "value": {
+        "schema": "berm.recovery_module/0.1",
+        "created_at": "2026-11-11T00:00:00.000Z",
+        "identity": {
+          "npub": "npub1synthetic",
+          "pubkey_hex": "abababababababababababababababababababababababababababababababab"
+        },
+        "recovery": {
+          "format": "nip49",
+          "ncryptsec": "ncryptsec1qqqq"
+        }
+      }
+    },
+    {
+      "id": "missing-identity.npub",
+      "shapeValid": false,
+      "value": {
+        "schema": "berm.recovery_module/0.1",
+        "created_at": "2026-11-11T00:00:00.000Z",
+        "identity": {
+          "pubkey_hex": "abababababababababababababababababababababababababababababababab"
+        },
+        "recovery": {
+          "format": "nip49",
+          "ncryptsec": "ncryptsec1qqqq"
+        },
+        "derived": {
+          "evm": {
+            "address": "0xabababababababababababababababababababab"
+          }
+        }
+      }
+    },
+    {
+      "id": "missing-identity.pubkey_hex",
+      "shapeValid": false,
+      "value": {
+        "schema": "berm.recovery_module/0.1",
+        "created_at": "2026-11-11T00:00:00.000Z",
+        "identity": {
+          "npub": "npub1synthetic"
+        },
+        "recovery": {
+          "format": "nip49",
+          "ncryptsec": "ncryptsec1qqqq"
+        },
+        "derived": {
+          "evm": {
+            "address": "0xabababababababababababababababababababab"
+          }
+        }
+      }
+    },
+    {
+      "id": "missing-recovery.format",
+      "shapeValid": false,
+      "value": {
+        "schema": "berm.recovery_module/0.1",
+        "created_at": "2026-11-11T00:00:00.000Z",
+        "identity": {
+          "npub": "npub1synthetic",
+          "pubkey_hex": "abababababababababababababababababababababababababababababababab"
+        },
+        "recovery": {
+          "ncryptsec": "ncryptsec1qqqq"
+        },
+        "derived": {
+          "evm": {
+            "address": "0xabababababababababababababababababababab"
+          }
+        }
+      }
+    },
+    {
+      "id": "missing-recovery.ncryptsec",
+      "shapeValid": false,
+      "value": {
+        "schema": "berm.recovery_module/0.1",
+        "created_at": "2026-11-11T00:00:00.000Z",
+        "identity": {
+          "npub": "npub1synthetic",
+          "pubkey_hex": "abababababababababababababababababababababababababababababababab"
+        },
+        "recovery": {
+          "format": "nip49"
+        },
+        "derived": {
+          "evm": {
+            "address": "0xabababababababababababababababababababab"
+          }
+        }
+      }
+    },
+    {
+      "id": "missing-derived.evm",
+      "shapeValid": false,
+      "value": {
+        "schema": "berm.recovery_module/0.1",
+        "created_at": "2026-11-11T00:00:00.000Z",
+        "identity": {
+          "npub": "npub1synthetic",
+          "pubkey_hex": "abababababababababababababababababababababababababababababababab"
+        },
+        "recovery": {
+          "format": "nip49",
+          "ncryptsec": "ncryptsec1qqqq"
+        },
+        "derived": {}
+      }
+    },
+    {
+      "id": "missing-derived.evm.address",
+      "shapeValid": false,
+      "value": {
+        "schema": "berm.recovery_module/0.1",
+        "created_at": "2026-11-11T00:00:00.000Z",
+        "identity": {
+          "npub": "npub1synthetic",
+          "pubkey_hex": "abababababababababababababababababababababababababababababababab"
+        },
+        "recovery": {
+          "format": "nip49",
+          "ncryptsec": "ncryptsec1qqqq"
+        },
+        "derived": {
+          "evm": {}
+        }
+      }
+    },
+    {
+      "id": "wrong-schema",
+      "shapeValid": false,
+      "value": {
+        "schema": "berm.recovery_module/0.2",
+        "created_at": "2026-11-11T00:00:00.000Z",
+        "identity": {
+          "npub": "npub1synthetic",
+          "pubkey_hex": "abababababababababababababababababababababababababababababababab"
+        },
+        "recovery": {
+          "format": "nip49",
+          "ncryptsec": "ncryptsec1qqqq"
+        },
+        "derived": {
+          "evm": {
+            "address": "0xabababababababababababababababababababab"
+          }
+        }
+      }
+    },
+    {
+      "id": "bad-date",
+      "shapeValid": false,
+      "value": {
+        "schema": "berm.recovery_module/0.1",
+        "created_at": "not-a-date",
+        "identity": {
+          "npub": "npub1synthetic",
+          "pubkey_hex": "abababababababababababababababababababababababababababababababab"
+        },
+        "recovery": {
+          "format": "nip49",
+          "ncryptsec": "ncryptsec1qqqq"
+        },
+        "derived": {
+          "evm": {
+            "address": "0xabababababababababababababababababababab"
+          }
+        }
+      }
+    },
+    {
+      "id": "date-not-string",
+      "shapeValid": false,
+      "value": {
+        "schema": "berm.recovery_module/0.1",
+        "created_at": 123,
+        "identity": {
+          "npub": "npub1synthetic",
+          "pubkey_hex": "abababababababababababababababababababababababababababababababab"
+        },
+        "recovery": {
+          "format": "nip49",
+          "ncryptsec": "ncryptsec1qqqq"
+        },
+        "derived": {
+          "evm": {
+            "address": "0xabababababababababababababababababababab"
+          }
+        }
+      }
+    },
+    {
+      "id": "bad-npub-prefix",
+      "shapeValid": false,
+      "value": {
+        "schema": "berm.recovery_module/0.1",
+        "created_at": "2026-11-11T00:00:00.000Z",
+        "identity": {
+          "npub": "nsec1fake",
+          "pubkey_hex": "abababababababababababababababababababababababababababababababab"
+        },
+        "recovery": {
+          "format": "nip49",
+          "ncryptsec": "ncryptsec1qqqq"
+        },
+        "derived": {
+          "evm": {
+            "address": "0xabababababababababababababababababababab"
+          }
+        }
+      }
+    },
+    {
+      "id": "npub-not-string",
+      "shapeValid": false,
+      "value": {
+        "schema": "berm.recovery_module/0.1",
+        "created_at": "2026-11-11T00:00:00.000Z",
+        "identity": {
+          "npub": 42,
+          "pubkey_hex": "abababababababababababababababababababababababababababababababab"
+        },
+        "recovery": {
+          "format": "nip49",
+          "ncryptsec": "ncryptsec1qqqq"
+        },
+        "derived": {
+          "evm": {
+            "address": "0xabababababababababababababababababababab"
+          }
+        }
+      }
+    },
+    {
+      "id": "pubkey-uppercase",
+      "shapeValid": false,
+      "value": {
+        "schema": "berm.recovery_module/0.1",
+        "created_at": "2026-11-11T00:00:00.000Z",
+        "identity": {
+          "npub": "npub1synthetic",
+          "pubkey_hex": "ABABABABABABABABABABABABABABABABABABABABABABABABABABABABABABABAB"
+        },
+        "recovery": {
+          "format": "nip49",
+          "ncryptsec": "ncryptsec1qqqq"
+        },
+        "derived": {
+          "evm": {
+            "address": "0xabababababababababababababababababababab"
+          }
+        }
+      }
+    },
+    {
+      "id": "pubkey-short",
+      "shapeValid": false,
+      "value": {
+        "schema": "berm.recovery_module/0.1",
+        "created_at": "2026-11-11T00:00:00.000Z",
+        "identity": {
+          "npub": "npub1synthetic",
+          "pubkey_hex": "ababababababababababababababababababababababababababababababab"
+        },
+        "recovery": {
+          "format": "nip49",
+          "ncryptsec": "ncryptsec1qqqq"
+        },
+        "derived": {
+          "evm": {
+            "address": "0xabababababababababababababababababababab"
+          }
+        }
+      }
+    },
+    {
+      "id": "pubkey-nonhex",
+      "shapeValid": false,
+      "value": {
+        "schema": "berm.recovery_module/0.1",
+        "created_at": "2026-11-11T00:00:00.000Z",
+        "identity": {
+          "npub": "npub1synthetic",
+          "pubkey_hex": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz"
+        },
+        "recovery": {
+          "format": "nip49",
+          "ncryptsec": "ncryptsec1qqqq"
+        },
+        "derived": {
+          "evm": {
+            "address": "0xabababababababababababababababababababab"
+          }
+        }
+      }
+    },
+    {
+      "id": "wrong-format",
+      "shapeValid": false,
+      "value": {
+        "schema": "berm.recovery_module/0.1",
+        "created_at": "2026-11-11T00:00:00.000Z",
+        "identity": {
+          "npub": "npub1synthetic",
+          "pubkey_hex": "abababababababababababababababababababababababababababababababab"
+        },
+        "recovery": {
+          "format": "plaintext",
+          "ncryptsec": "ncryptsec1qqqq"
+        },
+        "derived": {
+          "evm": {
+            "address": "0xabababababababababababababababababababab"
+          }
+        }
+      }
+    },
+    {
+      "id": "bad-ncryptsec-prefix",
+      "shapeValid": false,
+      "value": {
+        "schema": "berm.recovery_module/0.1",
+        "created_at": "2026-11-11T00:00:00.000Z",
+        "identity": {
+          "npub": "npub1synthetic",
+          "pubkey_hex": "abababababababababababababababababababababababababababababababab"
+        },
+        "recovery": {
+          "format": "nip49",
+          "ncryptsec": "nsec1qqqq"
+        },
+        "derived": {
+          "evm": {
+            "address": "0xabababababababababababababababababababab"
+          }
+        }
+      }
+    },
+    {
+      "id": "bad-ncryptsec-alphabet",
+      "shapeValid": false,
+      "value": {
+        "schema": "berm.recovery_module/0.1",
+        "created_at": "2026-11-11T00:00:00.000Z",
+        "identity": {
+          "npub": "npub1synthetic",
+          "pubkey_hex": "abababababababababababababababababababababababababababababababab"
+        },
+        "recovery": {
+          "format": "nip49",
+          "ncryptsec": "ncryptsec1boi"
+        },
+        "derived": {
+          "evm": {
+            "address": "0xabababababababababababababababababababab"
+          }
+        }
+      }
+    },
+    {
+      "id": "empty-ncryptsec-payload",
+      "shapeValid": false,
+      "value": {
+        "schema": "berm.recovery_module/0.1",
+        "created_at": "2026-11-11T00:00:00.000Z",
+        "identity": {
+          "npub": "npub1synthetic",
+          "pubkey_hex": "abababababababababababababababababababababababababababababababab"
+        },
+        "recovery": {
+          "format": "nip49",
+          "ncryptsec": "ncryptsec1"
+        },
+        "derived": {
+          "evm": {
+            "address": "0xabababababababababababababababababababab"
+          }
+        }
+      }
+    },
+    {
+      "id": "address-uppercase",
+      "shapeValid": false,
+      "value": {
+        "schema": "berm.recovery_module/0.1",
+        "created_at": "2026-11-11T00:00:00.000Z",
+        "identity": {
+          "npub": "npub1synthetic",
+          "pubkey_hex": "abababababababababababababababababababababababababababababababab"
+        },
+        "recovery": {
+          "format": "nip49",
+          "ncryptsec": "ncryptsec1qqqq"
+        },
+        "derived": {
+          "evm": {
+            "address": "0xABABABABABABABABABABABABABABABABABABABAB"
+          }
+        }
+      }
+    },
+    {
+      "id": "address-short",
+      "shapeValid": false,
+      "value": {
+        "schema": "berm.recovery_module/0.1",
+        "created_at": "2026-11-11T00:00:00.000Z",
+        "identity": {
+          "npub": "npub1synthetic",
+          "pubkey_hex": "abababababababababababababababababababababababababababababababab"
+        },
+        "recovery": {
+          "format": "nip49",
+          "ncryptsec": "ncryptsec1qqqq"
+        },
+        "derived": {
+          "evm": {
+            "address": "0xababababababababababababababababababab"
+          }
+        }
+      }
+    },
+    {
+      "id": "address-nonhex",
+      "shapeValid": false,
+      "value": {
+        "schema": "berm.recovery_module/0.1",
+        "created_at": "2026-11-11T00:00:00.000Z",
+        "identity": {
+          "npub": "npub1synthetic",
+          "pubkey_hex": "abababababababababababababababababababababababababababababababab"
+        },
+        "recovery": {
+          "format": "nip49",
+          "ncryptsec": "ncryptsec1qqqq"
+        },
+        "derived": {
+          "evm": {
+            "address": "0xzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz"
+          }
+        }
+      }
+    },
+    {
+      "id": "array-identity",
+      "shapeValid": false,
+      "value": {
+        "schema": "berm.recovery_module/0.1",
+        "created_at": "2026-11-11T00:00:00.000Z",
+        "identity": [],
+        "recovery": {
+          "format": "nip49",
+          "ncryptsec": "ncryptsec1qqqq"
+        },
+        "derived": {
+          "evm": {
+            "address": "0xabababababababababababababababababababab"
+          }
+        }
+      }
+    },
+    {
+      "id": "array-recovery",
+      "shapeValid": false,
+      "value": {
+        "schema": "berm.recovery_module/0.1",
+        "created_at": "2026-11-11T00:00:00.000Z",
+        "identity": {
+          "npub": "npub1synthetic",
+          "pubkey_hex": "abababababababababababababababababababababababababababababababab"
+        },
+        "recovery": [],
+        "derived": {
+          "evm": {
+            "address": "0xabababababababababababababababababababab"
+          }
+        }
+      }
+    },
+    {
+      "id": "array-derived",
+      "shapeValid": false,
+      "value": {
+        "schema": "berm.recovery_module/0.1",
+        "created_at": "2026-11-11T00:00:00.000Z",
+        "identity": {
+          "npub": "npub1synthetic",
+          "pubkey_hex": "abababababababababababababababababababababababababababababababab"
+        },
+        "recovery": {
+          "format": "nip49",
+          "ncryptsec": "ncryptsec1qqqq"
+        },
+        "derived": []
+      }
+    },
+    {
+      "id": "array-derived.evm",
+      "shapeValid": false,
+      "value": {
+        "schema": "berm.recovery_module/0.1",
+        "created_at": "2026-11-11T00:00:00.000Z",
+        "identity": {
+          "npub": "npub1synthetic",
+          "pubkey_hex": "abababababababababababababababababababababababababababababababab"
+        },
+        "recovery": {
+          "format": "nip49",
+          "ncryptsec": "ncryptsec1qqqq"
+        },
+        "derived": {
+          "evm": []
+        }
+      }
+    },
+    {
+      "id": "top-array",
+      "shapeValid": false,
+      "value": []
+    },
+    {
+      "id": "top-null",
+      "shapeValid": false,
+      "value": null
+    }
+  ]
+}

@@ -115,5 +115,14 @@
       "id": "privileged X API statuses/show with Bearer token (genesis-prep R1, HEAD 381274173b4375fe603ce1983e4e071815173997)",
       "standing": "QUARANTINED__REJECTED_DESIGN__NEVER_A_BASE"
     }
-  ]
+  ],
+  "recoveryProfile": {
+    "id": "berm.recovery_module/0.1",
+    "role": "DOCUMENTATION_OF_EXISTING_IMPLEMENTATION",
+    "profile": "recovery/brm-0.1/PROFILE.md",
+    "schema": "recovery/brm-0.1/schema.json",
+    "implementationHead": "5fff347e044a69b99d408aab772ece0f1136259f",
+    "externalBindingUnchanged": true,
+    "newRuntimeOrPin": false
+  }
 }

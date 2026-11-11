@@ -1,0 +1,45 @@
+{
+  "role": "Read-only implementation provenance, not a new runtime or pin",
+  "head": "5fff347e044a69b99d408aab772ece0f1136259f",
+  "tree": "a1d6ae7937e63a7625a56a996bd7a6895b27c746",
+  "files": {
+    "signer/src/brm.ts": {
+      "sha256": "67e54716d3016ff965bd08fdd67a2e0f20a677289a8b730e31409269a511c57b",
+      "bytes": 5136
+    },
+    "signer/src/vault.ts": {
+      "sha256": "c0dca6e8aaadae9e1535130a4d344c445c837455411eba02ee16e79cffe86b37",
+      "bytes": 11579
+    },
+    "signer/src/brm-r3-enrollment-main.ts": {
+      "sha256": "b1094a6674004bec32abd2079d0b241b696a01bb60ffee667c71ee010bf8e6d2",
+      "bytes": 5035
+    },
+    "signer/src/brm-r3-enrollment-broker.ts": {
+      "sha256": "55d860893455276a4472149d30df2e304747e75ec2072c203b5923bb01e5e591",
+      "bytes": 4196
+    },
+    "signer/test/brm-broker.test.mjs": {
+      "sha256": "6e5f2ff6cd7047b5df681bc50216ad2e2b0cc093af513b303a1cb41e4b57d94c",
+      "bytes": 2375
+    },
+    "signer/test/brm-security.test.mjs": {
+      "sha256": "4a4f7a9a65e752584a02e3a381a5022c3490d851e91ff2ef3a6f4691bfe4eca9",
+      "bytes": 1954
+    },
+    "signer/test/brm-session-binding.test.mjs": {
+      "sha256": "36ecc003ae452c0bc9a2ee7884c19c257ac4dcd9a3c8f7a7903de7c2766c1c9b",
+      "bytes": 4021
+    },
+    "signer/test/brm-vault.test.mjs": {
+      "sha256": "e21e8abbf90cdd44a7d206ed3bc769d241ff3502f459154ab34504045519c62e",
+      "bytes": 3093
+    },
+    "signer/test/brm.test.mjs": {
+      "sha256": "dafd57994c2acdda287d032e55054ccc540770e6de1eb29e1a0a8741fc77d4c1",
+      "bytes": 2859
+    }
+  },
+  "founderClarification": "Recovery confirmation means decrypt/derive equality against the live vault. It does not prove a saved/downloaded file was reopened. No additional user step.",
+  "sourceUrl": "https://github.com/xonly-ai/xonly/tree/5fff347e044a69b99d408aab772ece0f1136259f/signer/src"
+}

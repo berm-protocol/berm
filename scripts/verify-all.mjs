@@ -34,6 +34,12 @@ const ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
  * if a declaration stops covering reality, so this list cannot quietly rot.
  */
 const GROUPS = [
+  { name: 'brm-profile', dir: 'recovery/brm-0.1', why: 'existing BRM file shape and truthful recovery documentation', steps: [
+    ['npm', ['ci', '--no-audit', '--no-fund']],
+    ['node', ['--test', 'test.mjs']],
+    ['node', ['../../docs/build.mjs']],
+    ['node', ['../../scripts/check-brm-docs.mjs']],
+  ]},
   { name: 'external-binding-v2', dir: '.', why: 'exact current method, signed evidence, fresh developer example and source drift', steps: [
     ['node', ['sdk/external-binding-v2/verify.mjs']],
     ['node', ['--test', 'sdk/external-binding-v2/test.mjs']],
